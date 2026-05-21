@@ -1,0 +1,77 @@
+{
+  "name": "@chimichurricode/design-system",
+  "version": "0.7.1",
+  "description": "Chimi design system — tokens (colors, typography, recipes) as CSS variables and ES modules, plus shared Astro components and SEO helpers.",
+  "type": "module",
+  "files": [
+    "dist",
+    "tokens",
+    "components",
+    "assets",
+    "web.css",
+    "fonts.css",
+    "site-registry.ts",
+    "seo/index.mjs",
+    "seo/defaults.mjs",
+    "seo/defaults.d.ts",
+    "seo/json-ld.mjs",
+    "seo/alternates.mjs",
+    "seo/sitemap.mjs",
+    "seo/robots.mjs",
+    "seo/manifest.mjs",
+    "seo/render-head.mjs",
+    "seo/site-registry-runtime.generated.mjs",
+    "seo/README.md"
+  ],
+  "exports": {
+    "./tokens.css": "./dist/tokens.css",
+    "./web.css": "./web.css",
+    "./fonts.css": "./fonts.css",
+    "./ecosystem": "./components/ecosystem.ts",
+    "./SiteHeader.astro": "./components/SiteHeader.astro",
+    "./SiteFooter.astro": "./components/SiteFooter.astro",
+    "./SocialIcons.astro": "./components/SocialIcons.astro",
+    "./ThemeBootstrap.astro": "./components/ThemeBootstrap.astro",
+    "./ThemeIcons.astro": "./components/ThemeIcons.astro",
+    "./SEOHead.astro": "./components/SEOHead.astro",
+    "./BrandMark.astro": "./components/BrandMark.astro",
+    "./BrandFavicon.astro": "./components/BrandFavicon.astro",
+    "./BrandLogoWordmark.astro": "./components/BrandLogoWordmark.astro",
+    "./BrandLogoCircle.astro": "./components/BrandLogoCircle.astro",
+    "./seo": "./seo/index.mjs",
+    "./seo/defaults": {
+      "types": "./seo/defaults.d.ts",
+      "default": "./seo/defaults.mjs"
+    },
+    "./seo/json-ld": "./seo/json-ld.mjs",
+    "./seo/alternates": "./seo/alternates.mjs",
+    "./seo/sitemap": "./seo/sitemap.mjs",
+    "./seo/robots": "./seo/robots.mjs",
+    "./seo/manifest": "./seo/manifest.mjs",
+    "./seo/render-head": "./seo/render-head.mjs",
+    "./assets/logos/favicon.svg": "./assets/logos/favicon.svg",
+    "./assets/logos/logo-character.svg": "./assets/logos/logo-character.svg",
+    "./assets/logos/logo-circle.svg": "./assets/logos/logo-circle.svg",
+    "./assets/logos/logo-code.svg": "./assets/logos/logo-code.svg",
+    "./assets/icons/*": "./assets/icons/*",
+    "./assets/og/*": "./assets/og/*",
+    "./site-registry": "./site-registry.ts",
+    "./site-registry-runtime": "./seo/site-registry-runtime.generated.mjs",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build:registry": "bun scripts/emit-site-registry-runtime.mjs",
+    "build": "bun run build:registry && bun config.mjs"
+  },
+  "peerDependencies": {
+    "astro": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "astro": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "style-dictionary": "^4.4.0"
+  }
+}

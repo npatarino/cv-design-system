@@ -1,0 +1,96 @@
+{
+  "_comment": "Type recipes — whitelist of font families allowed per color recipe.",
+  "_metadataNote": "This file is METADATA, not a token source. It is NOT emitted to dist/tokens.css and NOT listed under config.mjs::source. Consumers: scripts/check-recipes.mjs (linter) and packages/talks/_data/typeRecipes.js (gallery captions). Color recipes (the actual tokens that produce CSS variables) live in color.recipe.json.",
+  "_schema": "Each recipe declares which of the 5 type families (display, body, editorial, data, code) is primary, secondary or disallowed, plus meta flags for usage rules. Critical has two modes: bg (full slide) and fg (overlay role on a carrier recipe). See docs/recipes.md.",
+
+  "type": {
+    "recipe": {
+      "canvas-quiet": {
+        "_description": "Display + body + editorial + code. Sin data.",
+        "primary":     ["display", "body", "code"],
+        "secondary":   ["editorial"],
+        "disallowed":  ["data"],
+        "meta": { "allowMultipleAccents": false, "allowMultipleStats": false, "allowDeckOverride": false }
+      },
+      "canvas-signal": {
+        "_description": "Data primary. Display secondary. Editorial limitado a 1 línea descriptora.",
+        "primary":     ["data", "code"],
+        "secondary":   ["display", "body", "editorial"],
+        "disallowed":  [],
+        "meta": { "allowMultipleAccents": false, "allowMultipleStats": false, "allowDeckOverride": false }
+      },
+      "paper": {
+        "_description": "Editorial primary. Display downscaled. Sin data. Soporta em patagonia y warn red.",
+        "primary":     ["editorial", "body", "code"],
+        "secondary":   ["display"],
+        "disallowed":  ["data"],
+        "meta": { "allowMultipleAccents": false, "allowMultipleStats": false, "allowDeckOverride": false }
+      },
+      "energy-loud": {
+        "_description": "Display máximo. Data opcional (1 stat máx). Body floor 16px sin opacidad. Scilla solo como em-word inline.",
+        "primary":     ["display", "code"],
+        "secondary":   ["body", "data", "editorial"],
+        "disallowed":  [],
+        "meta": { "allowMultipleAccents": false, "allowMultipleStats": false, "allowDeckOverride": false, "maxOneStat": true, "bodyFloorPx": 16 }
+      },
+      "cool-fresh": {
+        "_description": "Display + editorial supporting + code. Sin data. Body solo en CTAs cortas.",
+        "primary":     ["display", "editorial", "code"],
+        "secondary":   ["body"],
+        "disallowed":  ["data"],
+        "meta": { "allowMultipleAccents": false, "allowMultipleStats": false, "allowDeckOverride": false }
+      },
+      "critical": {
+        "_description": "Bg: display + editorial 1 línea + code. Fg: la recipe portadora manda; critical solo en el rol que esté marcando.",
+        "primary":     ["display", "code"],
+        "secondary":   ["editorial"],
+        "disallowed":  ["body", "data"],
+        "meta": {
+          "allowMultipleAccents": false,
+          "allowMultipleStats": false,
+          "allowDeckOverride": false,
+          "fg": {
+            "_description": "Reglas para uso de critical como fg en otras recipes. La recipe portadora manda los pairings normales — critical solo aparece en el rol .critical-fg-<role>.",
+            "allowedRoles": ["stat", "quote", "eyebrow", "marker", "display-word"],
+            "maxPerSlide": 1,
+            "disallowedHosts": ["energy-loud", "cool-fresh"]
+          }
+        }
+      }
+    },
+
+    "_namedExceptions": {
+      "_description": "Excepciones nombradas reusables. Cada template afectado las referencia por nombre. NO ad-hoc por template.",
+
+      "allowMultipleAccents": {
+        "description": "Permite los 4 roles del recipe (surface/ink/em/accent/warn) en simultáneo como código visual, no decorativo.",
+        "appliesTo": [
+          "kpi-grid-default",
+          "chart-bar",
+          "chart-line",
+          "matrix-default",
+          "stack-default",
+          "three-ideas-default"
+        ]
+      },
+
+      "allowMultipleStats": {
+        "description": "Permite Thunder repetido (más de 1 stat).",
+        "appliesTo": [
+          "kpi-grid-default",
+          "comparison-table-default",
+          "chart-bar",
+          "chart-line",
+          "three-ideas-default"
+        ]
+      },
+
+      "allowDeckOverride": {
+        "description": "La recipe se decide a nivel deck (frontmatter del .md), no a nivel template.",
+        "appliesTo": [
+          "closing-socials-default"
+        ]
+      }
+    }
+  }
+}

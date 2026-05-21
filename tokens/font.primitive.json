@@ -1,0 +1,19 @@
+{
+  "primitives": {
+    "font": {
+      "family": {
+        "chaney":    { "$value": "'CHANEY', 'Archivo Black', 'Impact', sans-serif",        "$type": "fontFamily", "$description": "CHANEY — condensed display face." },
+        "atAero":    { "$value": "'At Aero', 'Archivo', 'Helvetica Neue', sans-serif",     "$type": "fontFamily", "$description": "At Aero — neutral sans for body copy." },
+        "scilla":    { "$value": "'Scilla Narrow', 'Playfair Display', Georgia, serif",    "$type": "fontFamily", "$description": "Scilla Narrow — italic serif for emphasis and quotes." },
+        "thunder":   { "$value": "'Thunder', 'Oswald', 'Helvetica Neue', sans-serif",      "$type": "fontFamily", "$description": "Thunder — tall condensed sans for data." },
+        "nudicaMono": { "$value": "'Nudica Mono', 'Courier New', monospace",                "$type": "fontFamily", "$description": "Nudica Mono — for labels, eyebrows and code." }
+      },
+      "weight": {
+        "regular":  { "$value": "400", "$type": "fontWeight" },
+        "medium":   { "$value": "500", "$type": "fontWeight" },
+        "semibold": { "$value": "600", "$type": "fontWeight" },
+        "bold":     { "$value": "700", "$type": "fontWeight" }
+      }
+    }
+  }
+}

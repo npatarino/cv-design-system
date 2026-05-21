@@ -1,0 +1,329 @@
+/*
+ * Web-scale stylesheet for Chimi sites.
+ *
+ * Why this exists:
+ *   The DS type composites (--chimi-type-*) are slide-scale (1920×1080),
+ *   so each web needs to compose web-scale sizes. Before this file, all
+ *   5 webs duplicated near-identical CSS for tokens, reset, base styles
+ *   and utilities. This centralizes the shared layer.
+ *
+ * Layered import:
+ *   This file pulls in tokens.css and fonts.css automatically, so
+ *   consumers only need:
+ *     @import "@chimi/design-system/web.css";
+ *
+ *   Sites must also have the binary font files at /fonts/ on their
+ *   served root. Run `sync-dir.mjs fonts public/fonts` in prebuild.
+ *
+ * Per-site overrides:
+ *   --page-max defaults to 1120px. Sites with narrower content set their
+ *   own value in their global.css after the import.
+ *   Same for any --web-* size: redefine in :root and the cascade wins.
+ */
+@import "./dist/tokens.css";
+@import "./dist/breakpoints.css";
+@import "./fonts.css";
+
+:root {
+  /* ── layout ──────────────────────────────────────────────────────────
+   * --page-max defaults to --bp-xl (1280px). Editorial webs that prefer
+   * a narrower content column override --page-max in their own :root
+   * (blog/techconf/pdf/rfp/poker each pick their canonical width).
+   * --page-pad is the inline gutter for .container; not overridden today.
+   * Tighter mobile pad (16px) keeps the container readable below 480px.
+   */
+  --page-max: var(--bp-xl);
+  --page-pad: clamp(16px, 4vw, 56px);
+
+  --stack-xs: 8px;
+  --stack-sm: 16px;
+  --stack-md: 24px;
+  --stack-lg: 48px;
+  --stack-xl: 96px;
+  --stack-2xl: 144px;
+
+  /* ── role tokens (derived from --recipe-ink / --recipe-accent) ───────
+   * Percentages tuned for ivory ink on charcoal surface (canvas-quiet,
+   * default). Recipes that flip the contrast direction (paper
+   * with charcoal ink on ivory) read heavier at the same alpha, so we
+   * re-tune in :root[data-theme="light"] for that case (the recipes
+   * themselves now carry per-theme overrides via $extensions.chimi.theme.light
+   * in tokens/color.recipe.json — this block only re-tunes the alpha mixes).
+   */
+  --hairline:        color-mix(in srgb, var(--recipe-ink) 12%, transparent);
+  --hairline-strong: color-mix(in srgb, var(--recipe-ink) 24%, transparent);
+  --muted:           color-mix(in srgb, var(--recipe-ink) 62%, transparent);
+  --muted-strong:    color-mix(in srgb, var(--recipe-ink) 80%, transparent);
+  --row-bg:          color-mix(in srgb, var(--recipe-ink) 4%, transparent);
+  --row-bg-hover:    color-mix(in srgb, var(--recipe-accent) 8%, transparent);
+  --surface-raised:  color-mix(in srgb, var(--recipe-ink) 6%, transparent);
+
+  /* ── web-scale type composites (canonical = blog) ──────────────────── */
+  --web-display-xl: var(--chimi-type-display-xl-fontWeight) clamp(64px, 9vw, 128px)/0.92 var(--chimi-font-family-display);
+  --web-display-lg: var(--chimi-type-display-lg-fontWeight) clamp(48px, 6vw, 88px)/0.95  var(--chimi-font-family-display);
+  --web-display-md: var(--chimi-type-display-md-fontWeight) clamp(32px, 4vw, 56px)/1     var(--chimi-font-family-display);
+  --web-display-sm: var(--chimi-type-display-md-fontWeight) clamp(24px, 2.6vw, 32px)/1.05 var(--chimi-font-family-display);
+
+  --web-editorial-lg: italic clamp(22px, 2.4vw, 32px)/1.35 var(--chimi-font-family-editorial);
+  --web-editorial-md: italic clamp(18px, 1.8vw, 22px)/1.45 var(--chimi-font-family-editorial);
+
+  /* Body type clamps floor at 16px — below that mobile Safari triggers
+     zoom-on-focus on inputs and accessibility guidance fails (computed
+     font-size ≥ 16px is the standard mobile readability threshold).
+     Body-lg keeps a tighter range for editorial leads. */
+  --web-body-lg: var(--chimi-type-body-lg-fontWeight) clamp(17px, 1.4vw, 20px)/1.6  var(--chimi-font-family-body);
+  --web-body-md: var(--chimi-type-body-md-fontWeight) clamp(16px, 1.1vw, 17px)/1.55 var(--chimi-font-family-body);
+
+  --web-eyebrow: var(--chimi-type-eyebrow-md-fontWeight) 12px/1   var(--chimi-font-family-code);
+  --web-mono-sm: var(--chimi-type-eyebrow-sm-fontWeight) 13px/1.4 var(--chimi-font-family-code);
+  --web-meta:    var(--chimi-type-body-md-fontWeight) 13px/1.4 var(--chimi-font-family-body);
+}
+
+/* Default recipe for webs that haven't opted into a specific one yet.
+   Webs override by setting data-recipe="<id>" on <body>. The values match
+   canvas-quiet so unmigrated pages render exactly as they did pre-recipes. */
+:root:not([data-recipe]) {
+  --recipe-surface: var(--chimi-color-recipe-canvas-quiet-surface);
+  --recipe-ink:     var(--chimi-color-recipe-canvas-quiet-ink);
+  --recipe-em:      var(--chimi-color-recipe-canvas-quiet-em);
+  --recipe-accent:  var(--chimi-color-recipe-canvas-quiet-accent);
+  --recipe-warn:    var(--chimi-color-recipe-canvas-quiet-warn);
+}
+
+/* ── web-only override: paper recipes get patagonia accent ───────────────
+ * Slides on paper use charcoal as accent because long-form
+ * editorial reads cleaner without a chromatic CTA. Webs need a brand color
+ * for nav/links/CTAs to stand out from body charcoal — without it, every
+ * action collapses into the text. We re-map --recipe-accent here only,
+ * leaving em/warn/ink/surface untouched (so the recipe's typographic
+ * intent is preserved).
+ *
+ * Contrast: patagonia (#02B5B9) on ivory (#FAFAF8) hits ~2.5:1 — fine for
+ * UI/borders/icons (AA UI 3:1), but body links must stay charcoal-ink with
+ * underline. .btn.primary in paper recipes uses ink text on accent fill
+ * (charcoal on patagonia ≈ 5.7:1) — see button overrides below.
+ */
+[data-recipe="paper"] {
+  --recipe-accent: var(--chimi-color-recipe-canvas-quiet-accent); /* patagonia */
+}
+
+/* ── light-theme derived-token overrides ─────────────────────────────────
+ * Charcoal ink on ivory reads heavier than ivory ink on charcoal at the
+ * same alpha, so we drop the mix percentages by ~30–40% to keep hairlines
+ * and muted text from feeling oppressive in light mode. The recipe
+ * surface/ink/em variables themselves are flipped natively by tokens.css
+ * (see canvas-quiet/canvas-signal $extensions.chimi.theme.light overrides
+ * in tokens/color.recipe.json); this block only re-tunes the derived
+ * alpha mixes that depend on the inverted contrast direction.
+ */
+:root[data-theme="light"] {
+  --hairline:        color-mix(in srgb, var(--recipe-ink) 8%, transparent);
+  --hairline-strong: color-mix(in srgb, var(--recipe-ink) 16%, transparent);
+  --muted:           color-mix(in srgb, var(--recipe-ink) 55%, transparent);
+  --muted-strong:    color-mix(in srgb, var(--recipe-ink) 72%, transparent);
+  --row-bg:          color-mix(in srgb, var(--recipe-ink) 3%, transparent);
+  --row-bg-hover:    color-mix(in srgb, var(--recipe-accent) 12%, transparent);
+  --surface-raised:  color-mix(in srgb, var(--recipe-ink) 4%, transparent);
+}
+
+/* ── reset + base ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--recipe-surface);
+  color: var(--recipe-ink);
+  font: var(--web-body-md);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: inherit; text-decoration: none; transition: color 120ms ease; }
+a:hover { color: var(--recipe-accent); }
+
+img, svg { max-width: 100%; display: block; }
+
+[hidden] { display: none !important; }
+
+/* ── layout utilities ──────────────────────────────────────────────────
+ * .container is the canonical width-bounded wrapper for editorial pages.
+ * width: 100% is explicit so block-level defaults aren't relied on; webs
+ * that need a narrower max set --page-max in their own :root.
+ */
+.container {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-pad);
+}
+
+/* Vertical stack helpers — pair with the --stack-* tokens above so webs
+   compose layouts without re-declaring `display: flex; flex-direction: column`.
+   Use the size that matches the rhythm: sm for tightly grouped meta,
+   md for related content, lg for distinct sections. */
+.stack-sm { display: flex; flex-direction: column; gap: var(--stack-sm); }
+.stack-md { display: flex; flex-direction: column; gap: var(--stack-md); }
+.stack-lg { display: flex; flex-direction: column; gap: var(--stack-lg); }
+
+/* Visibility helpers gated by the canonical --md (768px) breakpoint.
+   `revert` (rather than `block`/`flex`) restores whatever the element's
+   intrinsic display would be, so these helpers compose with grid/flex
+   children without forcing a particular layout. */
+.hide-on-mobile { display: none; }
+.hide-on-desktop { display: revert; }
+@media (--md) {
+  .hide-on-mobile { display: revert; }
+  .hide-on-desktop { display: none; }
+}
+
+/* ── type utilities ──────────────────────────────────────────────────── */
+.eyebrow {
+  font: var(--web-eyebrow);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--recipe-accent);
+}
+
+.display-xl { font: var(--web-display-xl); letter-spacing: -0.015em; margin: 0; }
+.display-lg { font: var(--web-display-lg); letter-spacing: -0.015em; margin: 0; }
+.display-md { font: var(--web-display-md); letter-spacing: -0.01em;  margin: 0; }
+.display-sm { font: var(--web-display-sm); letter-spacing: -0.01em;  margin: 0; }
+
+.editorial-lg { font: var(--web-editorial-lg); }
+.editorial-md { font: var(--web-editorial-md); }
+
+.body-lg { font: var(--web-body-lg); }
+
+.meta { font: var(--web-meta); color: var(--muted); }
+.mono { font: var(--web-mono-sm); }
+
+.muted { color: var(--muted); }
+
+/* ── tags / pills ────────────────────────────────────────────────────── */
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  font: var(--web-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-strong);
+}
+.tag.accent {
+  color: var(--recipe-accent);
+  border-color: color-mix(in srgb, var(--recipe-accent) 45%, transparent);
+}
+.tag.warm {
+  color: var(--recipe-warn);
+  border-color: color-mix(in srgb, var(--recipe-warn) 45%, transparent);
+}
+.tag.energy {
+  color: var(--recipe-em);
+  border-color: color-mix(in srgb, var(--recipe-em) 45%, transparent);
+}
+/* `.tag.critical` is a primitive escape hatch — plasma is fixed by spec
+   regardless of carrying recipe (matches the `critical-fg-*` family in
+   tokens.css). Apply this class on a wrapper that already has the
+   appropriate recipe. */
+.tag.critical {
+  color: var(--chimi-primitives-color-plasma-base);  /* primitive escape hatch — see closed-recipe-model */
+  border-color: color-mix(in srgb, var(--chimi-primitives-color-plasma-base) 45%, transparent);
+}
+
+/* ── hairline rule ───────────────────────────────────────────────────── */
+hr.hairline { border: 0; border-top: 1px solid var(--hairline); margin: 0; }
+
+/* ── buttons (canonical = blog: outline pill + primary fill) ─────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font: var(--web-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--hairline-strong);
+  color: var(--recipe-ink);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease, transform 80ms ease;
+}
+.btn:hover {
+  border-color: var(--recipe-accent);
+  color: var(--recipe-accent);
+}
+.btn:active { transform: translateY(1px); }
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn.primary,
+.btn-primary {
+  background: var(--recipe-accent);
+  color: var(--recipe-surface);
+  border-color: transparent;
+}
+.btn.primary:hover,
+.btn-primary:hover {
+  background: color-mix(in srgb, var(--recipe-accent) 80%, transparent);
+  color: var(--recipe-surface);
+  border-color: transparent;
+}
+
+/* Paper recipes: --recipe-surface is ivory, so default `color: --recipe-surface`
+   on a patagonia fill gives ~2.5:1 (fails AA). Use ink (charcoal) instead —
+   charcoal on patagonia hits ~5.7:1. */
+[data-recipe="paper"] .btn.primary,
+[data-recipe="paper"] .btn-primary {
+  color: var(--recipe-ink);
+}
+[data-recipe="paper"] .btn.primary:hover,
+[data-recipe="paper"] .btn-primary:hover {
+  color: var(--recipe-ink);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted-strong);
+  border-color: var(--hairline);
+}
+.btn-ghost:hover {
+  border-color: var(--recipe-accent);
+  color: var(--recipe-accent);
+}
+
+/* ── tap targets (mobile only, WCAG 2.5.5 / Apple HIG ≥ 44×44) ───────────
+ * Selective: applies to buttons, button-shaped controls and primary nav
+ * anchors. Inline links inside paragraphs keep their natural size — they
+ * are not the target of this rule (long-form reading would otherwise gain
+ * unwanted vertical rhythm).
+ *
+ * Justified `max-width` exception (mobile-first rule explicitly exempts
+ * tap-target sizing per design.md D6): on desktop, .btn already lands at
+ * ~44px from its padding/font-size so the explicit min-height would only
+ * inflate compact UI. We gate to viewports below --md.
+ */
+@media (max-width: 767.98px) {
+  .btn,
+  .btn-ghost,
+  .btn-primary,
+  [role="button"],
+  nav a,
+  .nav a {
+    min-height: 44px;
+  }
+  /* Pure inline elements ignore min-height; flip nav anchors to inline-flex
+     so they actually grow. Body links inside paragraphs are unaffected. */
+  nav a,
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+  }
+}

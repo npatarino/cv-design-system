@@ -1,0 +1,87 @@
+---
+/**
+ * SEOHead — single source of truth for the head SEO across all webs.
+ *
+ * Wraps the `seo/render-head.mjs` helper so that Astro consumers get a
+ * componentised entrypoint without having to JSX-template every meta
+ * tag themselves. Talks (Eleventy) and brand (static HTML) call the
+ * helper directly via their build scripts; the same vocabulary covers
+ * both surfaces.
+ *
+ * Usage in a `Base.astro`:
+ *
+ *   <SEOHead
+ *     site="blog"
+ *     title={title}
+ *     description={description}
+ *     pathname={Astro.url.pathname}
+ *     isHome={Astro.url.pathname === "/"}
+ *     og={ogProps}
+ *     jsonLd={jsonLd}
+ *     includeEcosystemAlternates={Astro.url.pathname === "/"}
+ *   />
+ *
+ * The component renders a fragment (no wrapper element). Drop it
+ * directly inside `<head>`. Consumers are still responsible for
+ * `<meta charset>` and the `lang` attribute on `<html>` because those
+ * cannot be set from inside a `<head>` fragment without DOM gymnastics.
+ *
+ * Why this calls a string renderer rather than templating in Astro:
+ * the head HTML is non-trivial (33+ tags in order) and we want bit-for-
+ * bit identical output between Astro consumers and non-Astro consumers
+ * (talks, brand). Maintaining one implementation prevents drift.
+ */
+import { renderSEOHeadHTML } from "../seo/render-head.mjs";
+import type { SiteId } from "../seo/defaults";
+
+interface Props {
+  /**
+   * Closed catalog of every web property the monorepo publishes
+   * (`SEO_SITE_CATALOG`, 9 ids today). Type derived structurally so adding
+   * a new entry to `seo/defaults.{mjs,d.ts}` propagates here automatically;
+   * `check:site-id-union` enforces the lockstep at build time.
+   */
+  site: SiteId;
+  title: string;
+  description: string;
+  pathname: string;
+  isHome?: boolean;
+  canonical?: string;
+  noindex?: boolean;
+  includeEcosystemAlternates?: boolean;
+  hreflangAlternates?: Array<{ hreflang: string; href: string }>;
+  lang?: string;
+  og?: {
+    type?: "website" | "article" | "profile" | "event";
+    image?: string;
+    imageAlt?: string;
+    locale?: string;
+    publishedTime?: string;
+    modifiedTime?: string;
+    author?: string;
+    section?: string;
+    tags?: string[];
+  };
+  twitter?: {
+    card?: "summary" | "summary_large_image";
+    site?: string;
+    creator?: string;
+  };
+  jsonLd?: Array<Record<string, unknown>> | Record<string, unknown>;
+  preloadFonts?: boolean;
+  preloadFontUrls?: string[];
+  preloadImage?: string;
+  icons?: {
+    favicon?: string;
+    favicon32?: string;
+    appleTouchIcon?: string;
+    maskIcon?: string;
+    manifest?: string;
+  };
+  titleTemplate?: string;
+}
+
+const props = Astro.props as Props;
+const html = renderSEOHeadHTML(props);
+---
+<Fragment set:html={html} />

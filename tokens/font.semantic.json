@@ -1,0 +1,11 @@
+{
+  "font": {
+    "family": {
+      "display":   { "$value": "{primitives.font.family.chaney}",    "$type": "fontFamily", "$description": "Large, high-impact headlines." },
+      "body":      { "$value": "{primitives.font.family.atAero}",    "$type": "fontFamily", "$description": "Default body / UI text." },
+      "editorial": { "$value": "{primitives.font.family.scilla}",    "$type": "fontFamily", "$description": "Italic serif voice — quotes, <em> within display, editorial subtitles." },
+      "data":      { "$value": "{primitives.font.family.thunder}",   "$type": "fontFamily", "$description": "Tall condensed — large stats only." },
+      "code":      { "$value": "{primitives.font.family.nudicaMono}", "$type": "fontFamily", "$description": "Monospace — eyebrows, labels, metadata, code." }
+    }
+  }
+}
