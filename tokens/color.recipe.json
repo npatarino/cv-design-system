@@ -1,0 +1,196 @@
+{
+  "_recipeComment": "Color recipes — 7 closed combinations of surface + ink + em + accent + warn. Each recipe is consumed by setting `data-recipe=\"<id>\"` on the slide root. The build emits a `:where([data-recipe=\"<id>\"])` block in dist/tokens.css that populates --recipe-* short vars. Layouts only consume --recipe-*. critical is bicara: as bg it's a full recipe; as fg it's a `.critical-fg-<role>` class that overrides --recipe-em or --recipe-warn to plasma. See docs/recipes.md.",
+
+  "color": {
+    "recipe": {
+      "canvas-quiet": {
+        "_description": "Default editorial. Lectura larga, blog, docs, slides densos.",
+        "surface": {
+          "$value": "{primitives.color.charcoal.100}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.ivory.base}" } }
+        },
+        "ink": {
+          "$value": "{primitives.color.ivory.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.charcoal.100}" } }
+        },
+        "em": {
+          "$value": "{primitives.color.lemon.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
+        },
+        "accent": {
+          "$value": "{primitives.color.patagonia.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
+        },
+        "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "font-primary": { "$value": "{font.family.body}" },
+        "weight-primary": { "$value": "{type.body.md.fontWeight}" },
+        "letter-spacing-primary": { "$value": "0" },
+        "opacity-primary": { "$value": "1" },
+        "font-secondary": { "$value": "{font.family.editorial}" },
+        "weight-secondary": { "$value": "{type.editorial.md.fontWeight}" },
+        "letter-spacing-secondary": { "$value": "0" },
+        "opacity-secondary": { "$value": "0.85" },
+        "font-display": { "$value": "{font.family.display}" },
+        "weight-display": { "$value": "{type.display.md.fontWeight}" },
+        "font-body": { "$value": "{font.family.body}" },
+        "weight-body": { "$value": "{type.body.md.fontWeight}" },
+        "font-editorial": { "$value": "{font.family.editorial}" },
+        "weight-editorial": { "$value": "{type.editorial.md.fontWeight}" },
+        "font-data": { "$value": "{font.family.data}" },
+        "weight-data": { "$value": "{type.data.md.fontWeight}" },
+        "font-code": { "$value": "{font.family.code}" },
+        "weight-code": { "$value": "{type.eyebrow.md.fontWeight}" }
+      },
+      "canvas-signal": {
+        "_description": "Datos. KPI walls, big-stats, dashboards.",
+        "surface": {
+          "$value": "{primitives.color.charcoal.100}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.ivory.base}" } }
+        },
+        "ink": {
+          "$value": "{primitives.color.ivory.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.charcoal.100}" } }
+        },
+        "em": {
+          "$value": "{primitives.color.lemon.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
+        },
+        "accent": {
+          "$value": "{primitives.color.patagonia.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
+        },
+        "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "font-primary": { "$value": "{font.family.data}" },
+        "weight-primary": { "$value": "{type.data.md.fontWeight}" },
+        "letter-spacing-primary": { "$value": "{primitives.size.letterSpacing.display-tight}" },
+        "opacity-primary": { "$value": "1" },
+        "font-secondary": { "$value": "{font.family.body}" },
+        "weight-secondary": { "$value": "{type.body.md.fontWeight}" },
+        "letter-spacing-secondary": { "$value": "0" },
+        "opacity-secondary": { "$value": "0.85" },
+        "font-display": { "$value": "{font.family.data}" },
+        "weight-display": { "$value": "{type.data.md.fontWeight}" },
+        "font-body": { "$value": "{font.family.body}" },
+        "weight-body": { "$value": "{type.body.md.fontWeight}" },
+        "font-editorial": { "$value": "{font.family.editorial}" },
+        "weight-editorial": { "$value": "{type.editorial.md.fontWeight}" },
+        "font-data": { "$value": "{font.family.data}" },
+        "weight-data": { "$value": "{type.data.md.fontWeight}" },
+        "font-code": { "$value": "{font.family.code}" },
+        "weight-code": { "$value": "{type.eyebrow.md.fontWeight}" }
+      },
+      "paper": {
+        "_description": "Editorial ivory. Quotes, prompts, technical info.",
+        "surface": { "$value": "{primitives.color.ivory.base}",   "$type": "color" },
+        "ink":     { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "em":      { "$value": "{primitives.color.patagonia.base}", "$type": "color" },
+        "accent":  { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "font-primary": { "$value": "{font.family.editorial}" },
+        "weight-primary": { "$value": "{type.editorial.md.fontWeight}" },
+        "letter-spacing-primary": { "$value": "0" },
+        "opacity-primary": { "$value": "1" },
+        "font-secondary": { "$value": "{font.family.body}" },
+        "weight-secondary": { "$value": "{type.body.md.fontWeight}" },
+        "letter-spacing-secondary": { "$value": "0" },
+        "opacity-secondary": { "$value": "0.85" },
+        "font-display": { "$value": "{font.family.editorial}" },
+        "weight-display": { "$value": "{type.editorial.md.fontWeight}" },
+        "font-body": { "$value": "{font.family.body}" },
+        "weight-body": { "$value": "{type.body.md.fontWeight}" },
+        "font-editorial": { "$value": "{font.family.editorial}" },
+        "weight-editorial": { "$value": "{type.editorial.md.fontWeight}" },
+        "font-data": { "$value": "{font.family.data}" },
+        "weight-data": { "$value": "{type.data.md.fontWeight}" },
+        "font-code": { "$value": "{font.family.code}" },
+        "weight-code": { "$value": "{type.eyebrow.md.fontWeight}" }
+      },
+      "energy-loud": {
+        "_description": "Anuncios, posters, CTAs de evento. Lemon manda.",
+        "surface": { "$value": "{primitives.color.lemon.base}",   "$type": "color" },
+        "ink":     { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "em":      { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "accent":  { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "font-primary": { "$value": "{font.family.display}" },
+        "weight-primary": { "$value": "{type.display.md.fontWeight}" },
+        "letter-spacing-primary": { "$value": "{primitives.size.letterSpacing.display}" },
+        "opacity-primary": { "$value": "1" },
+        "font-secondary": { "$value": "{font.family.body}" },
+        "weight-secondary": { "$value": "{type.body.md.fontWeight}" },
+        "letter-spacing-secondary": { "$value": "0" },
+        "opacity-secondary": { "$value": "1" },
+        "font-display": { "$value": "{font.family.display}" },
+        "weight-display": { "$value": "{type.display.md.fontWeight}" },
+        "font-body": { "$value": "{font.family.body}" },
+        "weight-body": { "$value": "{type.body.md.fontWeight}" },
+        "font-editorial": { "$value": "{font.family.editorial}" },
+        "weight-editorial": { "$value": "{type.editorial.md.fontWeight}" },
+        "font-data": { "$value": "{font.family.data}" },
+        "weight-data": { "$value": "{type.data.md.fontWeight}" },
+        "font-code": { "$value": "{font.family.code}" },
+        "weight-code": { "$value": "{type.eyebrow.md.fontWeight}" }
+      },
+      "cool-fresh": {
+        "_description": "Cambio. Dividers, lanzamientos, banners de feature.",
+        "surface": { "$value": "{primitives.color.patagonia.base}", "$type": "color" },
+        "ink":     { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "em":      { "$value": "{primitives.color.ivory.base}",   "$type": "color" },
+        "accent":  { "$value": "{primitives.color.ivory.base}",   "$type": "color" },
+        "warn":    { "$value": "{primitives.color.lemon.base}",   "$type": "color" },
+        "font-primary": { "$value": "{font.family.display}" },
+        "weight-primary": { "$value": "{type.display.md.fontWeight}" },
+        "letter-spacing-primary": { "$value": "{primitives.size.letterSpacing.display}" },
+        "opacity-primary": { "$value": "1" },
+        "font-secondary": { "$value": "{font.family.body}" },
+        "weight-secondary": { "$value": "{type.body.md.fontWeight}" },
+        "letter-spacing-secondary": { "$value": "0" },
+        "opacity-secondary": { "$value": "0.9" },
+        "font-display": { "$value": "{font.family.display}" },
+        "weight-display": { "$value": "{type.display.md.fontWeight}" },
+        "font-body": { "$value": "{font.family.body}" },
+        "weight-body": { "$value": "{type.body.md.fontWeight}" },
+        "font-editorial": { "$value": "{font.family.editorial}" },
+        "weight-editorial": { "$value": "{type.editorial.md.fontWeight}" },
+        "font-data": { "$value": "{font.family.data}" },
+        "weight-data": { "$value": "{type.data.md.fontWeight}" },
+        "font-code": { "$value": "{font.family.code}" },
+        "weight-code": { "$value": "{type.eyebrow.md.fontWeight}" }
+      },
+      "critical": {
+        "_description": "Bicara · como bg, recipe completa con surface plasma.",
+        "surface": { "$value": "{primitives.color.plasma.base}",  "$type": "color" },
+        "ink":     { "$value": "{primitives.color.ivory.base}",   "$type": "color" },
+        "em":      { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "accent":  { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "warn":    { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "font-primary": { "$value": "{font.family.display}" },
+        "weight-primary": { "$value": "{type.display.md.fontWeight}" },
+        "letter-spacing-primary": { "$value": "{primitives.size.letterSpacing.display}" },
+        "opacity-primary": { "$value": "1" },
+        "font-secondary": { "$value": "{font.family.body}" },
+        "weight-secondary": { "$value": "{type.body.md.fontWeight}" },
+        "letter-spacing-secondary": { "$value": "0" },
+        "opacity-secondary": { "$value": "0.85" },
+        "font-display": { "$value": "{font.family.display}" },
+        "weight-display": { "$value": "{type.display.md.fontWeight}" },
+        "font-body": { "$value": "{font.family.body}" },
+        "weight-body": { "$value": "{type.body.md.fontWeight}" },
+        "font-editorial": { "$value": "{font.family.editorial}" },
+        "weight-editorial": { "$value": "{type.editorial.md.fontWeight}" },
+        "font-data": { "$value": "{font.family.data}" },
+        "weight-data": { "$value": "{type.data.md.fontWeight}" },
+        "font-code": { "$value": "{font.family.code}" },
+        "weight-code": { "$value": "{type.eyebrow.md.fontWeight}" },
+        "_fgModifiers": {
+          "_description": "Sobre otra recipe portadora (canvas-quiet/signal, paper/cool), aplicá .critical-fg-<role> al root del slide.",
+          "stat":         { "overrides": "em",   "color": "{primitives.color.plasma.base}" },
+          "quote":        { "overrides": "em",   "color": "{primitives.color.plasma.base}" },
+          "eyebrow":      { "overrides": "em",   "color": "{primitives.color.plasma.base}" },
+          "marker":       { "overrides": "warn", "color": "{primitives.color.plasma.base}" },
+          "display-word": { "overrides": "em",   "color": "{primitives.color.plasma.base}" }
+        }
+      }
+    }
+  }
+}

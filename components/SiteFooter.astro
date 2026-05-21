@@ -1,0 +1,456 @@
+---
+import SocialIcons from "./SocialIcons.astro";
+import {
+  ECOSYSTEM_SITES,
+  ecosystemLinksExcluding,
+  type EcosystemSite,
+  type SocialLink,
+} from "./ecosystem";
+
+export interface FooterColumn {
+  title: string;
+  links: { href: string; label: string; external?: boolean }[];
+}
+
+export interface MetaLink {
+  href: string;
+  label: string;
+  external?: boolean;
+}
+
+interface Props {
+  variant?: "rich" | "minimal";
+  siteId?: string;
+  brandName?: string;
+  brandDescription?: string;
+  socials?: SocialLink[];
+  columns?: FooterColumn[];
+  showEcosystem?: boolean;
+  metaLinks?: MetaLink[];
+  poweredBy?: { label: string; href: string } | null;
+  copyright?: string;
+}
+
+const {
+  variant = "minimal",
+  siteId,
+  brandName,
+  brandDescription,
+  socials = [],
+  columns = [],
+  showEcosystem = true,
+  metaLinks = [],
+  poweredBy = { label: "Chimichurri Code", href: "https://chimi.pro" },
+  copyright,
+} = Astro.props;
+
+const year = new Date().getFullYear();
+const otherSites: EcosystemSite[] = siteId
+  ? ecosystemLinksExcluding(siteId)
+  : ECOSYSTEM_SITES;
+
+// Chimiverse links: shown as a horizontal strip under the columns in the rich
+// variant, and inline (existing behavior) in the minimal variant. We retain
+// `logo` and `logoDark` so consumers can render the per-site mark next to
+// the label when present (sites without a `logoSrc` show the textual label
+// only). When `logoDark` is provided, both <img>s ship and CSS swaps them
+// via `[data-theme="dark"]`; otherwise only `logo` renders for both themes.
+type EcosystemEntry = {
+  href: string;
+  label: string;
+  external: true;
+  logo?: string;
+  logoDark?: string;
+};
+const ecosystemEntries: EcosystemEntry[] = showEcosystem && otherSites.length > 0
+  ? otherSites.map((s) => ({
+      href: s.url,
+      label: s.name,
+      external: true,
+      logo: s.logoSrc?.logo,
+      logoDark: s.logoSrc?.logoDark,
+    }))
+  : [];
+
+// Backwards-compatible shape for `ecosystemColumn` consumers (the rich
+// variant's `richColumns`). The text-only fallback below uses these.
+const ecosystemColumn: FooterColumn | null =
+  ecosystemEntries.length > 0
+    ? {
+        title: "Chimiverse",
+        links: ecosystemEntries.map((e) => ({ href: e.href, label: e.label, external: e.external })),
+      }
+    : null;
+
+// Rich-variant: ecosystem is no longer a grid column, only `columns` are.
+const richColumns: FooterColumn[] = columns;
+
+const isCurrentSiteByline = (href: string) =>
+  poweredBy && siteId === "blog" && href === poweredBy.href;
+---
+
+{variant === "rich" ? (
+  <footer class="site-footer site-footer--rich">
+    <div class="container footer-inner" style={`--footer-cols: ${richColumns.length};`}>
+      {(brandName || brandDescription || socials.length > 0) && (
+        <div class="col brand-col">
+          {brandName && <h3 class="footer-brand">{brandName}</h3>}
+          {brandDescription && <p class="footer-desc">{brandDescription}</p>}
+          {socials.length > 0 && (
+            <ul class="footer-socials" aria-label="Redes sociales">
+              {socials.map((s) => (
+                <li>
+                  <a href={s.href} target="_blank" rel="noopener" aria-label={s.label}>
+                    <SocialIcons icon={s.icon} size={s.icon === "twitter" ? 16 : 18} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      {richColumns.map((col) => (
+        <div class="col">
+          <h4 class="footer-kicker">{col.title}</h4>
+          <ul>
+            {col.links.map((l) => (
+              <li>
+                <a
+                  href={l.href}
+                  target={l.external ? "_blank" : undefined}
+                  rel={l.external ? "noopener" : undefined}
+                >{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    {ecosystemEntries.length > 0 && (
+      <div class="container">
+        <hr class="footer-hairline" />
+        <nav class="footer-ecosystem-strip" aria-label="Chimiverse">
+          <span class="footer-ecosystem-title">Chimiverse</span>
+          <ul>
+            {ecosystemEntries.map((l, i) => (
+              <li>
+                <a
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener"
+                  class:list={["footer-ecosystem-link", { "has-logo": l.logo }]}
+                >
+                  {l.logo && (
+                    <>
+                      <img
+                        src={l.logo}
+                        alt=""
+                        aria-hidden="true"
+                        class="footer-ecosystem-logo footer-ecosystem-logo--light"
+                        loading="lazy"
+                      />
+                      {l.logoDark && (
+                        <img
+                          src={l.logoDark}
+                          alt=""
+                          aria-hidden="true"
+                          class="footer-ecosystem-logo footer-ecosystem-logo--dark"
+                          loading="lazy"
+                        />
+                      )}
+                    </>
+                  )}
+                  <span>{l.label}</span>
+                </a>
+                {i < ecosystemEntries.length - 1 && <span class="sep" aria-hidden="true">·</span>}
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    )}
+    <div class="container copyright">
+      <hr class="footer-hairline" />
+      <p>{copyright ?? `© ${year} Nicolás Patarino. Todos los derechos reservados.`}</p>
+    </div>
+  </footer>
+) : (
+  <footer class="site-footer site-footer--minimal">
+    <div class="container">
+      <hr class="footer-hairline" />
+      {ecosystemEntries.length > 0 && (
+        <nav class="footer-ecosystem" aria-label="Chimiverse">
+          <span class="footer-ecosystem-title">Chimiverse</span>
+          <ul>
+            {ecosystemEntries.map((l) => (
+              <li>
+                <a
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener"
+                  class:list={["footer-ecosystem-link", { "has-logo": l.logo }]}
+                >
+                  {l.logo && (
+                    <>
+                      <img
+                        src={l.logo}
+                        alt=""
+                        aria-hidden="true"
+                        class="footer-ecosystem-logo footer-ecosystem-logo--light"
+                        loading="lazy"
+                      />
+                      {l.logoDark && (
+                        <img
+                          src={l.logoDark}
+                          alt=""
+                          aria-hidden="true"
+                          class="footer-ecosystem-logo footer-ecosystem-logo--dark"
+                          loading="lazy"
+                        />
+                      )}
+                    </>
+                  )}
+                  <span>{l.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+      <div class="footer-inner">
+        <p class="footer-meta">
+          {metaLinks.map((l, i) => (
+            <>
+              <a
+                href={l.href}
+                target={l.external ? "_blank" : undefined}
+                rel={l.external ? "noopener" : undefined}
+              >{l.label}</a>
+              <span aria-hidden="true">·</span>
+            </>
+          ))}
+          <span>{copyright ?? `© ${year}`}</span>
+        </p>
+        {poweredBy && !isCurrentSiteByline(poweredBy.href) && (
+          <p class="footer-meta">
+            Powered with <span aria-hidden="true">♥</span> by
+            <a href={poweredBy.href} target="_blank" rel="noopener">{poweredBy.label}</a>
+          </p>
+        )}
+      </div>
+    </div>
+  </footer>
+)}
+
+<style>
+  .site-footer { background: transparent; }
+  .footer-hairline { border: 0; border-top: 1px solid var(--hairline); margin: 0; }
+
+  /* Rich variant */
+  .site-footer--rich {
+    margin-top: var(--stack-2xl, var(--stack-xl));
+    padding-block: var(--stack-xl) var(--stack-lg);
+    background: var(--surface-raised);
+    border-top: 1px solid var(--hairline);
+  }
+  /*
+    Mobile-first footer grid:
+    - default (mobile): single column, brand stacks above link groups
+    - @media (--md) (≥768): two columns, brand col spans full width
+    - @media (--lg) (≥1024): full editorial layout (1.6fr brand + N link cols)
+  */
+  .site-footer--rich .footer-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(24px, 4vw, 72px);
+    padding-bottom: var(--stack-lg);
+  }
+  @media (--md) {
+    .site-footer--rich .footer-inner {
+      grid-template-columns: 1fr 1fr;
+    }
+    .site-footer--rich .brand-col { grid-column: 1 / -1; }
+  }
+  @media (--lg) {
+    .site-footer--rich .footer-inner {
+      grid-template-columns: 1.6fr repeat(var(--footer-cols, 3), minmax(0, 1fr));
+    }
+    .site-footer--rich .brand-col { grid-column: auto; }
+  }
+  .footer-brand {
+    font-family: var(--chimi-font-family-display);
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 var(--stack-sm);
+  }
+  .footer-desc {
+    color: var(--muted-strong);
+    margin: 0 0 var(--stack-md);
+    max-width: 42ch;
+  }
+  .site-footer--rich .footer-socials {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .footer-socials li { display: inline-flex; }
+  .footer-socials a {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid var(--hairline);
+    color: var(--muted-strong);
+    transition: color 150ms ease, border-color 150ms ease, transform 150ms ease;
+  }
+  .footer-socials a:hover {
+    color: var(--recipe-accent);
+    border-color: var(--recipe-accent);
+    transform: translateY(-2px);
+  }
+  .footer-kicker {
+    font: var(--web-eyebrow);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--recipe-accent);
+    margin: 0 0 var(--stack-sm);
+  }
+  .site-footer--rich .col ul:not(.footer-socials) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .site-footer--rich .col a { color: var(--muted-strong); }
+  .site-footer--rich .col a:hover { color: var(--recipe-accent); }
+
+  /* Ecosystem strip: horizontal row between columns and copyright.
+     Wraps gracefully as more sites are added. */
+  .footer-ecosystem-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--stack-sm) var(--stack-md);
+    padding-top: var(--stack-md);
+  }
+  .footer-ecosystem-strip ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+  }
+  .footer-ecosystem-strip ul li {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .footer-ecosystem-strip a {
+    font: var(--web-meta);
+    color: var(--muted-strong);
+  }
+  .footer-ecosystem-strip a:hover { color: var(--recipe-accent); }
+  .footer-ecosystem-strip .sep {
+    color: var(--muted);
+    user-select: none;
+  }
+  .site-footer--rich .copyright { margin-top: var(--stack-md); }
+  .site-footer--rich .copyright p {
+    color: var(--muted);
+    margin: var(--stack-md) 0 0;
+    font-size: 13px;
+  }
+
+  /* Minimal variant */
+  .site-footer--minimal {
+    margin-top: var(--stack-xl);
+    padding-block: var(--stack-md) var(--stack-lg);
+  }
+  .site-footer--minimal .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--stack-sm);
+    padding-top: var(--stack-md);
+  }
+  .footer-meta {
+    margin: 0;
+    font: var(--web-meta);
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .footer-meta a { color: var(--muted-strong); }
+  .footer-meta a:hover { color: var(--recipe-accent); }
+
+  .footer-ecosystem {
+    padding-top: var(--stack-md);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--stack-sm) var(--stack-md);
+  }
+  .footer-ecosystem-title {
+    font: var(--web-eyebrow);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--recipe-accent);
+  }
+  .footer-ecosystem ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+  .footer-ecosystem a {
+    font: var(--web-meta);
+    color: var(--muted-strong);
+  }
+  .footer-ecosystem a:hover { color: var(--recipe-accent); }
+
+  /* Per-site logo + label combo. Used by the ecosystem strip in both rich
+     and minimal variants when a sibling site has logoSrc declared in
+     ECOSYSTEM_SITES. Sites without a logoSrc fall back to the bare <span>.
+     Logos sit at 18px tall — visually balanced with the eyebrow-sized label
+     without overpowering the strip. */
+  .footer-ecosystem-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .footer-ecosystem-logo {
+    height: 18px;
+    width: auto;
+    flex: none;
+    /* Logos may carry their own colors (SSP uses red + teal). The strip is
+       small enough that we render them at full saturation; the eyebrow
+       label still leads visually. */
+  }
+  /* Theme-aware logo swap. The default (no data-theme) and the explicit
+     light theme show the light variant; dark hides it and shows the
+     dark-tuned artwork. Sites that only ship `logo` (no `logoDark`)
+     simply have a single `--light` <img> in the DOM. */
+  .footer-ecosystem-logo--dark { display: none; }
+  :root[data-theme="dark"] .footer-ecosystem-logo--light { display: none; }
+  :root[data-theme="dark"] .footer-ecosystem-logo--dark { display: inline-block; }
+  /* Cascade default (no attribute = dark mode at the cascade layer): the
+     ThemeBootstrap eagerly writes data-theme="light" so this branch only
+     fires when the user or OS picked dark. We mirror the [data-theme="dark"]
+     rule for safety in case ThemeBootstrap is omitted (e.g. talks/brand). */
+  :root:not([data-theme]) .footer-ecosystem-logo--light { display: none; }
+  :root:not([data-theme]) .footer-ecosystem-logo--dark { display: inline-block; }
+</style>

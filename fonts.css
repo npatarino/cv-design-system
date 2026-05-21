@@ -1,0 +1,110 @@
+/*
+ * Brand @font-face declarations for web consumers.
+ *
+ * Why this exists:
+ *   The brand uses four custom typefaces (CHANEY, At Aero, Scilla Narrow,
+ *   Thunder) bundled as .otf/.ttf in design-system/assets/fonts/. Astro
+ *   sites can't @import a binary file straight from node_modules — the
+ *   files have to be served from the site's own /fonts/ path.
+ *
+ * Consumer setup:
+ *   1. Run `node ../design-system/scripts/sync-dir.mjs fonts public/fonts`
+ *      in your prebuild (copies the .otf/.ttf into public/fonts/).
+ *   2. Import this stylesheet in your global.css *after* web.css:
+ *        @import "@chimi/design-system/web.css";
+ *        @import "@chimi/design-system/fonts.css";
+ *
+ *   Together: tokens (web.css) declare which font-family names exist;
+ *   this file declares where their files live and how to load them.
+ *
+ * Notes:
+ *   - Paths are root-absolute (/fonts/…) so they work from any route.
+ *   - CHANEY uses size-adjust: 75% to scale glyphs down ~25%, matching
+ *     the way the brand guide uses it. Inline overrides on individual
+ *     sites can drop the size-adjust if they want CHANEY at native size.
+ *   - font-display: swap → render fallback first, then swap when the
+ *     custom font loads. Avoids invisible-text-during-load on slow nets.
+ */
+
+@font-face {
+  font-family: 'CHANEY';
+  src: url('/fonts/CHANEY-Regular.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+  size-adjust: 75%;
+}
+@font-face {
+  font-family: 'CHANEY';
+  src: url('/fonts/CHANEY-Extended.otf') format('opentype');
+  font-weight: 700 900; font-style: normal; font-display: swap;
+  size-adjust: 75%;
+}
+@font-face {
+  font-family: 'At Aero';
+  src: url('/fonts/AtAero-Regular.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'At Aero';
+  src: url('/fonts/AtAero-Medium.otf') format('opentype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'At Aero';
+  src: url('/fonts/AtAero-Semibold.otf') format('opentype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'At Aero';
+  src: url('/fonts/AtAero-Bold.otf') format('opentype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'At Aero';
+  src: url('/fonts/AtAero-RegularItalic.otf') format('opentype');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Scilla Narrow';
+  src: url('/fonts/ScillaNarrow-Regular.otf') format('opentype');
+  font-weight: 400 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Scilla Narrow';
+  src: url('/fonts/ScillaNarrow-RegularItalic.otf') format('opentype');
+  font-weight: 400 700; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Thunder';
+  src: url('/fonts/Thunder-VF.ttf') format('truetype-variations');
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Nudica Mono';
+  src: url('/fonts/NudicaMono-Regular.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Nudica Mono';
+  src: url('/fonts/NudicaMono-RegularItalic.otf') format('opentype');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Nudica Mono';
+  src: url('/fonts/NudicaMono-Medium.otf') format('opentype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Nudica Mono';
+  src: url('/fonts/NudicaMono-MediumItalic.otf') format('opentype');
+  font-weight: 500; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Nudica Mono';
+  src: url('/fonts/NudicaMono-Bold.otf') format('opentype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Nudica Mono';
+  src: url('/fonts/NudicaMono-BoldItalic.otf') format('opentype');
+  font-weight: 700; font-style: italic; font-display: swap;
+}

@@ -1,0 +1,30 @@
+{
+  "primitives": {
+    "color": {
+      "charcoal": {
+        "100": { "$value": "#1C1C1C", "$type": "color", "$description": "Brand charcoal — primary dark canvas." },
+        "90":  { "$value": "#2A2A2A", "$type": "color", "$description": "Charcoal one step lighter — for card/section surfaces on dark canvas." },
+        "70":  { "$value": "#3D3D3D", "$type": "color", "$description": "Charcoal mid — de-emphasized text on light surfaces (on-paper-muted)." }
+      },
+      "ivory": {
+        "base":   { "$value": "#FAFAF8", "$type": "color", "$description": "Brand ivory — default text on dark canvas, default surface on light canvas. Near-neutral warm off-white (HSL 60°, 14%, 98%) — minimal yellow pigment for a cooler, more porcelain feel." },
+        "cream":  { "$value": "#FBFBFA", "$type": "color", "$description": "Ivory one step lighter — alternate light canvas where cream needs to read brighter than the raised primitive (used by recipe overrides). Keeps the same hue at a touch higher lightness." },
+        "raised": { "$value": "#F2F2EF", "$type": "color", "$description": "Cream one step darker — for raised surfaces on light canvas (mirrors charcoal.90 on dark). Same hue as base, ~3 lightness steps darker." }
+      },
+      "patagonia": {
+        "base": { "$value": "#02B5B9", "$type": "color", "$description": "Brand teal — primary cool accent." },
+        "soft": { "$value": "#7DD8D2", "$type": "color", "$description": "Patagonia lightened — secondary text / accent on dark surfaces." },
+        "deep": { "$value": "#017275", "$type": "color", "$description": "Patagonia darkened — high-contrast text on light surfaces." }
+      },
+      "lemon": {
+        "base": { "$value": "#F9D71C", "$type": "color", "$description": "Brand yellow — high-energy accent." }
+      },
+      "red": {
+        "base": { "$value": "#A64132", "$type": "color", "$description": "Brand red — warmth accent and emphasis." }
+      },
+      "plasma": {
+        "base": { "$value": "#FF2079", "$type": "color", "$description": "Plasma pink — critical accent. For disclaimers, alerts, controversial statements." }
+      }
+    }
+  }
+}

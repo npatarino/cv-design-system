@@ -1,0 +1,85 @@
+---
+/*
+ * ThemeBootstrap — synchronous inline script that applies the user's saved
+ * theme choice before the first paint, preventing FOUC.
+ *
+ * Resolution order:
+ *   1. localStorage["chimi-theme"] — explicit user choice via toggle.
+ *      - "light" → sets <html data-theme="light">
+ *      - "dark"  → leaves attribute unset (dark is the underlying default
+ *        of the cascade — see semantic tokens / web.css)
+ *   2. No saved value → respects prefers-color-scheme.
+ *      - System "dark" → leaves attribute unset (default cascade = dark).
+ *      - Otherwise (light or no preference) → sets data-theme="light".
+ *      In other words: light is the new default everywhere, but users on
+ *      dark-mode operating systems keep dark.
+ *   3. localStorage blocked (privacy mode) or matchMedia missing →
+ *      falls back to setting data-theme="light" so users without OS dark
+ *      preference still land in light.
+ *
+ * The cascade still treats "no attribute" as dark (see the recipe-rooted
+ * `$extensions.chimi.theme.light` overrides in tokens/color.recipe.json
+ * and the `:root[data-theme="light"]` block in dist/tokens.css that they
+ * generate). Inverting the cascade would have required rewriting every
+ * recipe override; instead we make the bootstrap eagerly write
+ * data-theme="light" so the cascade's default only applies when the user
+ * (or OS) actively wants dark.
+ *
+ * Usage (Astro):
+ *   ---
+ *   import ThemeBootstrap from "@chimi/design-system/ThemeBootstrap.astro";
+ *   ---
+ *   <html lang="es">
+ *     <head>
+ *       <ThemeBootstrap />
+ *       <link rel="stylesheet" href="..." />
+ *       …
+ *     </head>
+ *
+ * MUST be placed in <head> BEFORE any stylesheet that depends on
+ * data-theme, so the attribute is set before styles paint.
+ *
+ * Sites that want to opt out of light-by-default (e.g. talks, brand) simply
+ * do not import this component — they keep the cascade default (dark).
+ */
+---
+<script is:inline>
+  (function () {
+    var html = document.documentElement;
+    var key = "chimi-theme";
+    var saved = null;
+    try {
+      saved = localStorage.getItem(key);
+    } catch (_) {
+      /* localStorage blocked — fall through to OS preference */
+    }
+
+    if (saved === "light") {
+      html.setAttribute("data-theme", "light");
+      return;
+    }
+    if (saved === "dark") {
+      html.removeAttribute("data-theme");
+      return;
+    }
+    if (saved !== null) {
+      // self-heal: clobber bad values, treat as no preference saved.
+      try { localStorage.removeItem(key); } catch (_) {}
+    }
+
+    // No explicit user choice — respect OS preference, defaulting to light.
+    var prefersDark = false;
+    try {
+      prefersDark =
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+    } catch (_) {
+      /* matchMedia missing — treat as no preference (→ light) */
+    }
+    if (prefersDark) {
+      html.removeAttribute("data-theme");
+    } else {
+      html.setAttribute("data-theme", "light");
+    }
+  })();
+</script>

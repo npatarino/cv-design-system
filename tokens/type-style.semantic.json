@@ -1,0 +1,175 @@
+{
+  "type": {
+    "display": {
+      "_description": "CHANEY headlines — the loudest voice. 4 steps, each corresponding to a real slide context (default / punch / cover / transition).",
+      "md": {
+        "$description": "Default display headline (big-concept, kpi-grid, multiplier-stat title).",
+        "fontFamily":    { "$value": "{font.family.display}",              "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.bold}",      "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.4xl}",         "$type": "dimension" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.snug}",  "$type": "number" },
+        "letterSpacing": { "$value": "{primitives.size.letterSpacing.display}", "$type": "dimension" }
+      },
+      "lg": {
+        "$description": "Large display — quote punch and cover headline.",
+        "fontFamily":    { "$value": "{font.family.display}",              "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.bold}",      "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.6xl}",         "$type": "dimension" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.display}", "$type": "number" },
+        "letterSpacing": { "$value": "{primitives.size.letterSpacing.display}", "$type": "dimension" }
+      },
+      "xl": {
+        "$description": "Transition / xl quote — the loudest moment.",
+        "fontFamily":    { "$value": "{font.family.display}",              "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.bold}",      "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.7xl}",         "$type": "dimension" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.flush}", "$type": "number" },
+        "letterSpacing": { "$value": "{primitives.size.letterSpacing.display}", "$type": "dimension" }
+      }
+    },
+
+    "editorial": {
+      "_description": "Scilla Narrow italic — editorial subtitles and quote bodies. Three non-quote steps + three quote steps (quotes carry their own scale because they're the main voice, not support).",
+      "sm": {
+        "$description": "Small editorial detail — kpi cell descriptions.",
+        "fontFamily":    { "$value": "{font.family.editorial}",            "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.regular}",   "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.md}",          "$type": "dimension" },
+        "fontStyle":     { "$value": "italic",                             "$type": "fontStyle" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.body}",  "$type": "number" }
+      },
+      "md": {
+        "$description": "Editorial subtitle on cover.",
+        "fontFamily":    { "$value": "{font.family.editorial}",            "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.regular}",   "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.lg}",          "$type": "dimension" },
+        "fontStyle":     { "$value": "italic",                             "$type": "fontStyle" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.loose}", "$type": "number" }
+      },
+      "lg": {
+        "$description": "Editorial subtitle paired with display headlines (big-concept .sub / .line / .note, big-stat .ex).",
+        "fontFamily":    { "$value": "{font.family.editorial}",            "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.regular}",   "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.2xl}",         "$type": "dimension" },
+        "fontStyle":     { "$value": "italic",                             "$type": "fontStyle" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.body}",  "$type": "number" }
+      },
+      "quote-md": {
+        "$description": "Testimonial quote body.",
+        "fontFamily":    { "$value": "{font.family.editorial}",            "$type": "fontFamily" },
+        "fontSize":      { "$value": "70px",                               "$type": "dimension" },
+        "fontStyle":     { "$value": "italic",                             "$type": "fontStyle" },
+        "lineHeight":    { "$value": "1.15",                               "$type": "number" },
+        "letterSpacing": { "$value": "-0.005em",                           "$type": "dimension" }
+      },
+      "quote-lg": {
+        "$description": "Default quote body.",
+        "fontFamily":    { "$value": "{font.family.editorial}",            "$type": "fontFamily" },
+        "fontSize":      { "$value": "{primitives.size.font.4xl}",         "$type": "dimension" },
+        "fontStyle":     { "$value": "italic",                             "$type": "fontStyle" },
+        "lineHeight":    { "$value": "1.05",                               "$type": "number" },
+        "letterSpacing": { "$value": "-0.01em",                            "$type": "dimension" }
+      },
+      "quote-xl": {
+        "$description": "XL quote body — dark surface, large scale.",
+        "fontFamily":    { "$value": "{font.family.editorial}",            "$type": "fontFamily" },
+        "fontSize":      { "$value": "{primitives.size.font.7xl}",         "$type": "dimension" },
+        "fontStyle":     { "$value": "italic",                             "$type": "fontStyle" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.flush}", "$type": "number" },
+        "letterSpacing": { "$value": "{primitives.size.letterSpacing.display}", "$type": "dimension" }
+      }
+    },
+
+    "data": {
+      "_description": "Thunder tall-condensed — only for numerical stats.",
+      "md": {
+        "$description": "Small data figure — kpi cell number.",
+        "fontFamily":    { "$value": "{font.family.data}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.bold}",      "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.4xl}",         "$type": "dimension" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.display}", "$type": "number" },
+        "letterSpacing": { "$value": "{primitives.size.letterSpacing.display-tight}", "$type": "dimension" }
+      },
+      "lg": {
+        "$description": "Multiplier hero (420px).",
+        "fontFamily":    { "$value": "{font.family.data}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.bold}",      "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.data-lg}",     "$type": "dimension" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.tight}", "$type": "number" },
+        "letterSpacing": { "$value": "-0.04em",                            "$type": "dimension" }
+      },
+      "xl": {
+        "$description": "Hero stat (640px).",
+        "fontFamily":    { "$value": "{font.family.data}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.bold}",      "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.data-xl}",     "$type": "dimension" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.tight}", "$type": "number" },
+        "letterSpacing": { "$value": "-0.04em",                            "$type": "dimension" }
+      }
+    },
+
+    "body": {
+      "_description": "At Aero — neutral sans for body copy. Sizes chosen for slide-scale reading (1920×1080 canvas).",
+      "md": {
+        "$description": "Default body — descriptive copy on kpi cells, detail blocks.",
+        "fontFamily":    { "$value": "{font.family.body}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.medium}",    "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.lg}",          "$type": "dimension" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.body}",  "$type": "number" }
+      },
+      "lg": {
+        "$description": "Large body — readable in back-of-room slides.",
+        "fontFamily":    { "$value": "{font.family.body}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.medium}",    "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.xl}",          "$type": "dimension" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.body}",  "$type": "number" }
+      },
+      "xl": {
+        "$description": "Primary body — big-list items, list-heavy content.",
+        "fontFamily":    { "$value": "{font.family.body}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.semibold}",  "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.2xl}",         "$type": "dimension" },
+        "lineHeight":    { "$value": "{primitives.size.lineHeight.body}",  "$type": "number" },
+        "letterSpacing": { "$value": "-0.005em",                           "$type": "dimension" }
+      }
+    },
+
+    "numeral": {
+      "_description": "Thunder-based numerals at list-scale — shorter than `data` role, meant to accompany list items (not be the hero).",
+      "md": {
+        "$description": "Sub-item numeral — small leading marker (a, b, c).",
+        "fontFamily":    { "$value": "{font.family.data}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.bold}",      "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.2xl}",         "$type": "dimension" },
+        "lineHeight":    { "$value": "1",                                  "$type": "number" },
+        "letterSpacing": { "$value": "-0.02em",                            "$type": "dimension" }
+      },
+      "lg": {
+        "$description": "Primary list numeral — leading index (1., 2., 3.).",
+        "fontFamily":    { "$value": "{font.family.data}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.bold}",      "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.3xl}",         "$type": "dimension" },
+        "lineHeight":    { "$value": "1",                                  "$type": "number" },
+        "letterSpacing": { "$value": "-0.02em",                            "$type": "dimension" }
+      }
+    },
+
+    "eyebrow": {
+      "_description": "Monospace uppercase labels — kickers, section markers, metadata. Two steps: sm for footnotes / sources, md for default kickers. If a specific layout needs wider tracking, it pulls {primitives.size.letterSpacing.eyebrow-wide} directly.",
+      "sm": {
+        "$description": "Smallest eyebrow — source / footnote.",
+        "fontFamily":    { "$value": "{font.family.code}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.medium}",    "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.xs}",          "$type": "dimension" },
+        "letterSpacing": { "$value": "{primitives.size.letterSpacing.eyebrow}", "$type": "dimension" }
+      },
+      "md": {
+        "$description": "Default eyebrow — kickers, labels, kpi categories, cover metadata.",
+        "fontFamily":    { "$value": "{font.family.code}",                 "$type": "fontFamily" },
+        "fontWeight":    { "$value": "{primitives.font.weight.medium}",    "$type": "fontWeight" },
+        "fontSize":      { "$value": "{primitives.size.font.sm}",          "$type": "dimension" },
+        "letterSpacing": { "$value": "{primitives.size.letterSpacing.eyebrow}", "$type": "dimension" }
+      }
+    }
+  }
+}

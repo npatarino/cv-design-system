@@ -1,0 +1,10 @@
+{
+  "primitives": {
+    "bp": {
+      "sm": { "$value": "480px",  "$type": "dimension", "$description": "Phone landscape · transition for small layouts." },
+      "md": { "$value": "768px",  "$type": "dimension", "$description": "Tablet portrait · primary mobile↔desktop switch." },
+      "lg": { "$value": "1024px", "$type": "dimension", "$description": "Tablet landscape / small desktop." },
+      "xl": { "$value": "1280px", "$type": "dimension", "$description": "Large desktop · editorial container max-width." }
+    }
+  }
+}

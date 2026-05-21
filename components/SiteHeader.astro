@@ -1,0 +1,702 @@
+---
+import SocialIcons from "./SocialIcons.astro";
+import ThemeIcons from "./ThemeIcons.astro";
+import BrandMark from "./BrandMark.astro";
+import type { SocialLink } from "./ecosystem";
+
+export interface NavLink {
+  href: string;
+  label: string;
+  external?: boolean;
+  cta?: boolean;
+  /** Optional dropdown children. Shown on hover (desktop) or click (mobile). */
+  children?: { href: string; label: string }[];
+}
+
+export interface BrandConfig {
+  href?: string;
+  label: string;
+  mark?: string;
+  emText?: string;
+  byline?: string;
+  ariaLabel?: string;
+  /**
+   * Optional theme-aware logo. When present, replaces the textual brand
+   * (label/emText/byline) with an <img>. Both variants are rendered and
+   * swapped via CSS based on [data-theme] on <html>.
+   * - light: shown when theme is light (typically dark-inked artwork).
+   * - dark: shown when theme is dark (default; typically light-inked artwork).
+   */
+  logoSrc?: { light: string; dark: string };
+  /** Intrinsic logo height in px. Defaults to 28. */
+  logoHeight?: number;
+}
+
+interface Props {
+  brand: BrandConfig;
+  links?: NavLink[];
+  socials?: SocialLink[];
+  mobileMenu?: boolean;
+  themeToggle?: boolean;
+}
+
+const {
+  brand,
+  links = [],
+  socials = [],
+  mobileMenu = true,
+  themeToggle = true,
+} = Astro.props;
+
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path.startsWith(href);
+
+const brandHref = brand.href ?? "/";
+const brandAria = brand.ariaLabel ?? `${brand.label} — Inicio`;
+
+function splitBrandLabel(label: string, em?: string): [string, string, string] {
+  if (!em) return [label, "", ""];
+  const idx = label.indexOf(em);
+  if (idx === -1) return [label, "", ""];
+  return [label.slice(0, idx), em, label.slice(idx + em.length)];
+}
+const [brandPre, brandEm, brandPost] = splitBrandLabel(brand.label, brand.emText);
+
+const showNav = links.length > 0 || socials.length > 0 || themeToggle;
+const showMobileToggle = mobileMenu && showNav;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href={brandHref} class:list={["brand", { "brand--logo": brand.logoSrc }]} aria-label={brandAria}>
+      {brand.logoSrc ? (
+        <>
+          {/*
+            Both variants are decorative: the link already exposes the brand
+            name via aria-label, so duplicating it on the visible <img> would
+            double-announce in screen readers. We mark both alt="" + aria-hidden
+            so toggling the theme (which swaps which <img> is display:none)
+            doesn't change the accessible name.
+          */}
+          <img
+            src={brand.logoSrc.dark}
+            alt=""
+            aria-hidden="true"
+            class="brand-logo brand-logo--dark"
+            height={brand.logoHeight ?? 28}
+          />
+          <img
+            src={brand.logoSrc.light}
+            alt=""
+            aria-hidden="true"
+            class="brand-logo brand-logo--light"
+            height={brand.logoHeight ?? 28}
+          />
+        </>
+      ) : (
+        <>
+          {brand.mark === "chimi" ? (
+            <span class="brand-mark brand-mark--chimi" aria-hidden="true"><BrandMark size={14} /></span>
+          ) : brand.mark ? (
+            <span class="brand-mark" aria-hidden="true">{brand.mark}</span>
+          ) : null}
+          <span class="brand-name">
+            {brandEm ? (
+              <>{brandPre}<em>{brandEm}</em>{brandPost}</>
+            ) : (
+              brand.label
+            )}
+          </span>
+          {brand.byline && <span class="brand-by">{brand.byline}</span>}
+        </>
+      )}
+    </a>
+
+    {showMobileToggle && (
+      <button
+        class="nav-toggle"
+        aria-expanded="false"
+        aria-controls="ds-primary-nav"
+        aria-label="Abrir menú"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    )}
+
+    {showNav && (
+      <nav class="site-nav" id="ds-primary-nav" aria-label="Principal">
+        {links.length > 0 && (
+          <ul class="nav-list">
+            {links.map((l) => (
+              <li class:list={["nav-item", { "has-children": l.children && l.children.length > 0 }]}>
+                {l.children && l.children.length > 0 ? (
+                  <>
+                    <a
+                      href={l.href}
+                      class:list={[
+                        "nav-link",
+                        { active: !l.external && isActive(l.href), cta: l.cta },
+                      ]}
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                    >{l.label}<span class="nav-chevron" aria-hidden="true">▾</span></a>
+                    <button
+                      type="button"
+                      class="nav-submenu-toggle"
+                      aria-label={`Mostrar submenú de ${l.label}`}
+                      aria-expanded="false"
+                    ><span aria-hidden="true">▾</span></button>
+                    <ul class="nav-submenu" role="menu">
+                      {l.children.map((c) => (
+                        <li role="none">
+                          <a
+                            href={c.href}
+                            role="menuitem"
+                            class:list={["nav-sublink", { active: isActive(c.href) }]}
+                          >{c.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <a
+                    href={l.href}
+                    target={l.external ? "_blank" : undefined}
+                    rel={l.external ? "noopener" : undefined}
+                    class:list={[
+                      "nav-link",
+                      { active: !l.external && isActive(l.href), cta: l.cta },
+                    ]}
+                  >{l.label}</a>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        {themeToggle && (
+          <div class="nav-theme">
+            <button
+              type="button"
+              class="theme-toggle"
+              data-theme-toggle
+              aria-label="Activar modo claro"
+              title="Cambiar tema"
+            >
+              <span class="theme-toggle-icon" data-theme-icon="sun"><ThemeIcons icon="sun" size={18} /></span>
+              <span class="theme-toggle-icon" data-theme-icon="moon" hidden><ThemeIcons icon="moon" size={18} /></span>
+              <noscript><span class="theme-toggle-noscript">JS</span></noscript>
+            </button>
+          </div>
+        )}
+        {socials.length > 0 && (
+          <div class="nav-socials">
+            {socials.map((s) => (
+              <a
+                href={s.href}
+                class="social-link"
+                target="_blank"
+                rel="noopener"
+                aria-label={s.label}
+              >
+                <SocialIcons icon={s.icon} size={s.icon === "twitter" ? 16 : 18} />
+              </a>
+            ))}
+          </div>
+        )}
+      </nav>
+    )}
+  </div>
+</header>
+
+{showMobileToggle && (
+  <script is:inline>
+    const btn = document.querySelector(".site-header .nav-toggle");
+    const nav = document.getElementById("ds-primary-nav");
+    btn?.addEventListener("click", () => {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      nav?.classList.toggle("open", !open);
+    });
+
+    // Submenu toggles (mobile only — desktop uses :hover).
+    // Each chevron button toggles its parent .nav-item.has-children.
+    document.querySelectorAll(".site-header .nav-submenu-toggle").forEach((toggle) => {
+      toggle.addEventListener("click", (e) => {
+        e.preventDefault();
+        const item = toggle.closest(".nav-item");
+        if (!item) return;
+        const isOpen = item.classList.toggle("is-open");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+      });
+    });
+  </script>
+)}
+
+<script is:inline>
+  // Theme toggle wiring — supports any [data-theme-toggle] button in the document.
+  (function () {
+    if (typeof window === "undefined") return;
+
+    const STORAGE_KEY = "chimi-theme";
+    const buttons = document.querySelectorAll("[data-theme-toggle]");
+    if (buttons.length === 0) return;
+
+    function getCurrentTheme() {
+      return document.documentElement.getAttribute("data-theme") === "light"
+        ? "light"
+        : "dark";
+    }
+
+    function applyTheme(theme) {
+      if (theme === "light") {
+        document.documentElement.setAttribute("data-theme", "light");
+      } else {
+        document.documentElement.removeAttribute("data-theme");
+      }
+      try {
+        localStorage.setItem(STORAGE_KEY, theme);
+      } catch (_) {
+        /* ignore — privacy mode */
+      }
+      syncButtons(theme);
+      window.dispatchEvent(new CustomEvent("themechange", { detail: { theme } }));
+    }
+
+    function syncButtons(theme) {
+      buttons.forEach((btn) => {
+        const sun = btn.querySelector('[data-theme-icon="sun"]');
+        const moon = btn.querySelector('[data-theme-icon="moon"]');
+        if (theme === "light") {
+          // currently light — offer to switch to dark
+          sun?.setAttribute("hidden", "");
+          moon?.removeAttribute("hidden");
+          btn.setAttribute("aria-label", "Activar modo oscuro");
+        } else {
+          sun?.removeAttribute("hidden");
+          moon?.setAttribute("hidden", "");
+          btn.setAttribute("aria-label", "Activar modo claro");
+        }
+      });
+    }
+
+    // Sync on mount in case the bootstrap was skipped
+    syncButtons(getCurrentTheme());
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyTheme(getCurrentTheme() === "light" ? "dark" : "light");
+      });
+    });
+  })();
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--recipe-surface) 88%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .header-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 16px;
+    gap: var(--stack-sm) var(--stack-md);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--chimi-font-family-display);
+    /* Clamp floor handles small phones (≤480) directly — no extra media query
+       needed. The previous max-width override that pushed brand-name to 16px
+       below 480 collapses naturally into this clamp now that the floor is 16. */
+    font-size: clamp(16px, 4.5vw, 22px);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .brand-mark {
+    color: var(--recipe-accent);
+    font-family: var(--chimi-font-family-code);
+    font-size: 18px;
+  }
+  /* Chimi character mark: SVG inherits currentColor from the brand link, so
+     it adapts to the active recipe (ivory ink in dark canvas-quiet, charcoal
+     ink in light canvas-quiet, etc.). */
+  .brand-mark--chimi {
+    display: inline-flex;
+    align-items: center;
+    color: var(--recipe-ink);
+    /* SVG keeps its 38:82 aspect; a 22px wide rendering ≈ 47px tall, so we
+       scale it slightly to match the brand text height visually. */
+  }
+  .brand-mark--chimi svg {
+    height: 0.75em;
+    width: auto;
+    display: block;
+  }
+  .brand-name em {
+    color: var(--recipe-accent);
+    font-style: normal;
+    padding: 0 4px;
+  }
+  /*
+    `.brand-by` ("by Chimi" tagline) is hidden on phones to keep the brand
+    block compact alongside the hamburger; it returns at tablet and up where
+    the header has room for the secondary tagline.
+  */
+  .brand-by {
+    display: none;
+    font: var(--web-eyebrow);
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  @media (--md) {
+    .brand-by { display: inline; }
+  }
+
+  /* Theme-aware logo: render both, swap via [data-theme] on <html>. */
+  .brand--logo { gap: 0; }
+  .brand-logo {
+    display: block;
+    width: auto;
+    height: auto;
+    max-height: 28px;
+  }
+  /* Default theme is dark (no attribute). */
+  .brand-logo--light { display: none; }
+  :root[data-theme="light"] .brand-logo--dark { display: none; }
+  :root[data-theme="light"] .brand-logo--light { display: block; }
+
+  /*
+    Mobile-first nav:
+    - default (mobile, ≤1023): hamburger overlay; nav slides in from the
+      header bottom as a vertical list.
+    - @media (--lg) (≥1024): inline horizontal nav, hover-driven submenus,
+      socials/theme separated by hairlines.
+    The desktop layout was authored first and inverted — see commit history
+    if the nav looks wrong on mobile.
+  */
+  .site-nav {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--stack-md);
+    padding: var(--stack-md) var(--page-pad);
+    background: var(--recipe-surface);
+    border-bottom: 1px solid var(--hairline);
+    transform: translateY(-8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 180ms ease, opacity 180ms ease;
+    min-width: 0;
+  }
+  .site-nav.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+  .nav-link {
+    font: var(--web-eyebrow);
+    /* On mobile we bump nav-link to 14px for legibility / tap comfort; the
+       desktop block resets it to 12px (the eyebrow default). */
+    font-size: 14px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-strong);
+    padding: 4px 0;
+    border-bottom: 1px solid transparent;
+    white-space: nowrap;
+  }
+  .nav-link.active {
+    color: var(--recipe-ink);
+    border-bottom-color: var(--recipe-accent);
+  }
+  .nav-link:hover { color: var(--recipe-accent); }
+  /*
+    CTA pill — uses --recipe-em as the chrome color. On canvas-quiet/signal
+    that's lemon in dark and red in light (recipe handles the swap via
+    color.recipe.json's $extensions.chimi.theme.light overrides), so the CTA
+    stays legible across both themes without a dedicated [data-theme="light"]
+    block. On paper em is red, on paper em is patagonia — both
+    keep AA-acceptable contrast against the ivory paper surface.
+  */
+  .nav-link.cta {
+    color: var(--recipe-em);
+    border: 1px solid color-mix(in srgb, var(--recipe-em) 50%, transparent);
+    border-radius: 999px;
+    padding: 8px 14px;
+  }
+  .nav-link.cta:hover {
+    background: var(--recipe-em);
+    color: var(--recipe-surface);
+  }
+
+  /*
+    Submenu — accordion on mobile, floating dropdown on desktop.
+    The mobile defaults below are inlined into the parent .nav-item; desktop
+    promotes the submenu to a positioned floating panel inside @media (--lg).
+  */
+  .nav-item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .nav-chevron {
+    /* Mobile uses the dedicated .nav-submenu-toggle button; the inline
+       chevron on the link is hidden until desktop. */
+    display: none;
+    font-size: 9px;
+    margin-left: 4px;
+    color: var(--muted);
+    transition: transform 150ms ease;
+  }
+  .nav-item.has-children:hover .nav-chevron,
+  .nav-item.has-children.is-open .nav-chevron {
+    transform: rotate(180deg);
+    color: var(--recipe-accent);
+  }
+  .nav-submenu {
+    position: static;
+    width: 100%;
+    margin: 0 0 0 8px;
+    padding: 4px 0 4px 12px;
+    list-style: none;
+    background: transparent;
+    border: 0;
+    border-left: 2px solid var(--hairline);
+    border-radius: 0;
+    box-shadow: none;
+    display: grid;
+    gap: 2px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 1;
+    pointer-events: none;
+    transform: none;
+    transition: max-height 200ms ease;
+    z-index: 20;
+  }
+  .nav-item.has-children.is-open .nav-submenu {
+    max-height: 500px;
+    pointer-events: auto;
+  }
+  .nav-item.has-children.is-open .nav-submenu-toggle {
+    transform: rotate(180deg);
+  }
+  .nav-sublink {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font: var(--web-meta);
+    color: var(--muted-strong);
+    transition: background 120ms ease, color 120ms ease;
+  }
+  .nav-sublink:hover,
+  .nav-sublink:focus-visible {
+    background: color-mix(in srgb, var(--recipe-accent) 12%, transparent);
+    color: var(--recipe-accent);
+    outline: none;
+  }
+  .nav-sublink.active {
+    color: var(--recipe-accent);
+  }
+  /* On mobile, the chevron toggle button opens the submenu; on desktop it is
+     hidden and hover/.is-open drives the floating dropdown. */
+  .nav-submenu-toggle {
+    display: inline-flex;
+    margin-left: auto;
+    background: transparent;
+    border: 0;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--muted-strong);
+  }
+
+  .nav-socials {
+    display: flex;
+    gap: 12px;
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--stack-sm);
+  }
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--muted-strong);
+    border-radius: 999px;
+  }
+  .social-link:hover { color: var(--recipe-accent); }
+
+  /* Theme toggle — icon-only. On mobile it stacks under the socials with a
+     shared top hairline; on desktop it sits to the right with a vertical
+     hairline separator. */
+  .nav-theme {
+    display: flex;
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--stack-sm);
+  }
+  .theme-toggle {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-strong);
+    cursor: pointer;
+    transition: color 150ms ease, transform 80ms ease;
+  }
+  .theme-toggle:hover { color: var(--recipe-accent); }
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--recipe-accent);
+    outline-offset: 2px;
+  }
+  .theme-toggle:active { transform: translateY(1px); }
+  .theme-toggle-icon[hidden] { display: none; }
+  .theme-toggle-icon { display: inline-flex; }
+  .theme-toggle-noscript {
+    font: var(--web-meta);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* Hamburger button — visible on mobile, hidden at --lg (desktop). */
+  .nav-toggle {
+    display: inline-flex;
+    background: transparent;
+    border: 0;
+    padding: 8px;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .nav-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--recipe-ink);
+    transition: transform 180ms ease, opacity 180ms ease;
+  }
+  .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Below --sm we keep the brand name pinned at the WCAG-friendly 16px floor
+     so the brand block stays compact next to the hamburger; from --sm on we
+     let it inherit the .brand parent clamp and grow with the viewport. */
+  .brand-name { font-size: 16px; }
+  @media (--sm) {
+    .brand-name { font-size: 1em; }
+  }
+
+  /*
+    Desktop nav upgrade. Switches the overlay layout to inline horizontal
+    nav, restores hairline dividers between sections, and promotes the
+    submenu to a floating dropdown. The breakpoint is --lg (≥1024) rather
+    than --md (≥768) because the inline nav (logo + 4 links + socials +
+    theme + CTA) needs that extra width to avoid wrapping.
+  */
+  @media (--lg) {
+    .nav-toggle { display: none; }
+
+    .site-nav {
+      position: static;
+      flex-direction: row;
+      align-items: center;
+      gap: clamp(16px, 2.5vw, 32px);
+      padding: 0;
+      background: transparent;
+      border-bottom: 0;
+      transform: none;
+      opacity: 1;
+      pointer-events: auto;
+      transition: none;
+    }
+    .nav-list {
+      flex-direction: row;
+      gap: clamp(10px, 1.8vw, 22px);
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-link {
+      font-size: 12px;
+      padding: 6px 2px;
+    }
+
+    .nav-socials,
+    .nav-theme {
+      padding-left: clamp(8px, 1.5vw, 18px);
+      border-left: 1px solid var(--hairline);
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .nav-item { flex-wrap: nowrap; }
+    .nav-chevron { display: inline-block; }
+    .nav-submenu-toggle { display: none; }
+
+    .nav-submenu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: auto;
+      min-width: 180px;
+      margin: 0;
+      padding: 8px;
+      background: var(--surface-raised);
+      border: 1px solid var(--hairline);
+      border-left: 1px solid var(--hairline);
+      border-radius: 8px;
+      box-shadow: 0 12px 32px -8px color-mix(in srgb, #000 40%, transparent);
+      max-height: none;
+      overflow: visible;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(4px);
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+    .nav-item.has-children:hover .nav-submenu,
+    .nav-item.has-children:focus-within .nav-submenu,
+    .nav-item.has-children.is-open .nav-submenu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+  }
+</style>
