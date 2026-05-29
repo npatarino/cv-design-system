@@ -359,7 +359,7 @@ const showMobileToggle = mobileMenu && showNav;
     color: var(--muted);
     text-transform: uppercase;
   }
-  @media (--md) {
+  @media (min-width: 768px) {
     .brand-by { display: inline; }
   }
 
@@ -380,7 +380,7 @@ const showMobileToggle = mobileMenu && showNav;
     Mobile-first nav:
     - default (mobile, ≤1023): hamburger overlay; nav slides in from the
       header bottom as a vertical list.
-    - @media (--lg) (≥1024): inline horizontal nav, hover-driven submenus,
+    - @media (min-width: 1024px) (≥1024): inline horizontal nav, hover-driven submenus,
       socials/theme separated by hairlines.
     The desktop layout was authored first and inverted — see commit history
     if the nav looks wrong on mobile.
@@ -457,7 +457,7 @@ const showMobileToggle = mobileMenu && showNav;
   /*
     Submenu — accordion on mobile, floating dropdown on desktop.
     The mobile defaults below are inlined into the parent .nav-item; desktop
-    promotes the submenu to a positioned floating panel inside @media (--lg).
+    promotes the submenu to a positioned floating panel inside @media (min-width: 1024px).
   */
   .nav-item {
     position: relative;
@@ -620,7 +620,7 @@ const showMobileToggle = mobileMenu && showNav;
      so the brand block stays compact next to the hamburger; from --sm on we
      let it inherit the .brand parent clamp and grow with the viewport. */
   .brand-name { font-size: 16px; }
-  @media (--sm) {
+  @media (min-width: 480px) {
     .brand-name { font-size: 1em; }
   }
 
@@ -631,7 +631,7 @@ const showMobileToggle = mobileMenu && showNav;
     than --md (≥768) because the inline nav (logo + 4 links + socials +
     theme + CTA) needs that extra width to avoid wrapping.
   */
-  @media (--lg) {
+  @media (min-width: 1024px) {
     .nav-toggle { display: none; }
 
     .site-nav {
