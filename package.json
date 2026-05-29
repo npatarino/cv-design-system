@@ -1,6 +1,6 @@
 {
   "name": "@chimichurricode/design-system",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Chimi design system — tokens (colors, typography, recipes) as CSS variables and ES modules, plus shared Astro components and SEO helpers.",
   "type": "module",
   "files": [
@@ -55,7 +55,8 @@
     "./assets/logos/logo-code.svg": "./assets/logos/logo-code.svg",
     "./assets/icons/*": "./assets/icons/*",
     "./assets/og/*": "./assets/og/*",
-    "./site-registry": "./site-registry.ts",
+    "./recipes": "./recipes.mjs",
+  "./site-registry": "./site-registry.ts",
     "./site-registry-runtime": "./seo/site-registry-runtime.generated.mjs",
     "./package.json": "./package.json"
   },
