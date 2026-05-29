@@ -256,8 +256,8 @@ const isCurrentSiteByline = (href: string) =>
   /*
     Mobile-first footer grid:
     - default (mobile): single column, brand stacks above link groups
-    - @media (--md) (≥768): two columns, brand col spans full width
-    - @media (--lg) (≥1024): full editorial layout (1.6fr brand + N link cols)
+    - @media (min-width: 768px) (≥768): two columns, brand col spans full width
+    - @media (min-width: 1024px) (≥1024): full editorial layout (1.6fr brand + N link cols)
   */
   .site-footer--rich .footer-inner {
     display: grid;
@@ -265,13 +265,13 @@ const isCurrentSiteByline = (href: string) =>
     gap: clamp(24px, 4vw, 72px);
     padding-bottom: var(--stack-lg);
   }
-  @media (--md) {
+  @media (min-width: 768px) {
     .site-footer--rich .footer-inner {
       grid-template-columns: 1fr 1fr;
     }
     .site-footer--rich .brand-col { grid-column: 1 / -1; }
   }
-  @media (--lg) {
+  @media (min-width: 1024px) {
     .site-footer--rich .footer-inner {
       grid-template-columns: 1.6fr repeat(var(--footer-cols, 3), minmax(0, 1fr));
     }
