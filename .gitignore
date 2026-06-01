@@ -8,3 +8,4 @@ dist/
 # Test files
 scripts/__tests__/
 seo/__tests__/
+.npm-otp.txt
