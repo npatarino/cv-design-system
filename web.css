@@ -42,21 +42,14 @@
   --stack-xl: 96px;
   --stack-2xl: 144px;
 
-  /* ── role tokens (derived from --recipe-ink / --recipe-accent) ───────
-   * Percentages tuned for ivory ink on charcoal surface (canvas-quiet,
-   * default). Recipes that flip the contrast direction (paper
-   * with charcoal ink on ivory) read heavier at the same alpha, so we
-   * re-tune in :root[data-theme="light"] for that case (the recipes
-   * themselves now carry per-theme overrides via $extensions.chimi.theme.light
-   * in tokens/color.recipe.json — this block only re-tunes the alpha mixes).
+  /* ── role tokens: see the [data-recipe] block below ──────────────────
+   * They are declared on :root only as a fallback for documents that never
+   * set data-recipe. The real declaration lives on `:root, [data-recipe]`
+   * because a custom property is resolved where it is *declared*: a
+   * `--muted` declared on :root reads the :root `--recipe-ink` (canvas-quiet
+   * ivory), not the one the recipe sets on <body data-recipe="paper">. That
+   * bug made every paper page render ivory-on-ivory muted text (fixed 0.8.0).
    */
-  --hairline:        color-mix(in srgb, var(--recipe-ink) 12%, transparent);
-  --hairline-strong: color-mix(in srgb, var(--recipe-ink) 24%, transparent);
-  --muted:           color-mix(in srgb, var(--recipe-ink) 62%, transparent);
-  --muted-strong:    color-mix(in srgb, var(--recipe-ink) 80%, transparent);
-  --row-bg:          color-mix(in srgb, var(--recipe-ink) 4%, transparent);
-  --row-bg-hover:    color-mix(in srgb, var(--recipe-accent) 8%, transparent);
-  --surface-raised:  color-mix(in srgb, var(--recipe-ink) 6%, transparent);
 
   /* ── web-scale type composites (canonical = blog) ──────────────────── */
   --web-display-xl: var(--chimi-type-display-xl-fontWeight) clamp(64px, 9vw, 128px)/0.92 var(--chimi-font-family-display);
@@ -107,6 +100,23 @@
   --recipe-accent: var(--chimi-color-recipe-canvas-quiet-accent); /* patagonia */
 }
 
+/* ── role tokens (derived from --recipe-ink / --recipe-accent) ───────────
+ * Declared on every element that carries a recipe so the mixes resolve
+ * against *that* recipe's ink. Percentages tuned for ivory ink on charcoal
+ * (canvas-quiet); the light block below re-tunes them for the inverted
+ * contrast direction.
+ */
+:root,
+[data-recipe] {
+  --hairline:        color-mix(in srgb, var(--recipe-ink) 12%, transparent);
+  --hairline-strong: color-mix(in srgb, var(--recipe-ink) 24%, transparent);
+  --muted:           color-mix(in srgb, var(--recipe-ink) 62%, transparent);
+  --muted-strong:    color-mix(in srgb, var(--recipe-ink) 80%, transparent);
+  --row-bg:          color-mix(in srgb, var(--recipe-ink) 4%, transparent);
+  --row-bg-hover:    color-mix(in srgb, var(--recipe-accent) 8%, transparent);
+  --surface-raised:  color-mix(in srgb, var(--recipe-ink) 6%, transparent);
+}
+
 /* ── light-theme derived-token overrides ─────────────────────────────────
  * Charcoal ink on ivory reads heavier than ivory ink on charcoal at the
  * same alpha, so we drop the mix percentages by ~30–40% to keep hairlines
@@ -116,7 +126,8 @@
  * in tokens/color.recipe.json); this block only re-tunes the derived
  * alpha mixes that depend on the inverted contrast direction.
  */
-:root[data-theme="light"] {
+:root[data-theme="light"],
+:root[data-theme="light"] [data-recipe] {
   --hairline:        color-mix(in srgb, var(--recipe-ink) 8%, transparent);
   --hairline-strong: color-mix(in srgb, var(--recipe-ink) 16%, transparent);
   --muted:           color-mix(in srgb, var(--recipe-ink) 55%, transparent);
@@ -172,7 +183,10 @@ img, svg { max-width: 100%; display: block; }
    children without forcing a particular layout. */
 .hide-on-mobile { display: none; }
 .hide-on-desktop { display: revert; }
-@media (--md) {
+/* Literal query on purpose: web.css must work without PostCSS. Consumers
+   may still write `@media (--md)` in their own CSS using the postcss helper
+   exported as `@chimichurricode/design-system/postcss`. */
+@media (min-width: 768px) {
   .hide-on-mobile { display: revert; }
   .hide-on-desktop { display: none; }
 }

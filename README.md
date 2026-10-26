@@ -113,7 +113,7 @@ Recipes are the **consumption layer** for everything Chimi paints — slide temp
 
 Each surface declares one recipe — slide frontmatter (`recipe: canvas-quiet`) or `<body data-recipe="canvas-quiet">` for webs — and the rest derives. Recipes don't replace primitives or semantic — they sit above and select among them.
 
-See [docs/recipes.md](docs/recipes.md) for the full field guide and `openspec/specs/closed-recipe-model/spec.md` for the normative contract — the closed catalog of seven recipes, the `data-recipe` declaration point, the `--recipe-*` consumption rule, the `critical` bicara pattern, and the rule-of-one for `energy-loud`.
+See [docs/anti-patterns.md](docs/anti-patterns.md) for the list of patterns every Chimi surface avoids (template tells) and the `check-slop` script that scans a built site for them. See [docs/recipes.md](docs/recipes.md) for the full field guide and `openspec/specs/closed-recipe-model/spec.md` for the normative contract — the closed catalog of seven recipes, the `data-recipe` declaration point, the `--recipe-*` consumption rule, the `critical` bicara pattern, and the rule-of-one for `energy-loud`.
 
 ```bash
 npm run check:recipes   # linter that reports webs/slides consuming --chimi-color-* directly
@@ -155,7 +155,7 @@ Webs author CSS mobile-first against four canonical breakpoints (`--bp-sm` 480, 
 }
 ```
 
-`postcss-custom-media` (configured at the monorepo root) inlines `@media (--md)` to literal `@media (min-width: 768px)` at build time, so every browser sees standard CSS.
+Consumer CSS that writes `@media (--md)` must inline it at build time with the helper exported as `@chimichurricode/design-system/postcss` (see [docs/responsive.md](docs/responsive.md)). `web.css` and the components ship literal queries and need no tooling.
 
 `web.css` ships layout helpers built on these breakpoints — `.container`, `.stack-{sm,md,lg}`, `.hide-on-mobile` / `.hide-on-desktop`, plus a `(max-width: 767.98px)` floor that pins `.btn` / `[role="button"]` / `nav a` to a 44×44 tap target on phones (the only `max-width` rule the system allows).
 

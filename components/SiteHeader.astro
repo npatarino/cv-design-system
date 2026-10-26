@@ -296,9 +296,9 @@ const showMobileToggle = mobileMenu && showNav;
     position: sticky;
     top: 0;
     z-index: 10;
-    background: color-mix(in srgb, var(--recipe-surface) 88%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Solid surface. Frosted glass (backdrop-filter) is on the anti-patterns
+       list: see docs/anti-patterns.md. */
+    background: var(--recipe-surface);
     border-bottom: 1px solid var(--hairline);
   }
   .header-inner {

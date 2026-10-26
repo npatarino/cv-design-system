@@ -1,6 +1,6 @@
 {
   "name": "@chimichurricode/design-system",
-  "version": "0.7.6",
+  "version": "0.8.0",
   "description": "Chimi design system — tokens (colors, typography, recipes) as CSS variables and ES modules, plus shared Astro components and SEO helpers.",
   "type": "module",
   "files": [
@@ -22,7 +22,11 @@
     "seo/manifest.mjs",
     "seo/render-head.mjs",
     "seo/site-registry-runtime.generated.mjs",
-    "seo/README.md"
+    "seo/README.md",
+    "postcss.mjs",
+    "scripts/check-slop.mjs",
+    "docs/anti-patterns.md",
+    "docs/responsive.md"
   ],
   "exports": {
     "./tokens.css": "./dist/tokens.css",
@@ -59,11 +63,13 @@
     "./recipes": "./recipes.mjs",
     "./site-registry": "./site-registry.ts",
     "./site-registry-runtime": "./seo/site-registry-runtime.generated.mjs",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./postcss": "./postcss.mjs"
   },
   "scripts": {
     "build:registry": "bun scripts/emit-site-registry-runtime.mjs",
-    "build": "bun run build:registry && bun config.mjs"
+    "build": "bun run build:registry && bun config.mjs",
+    "check:slop": "node scripts/check-slop.mjs"
   },
   "peerDependencies": {
     "astro": "^5.0.0"
@@ -75,5 +81,9 @@
   },
   "devDependencies": {
     "style-dictionary": "^4.4.0"
+  },
+  "dependencies": {
+    "postcss-custom-media": "^12.0.0",
+    "postcss": "^8.4.0"
   }
 }

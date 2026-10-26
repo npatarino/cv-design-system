@@ -68,6 +68,12 @@ const DEFAULT_FONT_URLS = [
   "/fonts/CHANEY-Regular.otf",
 ];
 
+/** MIME type for a font URL, by extension. Falls back to font/woff2. */
+export function fontMimeType(href) {
+  const ext = String(href).split(/[?#]/)[0].split(".").pop()?.toLowerCase();
+  return { otf: "font/otf", ttf: "font/ttf", woff: "font/woff", woff2: "font/woff2" }[ext] ?? "font/woff2";
+}
+
 const DEFAULT_ICONS = {
   favicon: "/favicon.svg",
   favicon32: "/favicon-32x32.png",
@@ -227,8 +233,10 @@ export function renderSEOHeadHTML(props) {
   const fontUrls = props.preloadFontUrls ?? DEFAULT_FONT_URLS;
   if (props.preloadFonts !== false && fontUrls.length) {
     for (const href of fontUrls) {
+      // A preload whose `type` does not match the file is discarded by the
+      // browser (and logged as an unused preload). The DS ships .otf today.
       lines.push(
-        `<link rel="preload" as="font" type="font/woff2" href="${attr(href)}" crossorigin="anonymous">`,
+        `<link rel="preload" as="font" type="${fontMimeType(href)}" href="${attr(href)}" crossorigin="anonymous">`,
       );
     }
   }
