@@ -23,7 +23,15 @@ Each token also has a matching `@custom-media` query (`--sm`, `--md`, `--lg`, `-
 }
 ```
 
-`postcss-custom-media` (configured in the monorepo root `postcss.config.mjs`) inlines these to literal `@media (min-width: 768px) { … }` at build time. Browsers without native `@custom-media` support still get a working bundle.
+`@custom-media` is not supported by any browser: it must be inlined at build time. `web.css` and the DS components already ship literal `min-width` queries, so they work with no tooling. **Consumer CSS that writes `@media (--md)` needs the helper** exported by this package:
+
+```js
+// postcss.config.mjs (in the consumer site)
+import { dsCustomMedia } from "@chimichurricode/design-system/postcss";
+export default { plugins: [...dsCustomMedia()] };
+```
+
+`dsCustomMedia()` reads the `@custom-media` definitions from `dist/breakpoints.css`, injects them into every stylesheet and runs `postcss-custom-media`, so `@media (--md)` becomes `@media (min-width: 768px)`. Without it the queries reach the browser verbatim and are ignored: every layout renders as mobile. (This bit the blog after it left the monorepo, 2026-10.)
 
 If you need the breakpoint as a value (e.g. a `min(…, var(--bp-md))` calc), use the `--bp-*` custom property — it lives in `:root` everywhere `web.css` is imported.
 
