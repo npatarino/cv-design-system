@@ -72,4 +72,4 @@ for (const [label, n, max, note] of report) {
   if (n > max) warn++;
   console.log(`${flag} ${label}: ${n}${n > max ? ` (umbral ${max})` : ""}${note && n > max ? ` — ${note}` : ""}`);
 }
-console.log(`check-slop: ${html.length} páginas, ${css.length} hojas CSS, ${warn} avisos`);
+console.log(`check-slop: ${html.length} pages, ${css.length} CSS files, ${warn} warnings`);

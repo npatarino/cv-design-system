@@ -7,7 +7,7 @@
  *   needs a whole asset directory mirrored — e.g. brand needs every font
  *   file next to its styles.css — declare a prebuild like:
  *
- *     "sync:fonts": "node ../design-system/scripts/sync-dir.mjs fonts shared/fonts"
+ *     "sync:fonts": "node node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs fonts public/fonts"
  *
  *   Result: the DS owns the asset directory; the site mirrors it on every
  *   build. Output files are *generated*, don't hand-edit.

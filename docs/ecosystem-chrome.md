@@ -143,6 +143,6 @@ If you forget to pass `siteId`, the full list is rendered (including the current
 ## Related capabilities
 
 - `theme-toggle` — the toggle button mounted inside `SiteHeader` and (optionally) `SiteFooter`. Contract: `openspec/specs/theme-toggle/spec.md`.
-- `theming` — `[data-theme]` cascade that the toggle drives; both `SiteHeader` and `SiteFooter` consume `--chimi-color-*` semantic tokens that respect that cascade. Contract: `openspec/specs/theming/spec.md`.
+- `theming` — `[data-theme]` cascade that the toggle drives; both `SiteHeader` and `SiteFooter` consume `--recipe-*` tokens that respect that cascade. Contract: `openspec/specs/theming/spec.md`.
 - `cross-web-seo` — SEO catalog distinction (chrome vs SEO) and the cross-web meta/alternates surface. Contract: `openspec/specs/cross-web-seo/spec.md`.
 - `closed-recipe-model` — the recipe-driven color contract that the chrome's CSS rides on top of. Contract: `openspec/specs/closed-recipe-model/spec.md`.

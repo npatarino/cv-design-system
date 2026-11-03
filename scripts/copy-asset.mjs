@@ -6,7 +6,7 @@
  *   Astro static sites and HTML packages can't reach outside their workspace
  *   for build outputs. This helper lets a site declare a `prebuild` step
  *   like:
- *     "prebuild": "node ../design-system/scripts/copy-asset.mjs assets/logos/favicon.svg public/favicon.svg"
+ *     "prebuild": "node node_modules/@chimichurricode/design-system/scripts/copy-asset.mjs assets/logos/favicon.svg public/favicon.svg"
  *
  *   Result: the DS is the single source of truth for the file, and the
  *   site's tree mirrors it on every build.
