@@ -2,7 +2,7 @@
  * @file Generate the canonical favicon / apple-touch-icon / manifest
  * icon set from `assets/logos/favicon.svg`.
  *
- * Outputs (under `packages/design-system/assets/icons/`):
+ * Outputs (under `assets/icons/`):
  *   - favicon.svg                (copy of logos/favicon.svg, the canonical mark)
  *   - favicon-32x32.png          (32×32 PNG fallback for browsers that prefer ICO/PNG)
  *   - apple-touch-icon.png       (180×180 PNG for iOS Add-to-Home-Screen)
@@ -10,14 +10,11 @@
  *   - icon-192.png               (manifest icon, any/maskable)
  *   - icon-512.png               (manifest icon, any/maskable)
  *
- * Webs sync this directory into their `public/` (or equivalent) during
- * their build step. We do not ship favicons per-web because every site
+ * Consumers copy these into their `public/` during their build step
+ * (`scripts/seo-prebuild.mjs`). We do not ship favicons per-web because every site
  * uses the same canonical mark.
  *
- * Run via `npm --workspace @chimi/design-system run icons` (added in
- * task 0.6). Sharp is already a transitive devDependency through
- * Astro, so no extra install is required on developer machines that
- * have run `npm install` for the monorepo.
+ * Run: `bun run generate:icons` (sharp is a devDependency).
  */
 
 import { mkdir, readFile, writeFile, copyFile, access } from "node:fs/promises";

@@ -78,7 +78,9 @@
     "check:registry": "bun scripts/check-site-registry-drift.mjs",
     "check:site-id-union": "bun scripts/check-site-id-union.mjs",
     "check:ecosystem-chrome": "bun scripts/check-ecosystem-chrome.mjs",
-    "check:slop": "node scripts/check-slop.mjs"
+    "check:slop": "node scripts/check-slop.mjs",
+    "generate:icons": "bun scripts/generate-icons.mjs",
+    "generate:icon-preview": "bun scripts/generate-preview.mjs"
   },
   "peerDependencies": {
     "astro": "^5.0.0"
@@ -89,6 +91,7 @@
     }
   },
   "devDependencies": {
+    "sharp": "^0.34.0",
     "style-dictionary": "^4.4.0"
   },
   "dependencies": {

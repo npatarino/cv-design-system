@@ -1,8 +1,12 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const iconsDir = path.join(process.cwd(), 'assets/icons');
-const categories = fs.readdirSync(iconsDir).filter(f => fs.statSync(path.join(iconsDir, f)).isDirectory());
+// Sorted explicitly: readdir order is filesystem-dependent (APFS returns
+// names sorted, ext4 doesn't), which made the output differ per machine.
+const byName = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+const iconsDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../assets/icons');
+const categories = fs.readdirSync(iconsDir).filter(f => fs.statSync(path.join(iconsDir, f)).isDirectory()).sort(byName);
 
 let html = `
 <!DOCTYPE html>
@@ -105,7 +109,7 @@ let html = `
 
 let total = 0;
 for (const cat of categories) {
-  const files = fs.readdirSync(path.join(iconsDir, cat)).filter(f => f.endsWith('.svg'));
+  const files = fs.readdirSync(path.join(iconsDir, cat)).filter(f => f.endsWith('.svg')).sort(byName);
   if (files.length === 0) continue;
   
   total += files.length;
