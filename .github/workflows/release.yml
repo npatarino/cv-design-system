@@ -1,0 +1,90 @@
+name: Release
+# Publishes @chimichurricode/design-system to npm when package.json on main
+# carries a version that npm doesn't have yet, then tags v<version> and
+# creates a GitHub Release. See "Releasing" in README.md.
+on:
+  push:
+    branches: [main]
+    paths: [package.json]
+  workflow_dispatch:
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+permissions:
+  contents: write # tag + GitHub Release
+  id-token: write # npm provenance / trusted publishing
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check npm credentials
+        id: auth
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TRUSTED: ${{ vars.NPM_TRUSTED_PUBLISHING }}
+        run: |
+          if [ -n "$NPM_TOKEN" ] || [ "$TRUSTED" = "true" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          msg="Add NPM_TOKEN secret: npm automation/granular token with publish rights, bypass 2FA (repo Settings > Secrets and variables > Actions). Or set up npm Trusted Publishing and the repository variable NPM_TRUSTED_PUBLISHING=true."
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "::error title=NPM_TOKEN missing::$msg"
+            exit 1
+          fi
+          echo "::notice title=Release skipped (NPM_TOKEN missing)::$msg"
+          echo "ok=false" >> "$GITHUB_OUTPUT"
+
+      - if: steps.auth.outputs.ok == 'true'
+        uses: actions/checkout@v4
+      - if: steps.auth.outputs.ok == 'true'
+        uses: oven-sh/setup-bun@v2
+      - if: steps.auth.outputs.ok == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - if: steps.auth.outputs.ok == 'true'
+        name: Use npm 11 (trusted publishing needs >= 11.5.1)
+        run: npm install -g npm@11
+      - if: steps.auth.outputs.ok == 'true'
+        run: bun install --frozen-lockfile
+      - if: steps.auth.outputs.ok == 'true'
+        run: bun run build
+      - if: steps.auth.outputs.ok == 'true'
+        run: bun run check
+
+      - if: steps.auth.outputs.ok == 'true'
+        name: Publish if this version is not on npm
+        id: publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if out=$(npm view "$name@$version" version 2>&1); then
+            if [ "$out" = "$version" ]; then
+              echo "::notice::$name@$version is already on npm, nothing to publish."
+              echo "published=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          elif ! grep -q E404 <<<"$out"; then
+            echo "::error::Could not check $name@$version on npm: $out"
+            exit 1
+          fi
+          npm publish --access public --provenance
+          echo "published=true" >> "$GITHUB_OUTPUT"
+
+      - if: steps.publish.outputs.published == 'true'
+        name: Tag and create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ steps.publish.outputs.version }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::notice::Release $TAG already exists."
+          else
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "$TAG" --generate-notes
+          fi
