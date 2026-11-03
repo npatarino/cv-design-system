@@ -11,7 +11,9 @@
     "dist",
     "tokens",
     "components",
-    "assets",
+    "assets/icons",
+    "assets/logos",
+    "assets/og",
     "web.css",
     "recipes.mjs",
     "fonts.css",
@@ -33,14 +35,19 @@
     "scripts/seo-prebuild.mjs",
     "scripts/sync-dir.mjs",
     "scripts/copy-asset.mjs",
+    "scripts/fetch-fonts.mjs",
     "seo/lint.mjs",
     "docs/anti-patterns.md",
     "docs/responsive.md"
   ],
+  "bin": {
+    "chimi-fetch-fonts": "scripts/fetch-fonts.mjs"
+  },
   "exports": {
     "./tokens.css": "./dist/tokens.css",
     "./web.css": "./web.css",
     "./fonts.css": "./fonts.css",
+    "./fetch-fonts": "./scripts/fetch-fonts.mjs",
     "./ecosystem": "./components/ecosystem.ts",
     "./SiteHeader.astro": "./components/SiteHeader.astro",
     "./SiteFooter.astro": "./components/SiteFooter.astro",
@@ -84,7 +91,8 @@
     "check:ecosystem-chrome": "bun scripts/check-ecosystem-chrome.mjs",
     "check:slop": "node scripts/check-slop.mjs",
     "generate:icons": "bun scripts/generate-icons.mjs",
-    "generate:icon-preview": "bun scripts/generate-preview.mjs"
+    "generate:icon-preview": "bun scripts/generate-preview.mjs",
+    "test": "bun test test/"
   },
   "peerDependencies": {
     "astro": "^5.0.0"

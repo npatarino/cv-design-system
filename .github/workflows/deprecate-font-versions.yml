@@ -1,0 +1,48 @@
+name: Deprecate font versions
+# Versions <= 0.8.0 of @chimichurricode/design-system bundled the licensed
+# font files (assets/fonts). This marks them deprecated on npm so installs
+# warn and point to >= 0.8.1, where the fonts are fetched at build time from
+# the private repo. Manual only. See "Releasing" in README.md.
+on:
+  workflow_dispatch:
+concurrency:
+  group: deprecate-font-versions
+  cancel-in-progress: false
+permissions:
+  contents: read
+env:
+  PACKAGE: "@chimichurricode/design-system"
+  FIXED_VERSION: "0.8.1"
+  RANGE: "<=0.8.0"
+  MESSAGE: "Contains licensed font files that must not be redistributed. Upgrade to >=0.8.1 (fonts are fetched at build time)."
+jobs:
+  deprecate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check npm credentials
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "::error title=NPM_TOKEN missing::Add the NPM_TOKEN secret (same token as the Release workflow; see Releasing in README.md)."
+            exit 1
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Require ${{ env.FIXED_VERSION }} to be published
+        run: |
+          if ! out=$(npm view "$PACKAGE@$FIXED_VERSION" version 2>&1) || [ "$out" != "$FIXED_VERSION" ]; then
+            echo "::error title=$FIXED_VERSION not on npm::Publish $PACKAGE@$FIXED_VERSION first (Release workflow), so the deprecation points to an available version. npm said: $out"
+            exit 1
+          fi
+          echo "$PACKAGE@$FIXED_VERSION is published."
+      - name: Deprecate ${{ env.RANGE }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm deprecate "$PACKAGE@$RANGE" "$MESSAGE"
+          npm view "$PACKAGE" versions --json
+          npm view "$PACKAGE@0.8.0" deprecated

@@ -4,7 +4,7 @@
 
 **`@chimichurricode/design-system`** — the single source of truth for colors, typography, recipes, shared Astro chrome and SEO used across the Chimichurri Code surfaces (talks, blog, brand book and the ecosystem webs).
 
-Tokens are authored as JSON, built with [Style Dictionary v4](https://styledictionary.com/), and shipped as CSS custom properties. On top of them the package ships a web-scale stylesheet (`web.css`), the brand fonts, Astro components (header, footer, theme toggle, brand marks, SEO head) and framework-agnostic SEO helpers.
+Tokens are authored as JSON, built with [Style Dictionary v4](https://styledictionary.com/), and shipped as CSS custom properties. On top of them the package ships a web-scale stylesheet (`web.css`), the `@font-face` declarations and a build-time font fetcher (the licensed font files themselves live in a private repo, see [Fonts](#fonts)), Astro components (header, footer, theme toggle, brand marks, SEO head) and framework-agnostic SEO helpers.
 
 ![The six color recipes, each rendered with its own surface, ink, em, accent and warn roles](docs/images/recipes.png)
 
@@ -20,6 +20,7 @@ Tokens are authored as JSON, built with [Style Dictionary v4](https://styledicti
 - [Theming (dark + light)](#theming-dark--light)
 - [Responsive](#responsive)
 - [Ecosystem chrome and SEO](#ecosystem-chrome-and-seo)
+- [Fonts](#fonts)
 - [Local development](#local-development)
 - [Changing tokens](#changing-tokens)
 - [Releasing](#releasing)
@@ -42,11 +43,11 @@ npm install @chimichurricode/design-system
    @import "@chimichurricode/design-system/web.css";
    ```
 
-2. **Fonts and SEO assets** — `fonts.css` points at `/fonts/*`, and `SEOHead` expects the favicons, `/og/<site>.webp`, `manifest.webmanifest` and `robots.txt` in `public/`. Copy them before building with the shipped scripts:
+2. **Fonts and SEO assets** — `fonts.css` points at `/fonts/*`, and `SEOHead` expects the favicons, `/og/<site>.webp`, `manifest.webmanifest` and `robots.txt` in `public/`. Put them there before building with the shipped scripts (the fonts come from a private repo, see [Fonts](#fonts)):
 
    ```jsonc
    // package.json
-   "prebuild": "node node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs fonts public/fonts && node node_modules/@chimichurricode/design-system/scripts/seo-prebuild.mjs --site blog --public public"
+   "prebuild": "chimi-fetch-fonts public/fonts && node node_modules/@chimichurricode/design-system/scripts/seo-prebuild.mjs --site blog --public public"
    ```
 
 3. **Breakpoints** — if your own CSS writes `@media (--md)`, inline the custom media at build time:
@@ -99,7 +100,7 @@ Use the raw tokens without the web layer — `cv-talks` passthrough-copies `node
 | `web.css` | Everything a web needs: imports `dist/tokens.css`, `dist/breakpoints.css` and `fonts.css`, then adds a reset, web-scale type composites (`--web-display-xl`, `--web-body-md`, …), role tokens (`--muted`, `--hairline`, …) and utilities (`.container`, `.stack-{sm,md,lg}`, `.hide-on-mobile/-desktop`, `.display-*`, `.editorial-*`, `.eyebrow`, `.btn`, `.btn-primary`, `.tag`, …). |
 | `tokens.css` → `dist/tokens.css` | Generated token variables + `[data-recipe]` selectors + the `:root[data-theme="light"]` overrides. No imports. |
 | `dist/breakpoints.css` | Generated `--bp-{sm,md,lg,xl}` properties and matching `@custom-media` queries. |
-| `fonts.css` | Hand-written `@font-face` for CHANEY, At Aero, Scilla Narrow, Thunder and Nudica Mono (binaries in `assets/fonts/`). |
+| `fonts.css` | Hand-written `@font-face` for CHANEY, At Aero, Scilla Narrow, Thunder and Nudica Mono The font files are not in the package: see [Fonts](#fonts). |
 | `postcss` | `dsCustomMedia()` — PostCSS plugins that inline `@media (--md)` etc. |
 | `recipes` | `getTypeRecipes()` / `getTypeRecipeSummaries()` — type-family whitelist per recipe (from `tokens/type.recipe.json`). |
 | `*.astro` | `SiteHeader`, `SiteFooter`, `SocialIcons`, `ThemeBootstrap`, `ThemeIcons`, `SEOHead`, `BrandMark`, `BrandFavicon`, `BrandLogoWordmark`, `BrandLogoCircle`. Astro ≥ 5 is an optional peer dependency. |
@@ -225,6 +226,34 @@ The sibling-site logos in the footer (`logoSrc` in the registry, e.g. Simple Scr
 
 ---
 
+## Fonts
+
+The five typefaces (CHANEY, At Aero, Scilla Narrow, Thunder, Nudica Mono) are **licensed fonts that can't be redistributed**, so they are not in this repository or in the npm package (from 0.8.1). They live in the private repo [`npatarino/cv-fonts`](https://github.com/npatarino/cv-fonts) (`fonts/`). This package ships only `fonts.css` (the `@font-face` rules, pointing at `/fonts/<file>`) and `scripts/fetch-fonts.mjs`, which copies the files into a site at build time:
+
+```jsonc
+// package.json of a site
+"prebuild": "chimi-fetch-fonts public/fonts"
+```
+
+```js
+// or from a script
+import { fetchFonts } from "@chimichurricode/design-system/fetch-fonts";
+await fetchFonts({ outDir: "public/fonts" });
+```
+
+Where the files come from (first match wins):
+
+| Source | When |
+|---|---|
+| `CHIMI_FONTS_DIR` | A local directory with the files, e.g. `CHIMI_FONTS_DIR=~/code/cv-fonts/fonts` for local dev with a clone of `cv-fonts`. |
+| `CHIMI_FONTS_TOKEN` | A fine-grained GitHub token with **Contents: read-only** on `npatarino/cv-fonts` only. Downloads the repo tarball (`CHIMI_FONTS_REF`, default `main`) and extracts `fonts/*`. Cached in `node_modules/.cache/chimi-fonts/<ref>`; a branch is re-downloaded after `CHIMI_FONTS_CACHE_HOURS` (default 24). Set it in each site's Vercel project (Production and Preview) and, if CI should build with the real fonts, as a GitHub Actions secret. |
+| Legacy | An installed `@chimichurricode/design-system` ≤ 0.8.0 still has `assets/fonts/`; used with a warning. |
+| None | The build succeeds with a warning and the site falls back to system fonts. `--require` or `CHIMI_FONTS_REQUIRED=1` turns this into an error. |
+
+Files that are already identical in the target aren't rewritten, the target should be gitignored (`public/fonts/`), and the token is never printed. The fetcher has no dependencies (Node ≥ 18: `fetch`, `zlib` and a small tar reader). Tests: `bun run test`.
+
+`.gitignore` blocks `assets/fonts/` and font extensions so they can't be committed here again. Versions ≤ 0.8.0 on npm still contain the files; see [Releasing](#releasing) for the deprecation workflow.
+
 ## Local development
 
 Requires [Bun](https://bun.sh/) (the build scripts run with `bun`).
@@ -247,7 +276,8 @@ Shipped in the package and run from the consumer's root:
 
 | Script | What it does |
 |---|---|
-| `scripts/sync-dir.mjs <assets-subdir> <target>` | Copies a directory from `assets/` (e.g. `fonts public/fonts`). |
+| `scripts/fetch-fonts.mjs [target] [--require]` (bin `chimi-fetch-fonts`, import `@chimichurricode/design-system/fetch-fonts`) | Puts the licensed font files into `target` (default `public/fonts`). See [Fonts](#fonts). |
+| `scripts/sync-dir.mjs <assets-subdir> <target>` | Copies a directory from `assets/` (e.g. `icons public/icons`). |
 | `scripts/copy-asset.mjs <package-path> <target>` | Copies one file from the package. |
 | `scripts/seo-prebuild.mjs --site <id> [--public public]` | Writes favicons, `og/<id>.webp`, `manifest.webmanifest` and `robots.txt` into `public/`. `--disallow`, `--noindex`, `--sitemap`, `--no-*` flags. |
 | `scripts/check-seo.mjs --site <id> [--dir dist]` | Lints the built HTML, sitemap and robots against the cross-web SEO contract. Exits 1 on errors. |
@@ -281,21 +311,23 @@ More secure alternative, no token: [npm Trusted Publishing](https://docs.npmjs.c
 
 Publishing by hand still works (`bun run build && bun run check && npm publish`, with a 2FA OTP). `dist/` must exist: it's in the tarball but not in git.
 
+**Deprecating the versions that bundled the fonts.** Versions ≤ 0.8.0 contain the licensed font files. Once 0.8.1 is on npm, run Actions → *Deprecate font versions* → Run workflow ([`.github/workflows/deprecate-font-versions.yml`](.github/workflows/deprecate-font-versions.yml), manual only, uses the same `NPM_TOKEN`). It checks that 0.8.1 is published (and fails otherwise) and then runs `npm deprecate "@chimichurricode/design-system@<=0.8.0" "…"` so installs of those versions warn and point to ≥ 0.8.1. Deprecating doesn't remove the tarballs from npm; unpublishing is a separate decision (npm only allows it within 72 h or for packages without dependents).
+
 Consumers pin a caret range (`cv-blog` `^0.8.0`, `cv-brand` `^0.7.5`, `cv-talks` `^0.7.6`), so bump them after a minor release.
 
 ---
 
 ## Status and known gaps
 
-Fixed in 0.8.1: the footer no longer requests `/logos/simple-scrum-poker/favicon{,-dark}.svg` from each consumer (404 on every site that didn't copy them); `check-seo`, `seo-prebuild`, `sync-dir` and `copy-asset` work from `node_modules` and are shipped; `check-ecosystem-chrome` derives from the registry; the dead monorepo scripts are gone.
+Fixed in 0.8.1: the footer no longer requests `/logos/simple-scrum-poker/favicon{,-dark}.svg` from each consumer (404 on every site that didn't copy them); `check-seo`, `seo-prebuild`, `sync-dir` and `copy-asset` work from `node_modules` and are shipped; `check-ecosystem-chrome` derives from the registry; the dead monorepo scripts are gone; the licensed fonts are out of the package (fetched at build time, see [Fonts](#fonts)).
 
 Still open:
 
 - Spacing isn't tokenized yet (`--stack-*` lives in `web.css`, raw px elsewhere) — see [`docs/gaps.md`](docs/gaps.md).
 - The talks mobile viewer uses viewport units rather than DS breakpoints, so `dist/breakpoints.css` is webs-only today.
-- No automated tests: the monorepo's `node:test` suites weren't carried over. `bun run check` covers the registry and catalog contracts only.
+- Few automated tests: the monorepo's `node:test` suites weren't carried over. `bun run check` covers the registry and catalog contracts, and `bun run test` the font fetcher.
 - `docs/anti-patterns.md` and parts of `docs/recipes.md` are still in Spanish.
 
 ## License
 
-No license is declared yet (no `LICENSE` file and no `license` field in `package.json`). The typefaces in `assets/fonts/` are third-party fonts; check their own licenses before reusing them elsewhere.
+No license is declared yet (no `LICENSE` file and no `license` field in `package.json`). The typefaces are third-party licensed fonts and are not part of this repository or the package (see [Fonts](#fonts)).

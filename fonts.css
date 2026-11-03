@@ -3,13 +3,16 @@
  *
  * Why this exists:
  *   The brand uses five custom typefaces (CHANEY, At Aero, Scilla Narrow,
- *   Thunder, Nudica Mono) bundled as .otf/.ttf in assets/fonts/. Astro
- *   sites can't @import a binary file straight from node_modules — the
- *   files have to be served from the site's own /fonts/ path.
+ *   Thunder, Nudica Mono). They are licensed, so the .otf/.ttf files are
+ *   NOT in this package: they live in the private repo npatarino/cv-fonts
+ *   and each site copies them into its own /fonts/ path at build time.
  *
  * Consumer setup:
- *   1. Run `node node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs fonts public/fonts`
- *      in your prebuild (copies the .otf/.ttf into public/fonts/).
+ *   1. Run `chimi-fetch-fonts public/fonts` in your prebuild
+ *      (scripts/fetch-fonts.mjs). It needs CHIMI_FONTS_TOKEN (read-only
+ *      token for npatarino/cv-fonts) or CHIMI_FONTS_DIR (a local clone's
+ *      fonts/); without either the site falls back to system fonts.
+ *      See "Fonts" in the package README.
  *   2. Import this stylesheet in your global.css *after* web.css:
  *        @import "@chimichurricode/design-system/web.css";
  *        @import "@chimichurricode/design-system/fonts.css";

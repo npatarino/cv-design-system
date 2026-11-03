@@ -13,8 +13,8 @@
  *     @import "@chimichurricode/design-system/web.css";
  *
  *   Sites must also have the binary font files at /fonts/ on their
- *   served root. Run `sync-dir.mjs fonts public/fonts` in prebuild
- *   (node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs).
+ *   served root. Run `chimi-fetch-fonts public/fonts` in prebuild
+ *   (scripts/fetch-fonts.mjs; see "Fonts" in the README).
  *
  * Per-site overrides:
  *   --page-max defaults to --bp-xl (1280px). Sites with narrower content set
