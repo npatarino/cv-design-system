@@ -8,6 +8,16 @@ const SOURCE_PATH = join(__dirname, "../site-registry.ts");
 
 const sourceContent = readFileSync(SOURCE_PATH, "utf8");
 
+// Brand colors a site may declare: every hex in the primitive palette.
+const PRIMITIVES_PATH = join(__dirname, "../tokens/color.primitive.json");
+const primitiveHexes = new Set();
+(function collect(node) {
+  if (node && typeof node === "object") {
+    if (typeof node.$value === "string" && node.$value.startsWith("#")) primitiveHexes.add(node.$value.toUpperCase());
+    for (const v of Object.values(node)) collect(v);
+  }
+})(JSON.parse(readFileSync(PRIMITIVES_PATH, "utf8")));
+
 let errors = 0;
 
 function report(msg) {
@@ -27,6 +37,12 @@ for (const site of SITE_REGISTRY_RUNTIME) {
   }
   if (!site.themeColor || !site.backgroundColor || !site.maskIconColor) {
     report(`Site ${site.id} is missing theme colors.`);
+  }
+  for (const key of ["themeColor", "backgroundColor", "maskIconColor"]) {
+    const value = site[key];
+    if (value && !primitiveHexes.has(value.toUpperCase())) {
+      report(`Site ${site.id} ${key} ${value} is not a primitive color in tokens/color.primitive.json.`);
+    }
   }
 }
 
