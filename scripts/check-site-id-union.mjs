@@ -16,7 +16,7 @@
  * AND fail the build if any consumer ever re-introduces a hand-typed
  * union that doesn't match the catalog.
  *
- * Run: npm --workspace @chimi/design-system run check:site-id-union
+ * Run: bun run check:site-id-union
  *
  * Exits 0 on clean, 1 on drift, 2 on infrastructure error.
  */

@@ -37,7 +37,7 @@ const sourceIds = [...sourceContent.matchAll(/id: "([^"]+)"/g)].map(m => m[1]);
 const uniqueSourceIds = [...new Set(sourceIds)];
 
 if (uniqueSourceIds.length !== SITE_REGISTRY_RUNTIME.length) {
-  report(`Registry source (${uniqueSourceIds.length} sites) and runtime mirror (${SITE_REGISTRY_RUNTIME.length} sites) are out of sync. Run npm run build:tokens.`);
+  report(`Registry source (${uniqueSourceIds.length} sites) and runtime mirror (${SITE_REGISTRY_RUNTIME.length} sites) are out of sync. Run "bun run build:registry".`);
 }
 
 if (errors === 0) {
