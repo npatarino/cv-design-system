@@ -1,6 +1,6 @@
 # Recipes
 
-> **Canonical contract**: `openspec/specs/closed-recipe-model/spec.md`. This page is the field guide; the spec is the normative document. If they ever drift, the spec wins and this page must be updated to match.
+> **Canonical contract**: the closed catalog lives in [`tokens/color.recipe.json`](../tokens/color.recipe.json) (six recipes). The original OpenSpec change that introduced the model is archived at `openspec/changes/archive/2026-04-30-add-closed-recipe-model-spec/`; it still lists seven recipes because it predates the merge of the two paper variants into `paper`. This page is the field guide; if it ever drifts from the tokens, the tokens win and this page must be updated to match.
 
 Canonical reference for the **recipe model** that drives Chimi colors and typography across slides and webs. Recipes are the **only consumed layer** — primitives and semantic exist below them as raw values and design roles, but no surface (slide template, Astro page, brand book) reads them directly.
 
@@ -29,18 +29,18 @@ Every recipe defines exactly five roles. Anything outside them is "no pintita ex
 Every recipe also maps the five core font families to semantic roles. Components should consume the role that matches their **intent**.
 
 | Role | Design Intent | Typical Mapping |
-24: |---|---|---|
-25: | `font-display` | Headlines, big concepts, covers. | `display` (CHANEY) or `editorial` (Scilla) |
-26: | `font-body` | Long-form reading, paragraphs. | `body` (At Aero) |
-27: | `font-editorial` | Quotes, testimonials, reflexions. | `editorial` (Scilla) |
-28: | `font-data` | Numbers, KPIs, technical figures. | `data` (Thunder) |
-29: | `font-code` | Monospaced snippets, metadata. | `code` (Nudica Mono) |
-30: 
-31: > **Primary/Secondary aliases**: For convenience, recipes also define `font-primary` and `font-secondary` as the "main voice" and "secondary voice" of the mode. For example, in `canvas-quiet` (reading mode), primary is `body`; in `canvas-signal` (data mode), primary is `data`.
-32: 
-33: ---
-34: 
-35: ## The seven recipes
+|---|---|---|
+| `font-display` | Headlines, big concepts, covers. | `display` (CHANEY) or `editorial` (Scilla) |
+| `font-body` | Long-form reading, paragraphs. | `body` (At Aero) |
+| `font-editorial` | Quotes, testimonials, reflexions. | `editorial` (Scilla) |
+| `font-data` | Numbers, KPIs, technical figures. | `data` (Thunder) |
+| `font-code` | Monospaced snippets, metadata. | `code` (Nudica Mono) |
+
+> **Primary/Secondary aliases**: For convenience, recipes also define `font-primary` and `font-secondary` as the "main voice" and "secondary voice" of the mode. For example, in `canvas-quiet` (reading mode), primary is `body`; in `canvas-signal` (data mode), primary is `data`.
+
+---
+
+## The six recipes
 
 ### 01 · `canvas-quiet`
 
@@ -49,7 +49,7 @@ Every recipe also maps the five core font families to semantic roles. Components
 | Role | Hex | Name |
 |---|---|---|
 | surface | `#1C1C1C` | charcoal |
-| ink | `#F5EFE0` | ivory |
+| ink | `#FAFAF8` | ivory |
 | em | `#F9D71C` | lemon |
 | accent | `#02B5B9` | patagonia |
 | warn | `#A64132` | red |
@@ -63,7 +63,7 @@ Every recipe also maps the five core font families to semantic roles. Components
 
 > STATS, KPI WALLS, DASHBOARDS
 
-Misma paleta que `canvas-quiet`. Lo que cambia es el énfasis tipográfico — Thunder en `em` (lemon) como protagonista.
+Misma paleta que `canvas-quiet` en los dos temas (lemon como `em` en oscuro, red en claro). Lo que cambia es el énfasis tipográfico: Thunder como fuente primaria y protagonista.
 
 ✓ Slides big-stat · KPI grid · stat cards · dashboards
 ✗ Body extenso (la lemon cansa) · charlas/talks de ideas (es para datos)
@@ -74,7 +74,7 @@ Misma paleta que `canvas-quiet`. Lo que cambia es el énfasis tipográfico — T
 
 | Role | Hex | Name |
 |---|---|---|
-| surface | `#F5EFE0` | ivory |
+| surface | `#FAFAF8` | ivory |
 | ink | `#1C1C1C` | charcoal |
 | em | `#02B5B9` | patagonia |
 | accent | `#1C1C1C` | charcoal |
@@ -85,7 +85,7 @@ Misma paleta que `canvas-quiet`. Lo que cambia es el énfasis tipográfico — T
 ✓ Slides quote, prompts · testimonials · resource-cards · FAQ informativo · tickets, flyers print
 ✗ UI de producto (ivory agota a 60min) · stats grandes (sin contraste para Thunder)
 
-### 05 · `energy-loud`
+### 04 · `energy-loud`
 
 > ANUNCIOS, AFICHES, CTAS DE EVENTO
 
@@ -102,7 +102,7 @@ Misma paleta que `canvas-quiet`. Lo que cambia es el énfasis tipográfico — T
 ✓ Posters, IG stat-posts · slides cover de techconf
 ✗ Body de blog · junto a otra `energy-loud` o `critical`
 
-### 06 · `cool-fresh`
+### 05 · `cool-fresh`
 
 > FEATURE LAUNCHES, OPEN BETAS, DIVIDERS
 
@@ -110,7 +110,7 @@ Misma paleta que `canvas-quiet`. Lo que cambia es el énfasis tipográfico — T
 |---|---|---|
 | surface | `#02B5B9` | patagonia |
 | ink | `#1C1C1C` | charcoal |
-| em | `#F5EFE0` | ivory |
+| em | `#FAFAF8` | ivory |
 | accent | `#F9D71C` | lemon |
 | warn | `#1C1C1C` | charcoal |
 
@@ -119,14 +119,14 @@ El em es ivory (no lemon) porque la cool ya tiene cromaticidad — sumar lemon c
 ✓ Slide-divider entre bloques · banners de feature
 ✗ Lectura larga · junto a `paper` (chocan en saturación)
 
-### 07 · `critical` (bicara)
+### 06 · `critical` (bicara)
 
 > CRISIS, DENUNCIA, DISCLAIMERS · USABLE COMO BG **Y** COMO FG
 
 | Role | Hex | Name |
 |---|---|---|
 | surface | `#FF2079` | plasma |
-| ink | `#F5EFE0` | ivory |
+| ink | `#FAFAF8` | ivory |
 | em | `#1C1C1C` | charcoal |
 | accent | `#1C1C1C` | charcoal |
 | warn | `#1C1C1C` | charcoal |
@@ -140,7 +140,7 @@ Es la única recipe **bicara**: vive como bg (slide entera plasma) o como fg (nu
 - ✗ Marketing (usar `energy-loud`)
 - ✗ Slides contiguas a `energy-loud` o `cool-fresh` (saturaciones que pelean)
 
-**Modo fg** — `critical` como rol dentro de otra recipe (canvas-quiet/signal, paper/cool):
+**Modo fg** — `critical` como rol dentro de otra recipe (canvas-quiet, canvas-signal o paper):
 Aplicá una clase `critical-fg-<role>` al root del slide. La clase overridea `--recipe-em` (o `--recipe-warn` para `marker`) a plasma.
 
 | Role | Override | Templates de ejemplo |
@@ -157,17 +157,40 @@ Aplicá una clase `critical-fg-<role>` al root del slide. La clase overridea `--
 
 ---
 
+## Contrast (WCAG 2.1)
+
+Ratios for each role on its own recipe surface, computed from the primitive hexes. AA needs 4.5:1 for body text and 3:1 for large text (≥ 24 px, or ≥ 18.7 px bold) and UI strokes.
+
+| Recipe | ink | em | accent | warn |
+|---|---:|---:|---:|---:|
+| `canvas-quiet` / `canvas-signal`, dark | 16.31 | 11.98 | 6.75 | **2.78** |
+| `canvas-quiet` / `canvas-signal`, light | 16.31 | 5.87 | 5.48 | 5.87 |
+| `paper` | 16.31 | **2.42** | 16.31 (web.css: 5.48 light, **2.42** dark) | 5.87 |
+| `energy-loud` | 11.98 | *4.31* | 11.98 | *4.31* |
+| `cool-fresh` | 6.75 | **2.42** | **2.42** | **1.78** |
+| `critical` | *3.50* | 4.65 | 4.65 | 4.65 |
+
+Bold = fails 3:1 (decoration only). Italic = large text only. What that means in practice:
+
+- `warn` on charcoal is a stroke/marker color, never body text in dark mode.
+- `paper` `em` (patagonia on ivory) is only for display-size italics (slides, ≥ 48 px). On webs use `--recipe-ink` or red for inline emphasis.
+- `cool-fresh` text is `ink` (charcoal). Ivory `em`/`accent` and lemon `warn` are for display words and shapes, not for copy.
+- `critical` ink (ivory on plasma) is large-text only; keep disclaimers short and big.
+- `.critical-fg-*` on light surfaces (plasma on ivory, 3.50:1) is large-text only.
+- `--muted` at 55 % (light theme) lands at 3.79:1 on ivory: meta and captions only. `--muted-strong` passes everywhere except on `cool-fresh` and `critical`.
+
+---
+
 ## Matriz de uso
 
 | id | Surface | Mood | Trabajo | NO usar con |
 |---|---|---|---|---|
 | 01 · canvas-quiet | charcoal | Editorial neutral | Lectura larga, blog, docs | — |
 | 02 · canvas-signal | charcoal | Datos numéricos | KPI, big-stat, dashboards | Long body |
-| 03 · paper | ivory | Reflexivo cálido | Quotes, tickets, prints | UI extensa, paper contiguo |
-| 04 · paper | ivory | Reflexivo con peso | Testimonios técnicos, team, FAQ | UI extensa, paper contiguo |
-| 05 · energy-loud | lemon | Anuncio directo | Posters, social marketing | Otra energy o critical |
-| 06 · cool-fresh | patagonia | Cambio · señal | Dividers, lanzamientos | paper contiguo |
-| 07 · critical | plasma | Crisis · denuncia | Disclaimers (bg) + numerales/quotes (fg) | Contiguo a energy-loud o cool-fresh |
+| 03 · paper | ivory | Reflexivo | Quotes, tickets, prints, testimonios técnicos, FAQ | UI extensa |
+| 04 · energy-loud | lemon | Anuncio directo | Posters, social marketing | Otra energy o critical |
+| 05 · cool-fresh | patagonia | Cambio · señal | Dividers, lanzamientos | paper contiguo |
+| 06 · critical | plasma | Crisis · denuncia | Disclaimers (bg) + numerales/quotes (fg) | Contiguo a energy-loud o cool-fresh |
 
 ---
 
