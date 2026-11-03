@@ -68,7 +68,7 @@ Things the current system does **not** yet formalize. Each entry says what's mis
 
 **Status (resolved)**:
 - Canonical SVG logos (`logo-character`, `logo-circle`, `logo-code`, `favicon`) live in `assets/logos/`.
-- Canonical font files (CHANEY, At Aero, Scilla Narrow, Thunder, Nudica Mono) live in `assets/fonts/`.
+- Canonical font files (CHANEY, At Aero, Scilla Narrow, Thunder, Nudica Mono) are licensed and live in the private repo `npatarino/cv-fonts` (since 0.8.1; they were in `assets/fonts/` before). Sites fetch them at build time with `chimi-fetch-fonts` (see "Fonts" in the README).
 
 Both used to live duplicated across `talks/`, `brand/shared/` and `brand/uploads/`. They are now single-source-of-truth in DS.
 
@@ -76,7 +76,7 @@ Both used to live duplicated across `talks/`, `brand/shared/` and `brand/uploads
 - **Astro sites**: use the brand components — `BrandMark`, `BrandFavicon`, `BrandLogoWordmark`, `BrandLogoCircle` — which inline the SVG with theme-aware colors via `currentColor` or via props.
 - **Static sites that need the asset on disk** (e.g., `<link rel="icon">`, `@font-face url(...)`, `<img src=...>`):
   - **Single file**: `node node_modules/@chimichurricode/design-system/scripts/copy-asset.mjs <ds-path> <target>`.
-  - **Whole directory**: `node node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs <subdir> <target-dir>` (e.g. `fonts public/fonts`).
+  - **Whole directory**: `node node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs <subdir> <target-dir>` (e.g. `icons public/icons`). Fonts: `chimi-fetch-fonts public/fonts`.
 - Synced output paths are listed in `.gitignore` — they're regenerated at build time, not committed.
 
 **What's still pending**: `brand/shared/podcast-{dark,light}.png` are brand-guide-specific covers. They could move to `design-system/assets/podcast/` and be synced the same way, but they're not consumed by other sites today. Low priority.

@@ -8,6 +8,17 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [0.8.1]
 
+### Changed
+
+- **The licensed font files are no longer in the package or the repo.**
+  CHANEY, At Aero, Scilla Narrow, Thunder and Nudica Mono can't be
+  redistributed, so `assets/fonts/` is gone (and gitignored) and `files`
+  ships only `assets/icons`, `assets/logos` and `assets/og`. The fonts live
+  in the private repo `npatarino/cv-fonts`. Sites now run
+  `chimi-fetch-fonts public/fonts` (new, see below) instead of
+  `sync-dir.mjs fonts public/fonts`, and set `CHIMI_FONTS_TOKEN` in their
+  build environment. See "Fonts" in the README.
+
 ### Fixed
 
 - `SiteFooter` bundles the ecosystem logos from `assets/logos` instead of
@@ -26,6 +37,14 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ### Added
 
+- `scripts/fetch-fonts.mjs` (bin `chimi-fetch-fonts`, import
+  `@chimichurricode/design-system/fetch-fonts`): copies the fonts into a
+  site from `CHIMI_FONTS_DIR`, or downloads them from `npatarino/cv-fonts`
+  with `CHIMI_FONTS_TOKEN` (cached per ref), or falls back to an installed
+  ≤ 0.8.0 package; otherwise warns and succeeds (`--require` to fail). No
+  dependencies; tested with `bun run test` (also in CI).
+- Manual workflow `deprecate-font-versions.yml` that deprecates the npm
+  versions ≤ 0.8.0 (they contain the font files) once 0.8.1 is published.
 - `check-seo`, `seo-prebuild`, `sync-dir`, `copy-asset` and `seo/lint.mjs`
   are shipped in the package.
 - `node-html-parser` dependency (used by `check-seo`).
