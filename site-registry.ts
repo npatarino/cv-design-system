@@ -5,6 +5,9 @@ export interface SiteEntry {
   readonly description: string;  // ≤ 80 chars for tooltips
   readonly chrome: boolean;      // include in cross-web chrome (header/footer)?
   readonly seo: boolean;         // has its own SEO surface (sitemap, manifest, OG, alternates)?
+  // The three colors below must be primitive hexes from tokens/color.primitive.json
+  // (charcoal.100 #1C1C1C, ivory.base #FAFAF8, patagonia.base #02B5B9,
+  // patagonia.deep #017275, lemon.base #F9D71C…). `bun run check:registry` enforces it.
   readonly themeColor: string;   // hex, used by manifest theme_color + Safari pinned tab
   readonly backgroundColor: string;
   readonly maskIconColor: string;
@@ -32,8 +35,8 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     description: "Blog, podcast y charlas sobre software, liderazgo y artesanía técnica.",
     chrome: true,
     seo: true,
-    themeColor: "#1B1B1B",
-    backgroundColor: "#1B1B1B",
+    themeColor: "#1C1C1C",
+    backgroundColor: "#1C1C1C",
     maskIconColor: "#02B5B9",
   },
   {
@@ -43,9 +46,9 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     description: "Conferencias técnicas en España con foco en mobile, plataforma y backend.",
     chrome: true,
     seo: true,
-    themeColor: "#02898C",
-    backgroundColor: "#02898C",
-    maskIconColor: "#02898C",
+    themeColor: "#017275",
+    backgroundColor: "#017275",
+    maskIconColor: "#017275",
   },
   {
     id: "recall-for-papers",
@@ -54,8 +57,8 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     description: "Pulí tu propuesta de charla con feedback estructurado y herramientas concretas.",
     chrome: true,
     seo: true,
-    themeColor: "#1B1B1B",
-    backgroundColor: "#1B1B1B",
+    themeColor: "#1C1C1C",
+    backgroundColor: "#1C1C1C",
     maskIconColor: "#02B5B9",
   },
   {
@@ -67,7 +70,7 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     seo: true,
     themeColor: "#FAFAF8",
     backgroundColor: "#FAFAF8",
-    maskIconColor: "#02898C",
+    maskIconColor: "#017275",
   },
   {
     id: "simple-scrum-poker",
@@ -76,9 +79,9 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     description: "Voto a ciegas para estimar puntos en equipos remotos. Sin login, sin fricción.",
     chrome: true,
     seo: true,
-    themeColor: "#D9B038",
-    backgroundColor: "#1B1B1B",
-    maskIconColor: "#D9B038",
+    themeColor: "#F9D71C",
+    backgroundColor: "#1C1C1C",
+    maskIconColor: "#F9D71C",
     logoSrc: {
       logo: "/logos/simple-scrum-poker/favicon.svg",
       logoDark: "/logos/simple-scrum-poker/favicon-dark.svg",
@@ -92,8 +95,8 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     description: "Compará dos JSONs ignorando orden y formato. Diff determinista, 100% en el navegador.",
     chrome: true,
     seo: true,
-    themeColor: "#1B1B1B",
-    backgroundColor: "#1B1B1B",
+    themeColor: "#1C1C1C",
+    backgroundColor: "#1C1C1C",
     maskIconColor: "#02B5B9",
   },
   {
@@ -103,8 +106,8 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     description: "Validador in-browser de meta tags, JSON-LD, sitemap, favicons y headers. Pegá una URL y revisá todo.",
     chrome: true,
     seo: true,
-    themeColor: "#1B1B1B",
-    backgroundColor: "#1B1B1B",
+    themeColor: "#1C1C1C",
+    backgroundColor: "#1C1C1C",
     maskIconColor: "#02B5B9",
   },
   {
@@ -114,8 +117,8 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     description: "Visualizá tu seniority como un radar chart frente a frameworks reales de Big Tech.",
     chrome: true,
     seo: true,
-    themeColor: "#1B1B1B",
-    backgroundColor: "#1B1B1B",
+    themeColor: "#1C1C1C",
+    backgroundColor: "#1C1C1C",
     maskIconColor: "#02B5B9",
   },
   {
@@ -125,8 +128,8 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     description: "Charlas y decks técnicos de Chimichurri Code, listos para presentar o leer.",
     chrome: false,
     seo: true,
-    themeColor: "#1B1B1B",
-    backgroundColor: "#1B1B1B",
+    themeColor: "#1C1C1C",
+    backgroundColor: "#1C1C1C",
     maskIconColor: "#02B5B9",
   },
   {
@@ -138,17 +141,17 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
     seo: true,
     themeColor: "#FAFAF8",
     backgroundColor: "#FAFAF8",
-    maskIconColor: "#02898C",
+    maskIconColor: "#017275",
   },
   {
     id: "simple-font-tester",
     name: "Simple Font Tester",
     url: "https://fonts.chimi.pro",
-    description: "Probá y compará tus tipografías locales con texto personalizable. 100% privado y local.",
+    description: "Probá y compará las tipografías de la biblioteca incluida con tu propio texto.",
     chrome: true,
     seo: true,
-    themeColor: "#1B1B1B",
-    backgroundColor: "#1B1B1B",
+    themeColor: "#1C1C1C",
+    backgroundColor: "#1C1C1C",
     maskIconColor: "#02B5B9",
   },
 ]);
