@@ -3,6 +3,10 @@
   "version": "0.8.1",
   "description": "Chimi design system — tokens (colors, typography, recipes) as CSS variables and ES modules, plus shared Astro components and SEO helpers.",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/npatarino/cv-design-system.git"
+  },
   "files": [
     "dist",
     "tokens",

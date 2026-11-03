@@ -271,12 +271,15 @@ Before adding a role, ask: is it really new, or a variant of an existing one? Wi
 
 Published to npm as [`@chimichurricode/design-system`](https://www.npmjs.com/package/@chimichurricode/design-system) (semver, `0.x`). Only the paths in `package.json` → `files` are shipped — of `scripts/`, only the [consumer scripts](#consumer-scripts).
 
-```bash
-# bump "version" in package.json, then
-bun run build        # dist/ must exist: it's in the tarball but not in git
-bun run check
-npm publish          # registry from .npmrc; 2FA OTP required
-```
+1. Bump `version` in `package.json` and add an entry to [`CHANGELOG.md`](CHANGELOG.md).
+2. Merge to `main`.
+3. [`.github/workflows/release.yml`](.github/workflows/release.yml) runs on pushes to `main` that touch `package.json` (or by hand: Actions → Release → Run workflow). It runs `bun run build` and `bun run check`, and if `npm view @chimichurricode/design-system@<version>` doesn't find the version, it runs `npm publish --access public --provenance`, tags `v<version>` and creates a GitHub Release with generated notes. A version already on npm is skipped, so re-running is safe.
+
+**Required secret: `NPM_TOKEN`** (repo Settings → Secrets and variables → Actions). Create it on npmjs.com → Access Tokens → Generate New Token → *Granular Access Token*: packages and scopes `@chimichurricode/*` (or this package), permission *Read and write*. If the account requires 2FA for publishing, enable *Bypass two-factor authentication* on the token (granular tokens with that option, and legacy *Automation* tokens, publish without an OTP). Without the secret, a push to `main` skips the release with a notice and a manual run fails with an error saying what to add.
+
+More secure alternative, no token: [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers). On npmjs.com → the package → Settings → Trusted Publisher → GitHub Actions, enter owner `npatarino`, repository `cv-design-system` and workflow `release.yml`; then set the repository **variable** `NPM_TRUSTED_PUBLISHING=true` so the workflow runs without `NPM_TOKEN`.
+
+Publishing by hand still works (`bun run build && bun run check && npm publish`, with a 2FA OTP). `dist/` must exist: it's in the tarball but not in git.
 
 Consumers pin a caret range (`cv-blog` `^0.8.0`, `cv-brand` `^0.7.5`, `cv-talks` `^0.7.6`), so bump them after a minor release.
 
