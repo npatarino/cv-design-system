@@ -1,5 +1,7 @@
 # Chimi design system
 
+[![CI](https://github.com/npatarino/cv-design-system/actions/workflows/ci.yml/badge.svg)](https://github.com/npatarino/cv-design-system/actions/workflows/ci.yml)
+
 **`@chimichurricode/design-system`** — the single source of truth for colors, typography, recipes, shared Astro chrome and SEO used across the Chimichurri Code surfaces (talks, blog, brand book and the ecosystem webs).
 
 Tokens are authored as JSON, built with [Style Dictionary v4](https://styledictionary.com/), and shipped as CSS custom properties. On top of them the package ships a web-scale stylesheet (`web.css`), the brand fonts, Astro components (header, footer, theme toggle, brand marks, SEO head) and framework-agnostic SEO helpers.
