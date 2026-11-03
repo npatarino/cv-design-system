@@ -1,6 +1,6 @@
 {
   "name": "@chimichurricode/design-system",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Chimi design system — tokens (colors, typography, recipes) as CSS variables and ES modules, plus shared Astro components and SEO helpers.",
   "type": "module",
   "repository": {
@@ -87,7 +87,7 @@
     "generate:icon-preview": "bun scripts/generate-preview.mjs"
   },
   "peerDependencies": {
-    "astro": "^5.0.0"
+    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"
   },
   "peerDependenciesMeta": {
     "astro": {
