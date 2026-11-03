@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /**
- * @file `check:seo` — validates that every HTML page in every web's
- * build output complies with the cross-web SEO contract defined in
- * `openspec/specs/cross-web-seo/spec.md`.
+ * @file `check-seo` — validates a built site against the cross-web SEO
+ * contract (`seo/lint.mjs`). Run it from a consumer site after its build:
  *
- * Usage:
- *   node packages/design-system/scripts/check-seo.mjs               # check all webs
- *   node packages/design-system/scripts/check-seo.mjs --web blog    # single web
- *   node packages/design-system/scripts/check-seo.mjs --skip-missing # don't fail when a build dir is missing
+ *   node node_modules/@chimichurricode/design-system/scripts/check-seo.mjs --site <id> [--dir dist]
+ *
+ * Options:
+ *   --site <id>       Site id from the registry (required).
+ *   --dir <path>      Build output, relative to the cwd. Default: `dist/client`
+ *                     when it exists (Vercel adapter), otherwise `dist`.
+ *   --sitemap <file>  Sitemap filename inside the build dir. Default: `sitemap-index.xml`.
+ *   --verbose, -v     Print every page checked, even passes.
  *
  * Per-page checks:
  *   - <title> present and ≤ 70 chars
@@ -20,138 +23,50 @@
  *   - At least one <script type="application/ld+json"> with @context + @type
  *   - <link rel="manifest">, favicon links
  *
- * Per-web checks:
- *   - sitemap.xml exists and parses (XML root <urlset> in sitemaps.org ns)
+ * Per-site checks:
+ *   - the sitemap exists and parses (XML root <urlset>/<sitemapindex>)
  *   - robots.txt exists and references the sitemap
- *   - Home page emits 8 ecosystem alternate links with data-chimi-ecosystem
+ *   - Home page emits one ecosystem alternate link (data-chimi-ecosystem)
+ *     per other SEO site in the registry
  *
  * Escape hatch:
  *   - Pages can opt out by including <meta name="chimi-seo-skip"> in head.
  *     Use sparingly (e.g. legacy redirect pages).
  *
- * Exit code 0 on success, 1 on any error.
+ * Exit code 0 on success, 1 on any error, 2 on bad usage.
  */
 
 import { readFile, readdir, access } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { resolve, relative, join, sep } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { lintHtmlPage, lintSitemap, lintRobotsTxt } from "../seo/lint.mjs";
+import { isSiteId } from "../seo/defaults.mjs";
 import { SITE_REGISTRY_RUNTIME } from "../seo/site-registry-runtime.generated.mjs";
 
-const EXPECTED_ECO_LINKS = SITE_REGISTRY_RUNTIME.filter(s => s.seo).length - 1;
-
-const __filename = fileURLToPath(import.meta.url);
-const REPO_ROOT = resolve(fileURLToPath(import.meta.url), "../../../..");
+const EXPECTED_ECO_LINKS = SITE_REGISTRY_RUNTIME.filter((s) => s.seo).length - 1;
+const CWD = process.cwd();
 
 /**
  * @typedef WebTarget
  * @property {import("../seo/defaults.mjs").SiteId} siteId
  * @property {string} buildDir         - Absolute path to the directory holding built HTML.
- * @property {string} sitemapPath      - Relative path within buildDir for sitemap.xml.
+ * @property {string} sitemapPath      - Relative path within buildDir for the sitemap.
  * @property {string} robotsPath       - Relative path within buildDir for robots.txt.
  * @property {(rel: string) => boolean} [isHomePath] - Returns true if the relative path is the home page.
  * @property {(rel: string) => boolean} [skipFile]   - Returns true if the file should be skipped entirely.
  */
 
-/** @type {WebTarget[]} */
-const TARGETS = [
-  {
-    siteId: "blog",
-    buildDir: resolve(REPO_ROOT, "packages/blog/dist"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    siteId: "techconf",
-    buildDir: resolve(REPO_ROOT, "packages/techconf/dist"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    // The Vercel Astro adapter writes prerendered HTML and static
-    // assets (favicons, manifest, sitemap, robots) into `dist/client/`,
-    // not `dist/`. SSR-only routes (e.g. /api/*) live in
-    // `dist/server/` and are not part of the SEO surface.
-    siteId: "recall-for-papers",
-    buildDir: resolve(REPO_ROOT, "packages/recall-for-papers/dist/client"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    siteId: "simple-pdf-converter",
-    buildDir: resolve(REPO_ROOT, "packages/simple-pdf-converter/dist"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    siteId: "simple-scrum-poker",
-    buildDir: resolve(REPO_ROOT, "packages/simple-scrum-poker/dist"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    siteId: "simple-json-diff",
-    buildDir: resolve(REPO_ROOT, "packages/simple-json-diff/dist"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    siteId: "simple-web-validator",
-    buildDir: resolve(REPO_ROOT, "packages/simple-web-validator/dist"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    siteId: "simple-radar-skills",
-    buildDir: resolve(REPO_ROOT, "packages/simple-radar-skills/dist"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    siteId: "simple-font-tester",
-    buildDir: resolve(REPO_ROOT, "packages/simple-font-tester/dist/client"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    siteId: "talks",
-    buildDir: resolve(REPO_ROOT, "_site"),
-    sitemapPath: "sitemap.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-  },
-  {
-    siteId: "brand",
-    buildDir: resolve(REPO_ROOT, "packages/brand/dist"),
-    sitemapPath: "sitemap-index.xml",
-    robotsPath: "robots.txt",
-    isHomePath: (rel) => rel === "index.html",
-    // Skip HTML fragments or internal folders if any.
-    skipFile: (rel) =>
-      rel.startsWith("node_modules/") ||
-      rel.startsWith("shared/"),
-  },
-];
-
 const args = parseArgs(process.argv.slice(2));
 
 function parseArgs(argv) {
-  /** @type {{ web?: string; skipMissing: boolean; verbose: boolean; help: boolean }} */
-  const out = { skipMissing: false, verbose: false, help: false };
+  /** @type {{ site?: string; dir?: string; sitemap: string; verbose: boolean; help: boolean }} */
+  const out = { sitemap: "sitemap-index.xml", verbose: false, help: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === "--web") out.web = argv[++i];
-    else if (a === "--skip-missing") out.skipMissing = true;
+    if (a === "--site" || a === "--web") out.site = argv[++i];
+    else if (a === "--dir") out.dir = argv[++i];
+    else if (a === "--sitemap") out.sitemap = argv[++i];
     else if (a === "--verbose" || a === "-v") out.verbose = true;
     else if (a === "--help" || a === "-h") out.help = true;
   }
@@ -161,32 +76,36 @@ function parseArgs(argv) {
 if (args.help) {
   console.log(
     [
-      "Usage: check-seo [--web <id>] [--skip-missing] [--verbose]",
+      "Usage: check-seo --site <id> [--dir <build dir>] [--sitemap <file>] [--verbose]",
       "",
-      "Validates every built HTML page against the cross-web-seo spec.",
-      "  --web <id>        Run only the named web (blog, techconf, ...).",
-      "  --skip-missing    Don't fail when a build dir is missing (useful in CI matrix).",
-      "  --verbose         Print every page checked, even passes.",
+      "Validates every built HTML page of one site against the cross-web SEO contract.",
     ].join("\n"),
   );
   process.exit(0);
 }
 
-/** @type {{ pageErrors: number; pageWarnings: number; webErrors: number }} */
-const totals = { pageErrors: 0, pageWarnings: 0, webErrors: 0 };
-
-const targets = args.web
-  ? TARGETS.filter((t) => t.siteId === args.web)
-  : TARGETS;
-
-if (args.web && targets.length === 0) {
-  console.error(`[check:seo] Unknown --web "${args.web}".`);
+if (!args.site || !isSiteId(args.site)) {
+  const ids = SITE_REGISTRY_RUNTIME.map((s) => s.id).join(", ");
+  console.error(`[check:seo] --site is required and must be one of: ${ids}. Got "${args.site ?? ""}".`);
   process.exit(2);
 }
 
-for (const target of targets) {
-  await checkTarget(target);
-}
+const defaultDir = existsSync(resolve(CWD, "dist/client")) ? "dist/client" : "dist";
+
+/** @type {WebTarget} */
+const target = {
+  siteId: args.site,
+  buildDir: resolve(CWD, args.dir ?? defaultDir),
+  sitemapPath: args.sitemap,
+  robotsPath: "robots.txt",
+  isHomePath: (rel) => rel === "index.html",
+  skipFile: (rel) => rel.startsWith("node_modules/"),
+};
+
+/** @type {{ pageErrors: number; pageWarnings: number; webErrors: number }} */
+const totals = { pageErrors: 0, pageWarnings: 0, webErrors: 0 };
+
+await checkTarget(target);
 
 const ok = totals.pageErrors === 0 && totals.webErrors === 0;
 console.log("");
@@ -198,10 +117,6 @@ process.exit(ok ? 0 : 1);
 async function checkTarget(/** @type {WebTarget} */ target) {
   const exists = await pathExists(target.buildDir);
   if (!exists) {
-    if (args.skipMissing) {
-      console.log(`[${target.siteId}] (skipped — build dir not found at ${rel(target.buildDir)})`);
-      return;
-    }
     console.error(`[${target.siteId}] ERROR build dir missing: ${rel(target.buildDir)}`);
     totals.webErrors++;
     return;
@@ -340,5 +255,5 @@ async function listHtmlFiles(dir) {
  * @param {string} p
  */
 function rel(p) {
-  return relative(REPO_ROOT, p);
+  return relative(CWD, p) || ".";
 }
