@@ -1,6 +1,6 @@
 {
   "_comment": "Type recipes — whitelist of font families allowed per color recipe.",
-  "_metadataNote": "This file is METADATA, not a token source. It is NOT emitted to dist/tokens.css and NOT listed under config.mjs::source. Consumers: scripts/check-recipes.mjs (linter) and packages/talks/_data/typeRecipes.js (gallery captions). Color recipes (the actual tokens that produce CSS variables) live in color.recipe.json.",
+  "_metadataNote": "This file is METADATA, not a token source. It is NOT emitted to dist/tokens.css and NOT listed under config.mjs::source. Consumers: recipes.mjs (getTypeRecipes) and cv-talks _data/typeRecipes.js (gallery captions). Color recipes (the actual tokens that produce CSS variables) live in color.recipe.json.",
   "_schema": "Each recipe declares which of the 5 type families (display, body, editorial, data, code) is primary, secondary or disallowed, plus meta flags for usage rules. Critical has two modes: bg (full slide) and fg (overlay role on a carrier recipe). See docs/recipes.md.",
 
   "type": {
