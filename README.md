@@ -40,7 +40,12 @@ npm install @chimichurricode/design-system
    @import "@chimichurricode/design-system/web.css";
    ```
 
-2. **Fonts** — `fonts.css` points at `/fonts/*`, so copy the binaries from `node_modules/@chimichurricode/design-system/assets/fonts` into `public/fonts/` before building (the consumers do it with a small `scripts/sync-fonts.mjs`).
+2. **Fonts and SEO assets** — `fonts.css` points at `/fonts/*`, and `SEOHead` expects the favicons, `/og/<site>.webp`, `manifest.webmanifest` and `robots.txt` in `public/`. Copy them before building with the shipped scripts:
+
+   ```jsonc
+   // package.json
+   "prebuild": "node node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs fonts public/fonts && node node_modules/@chimichurricode/design-system/scripts/seo-prebuild.mjs --site blog --public public"
+   ```
 
 3. **Breakpoints** — if your own CSS writes `@media (--md)`, inline the custom media at build time:
 
@@ -100,7 +105,7 @@ Use the raw tokens without the web layer — `cv-talks` passthrough-copies `node
 | `site-registry`, `site-registry-runtime` | The canonical list of sites (`getSite`, `findSite`, `sitesWithRole("chrome" \| "seo")`) and its generated runtime copy. |
 | `seo`, `seo/*` | `buildJsonLd`, `defaultsForSite`, `renderSEOHeadHTML`, sitemap / robots / manifest renderers. See [`seo/README.md`](seo/README.md). |
 | `assets/logos/*`, `assets/icons/*`, `assets/og/*` | Brand logos, the icon set and per-site OG images. |
-| `scripts/check-slop.mjs` | Reports "template look" patterns in a built site: `node node_modules/@chimichurricode/design-system/scripts/check-slop.mjs dist`. See [`docs/anti-patterns.md`](docs/anti-patterns.md). |
+| `scripts/*.mjs` (shipped) | Node CLIs a consumer runs from `node_modules/@chimichurricode/design-system/scripts/` — see [Consumer scripts](#consumer-scripts). |
 
 The full map is the `exports` field in [`package.json`](package.json).
 
@@ -212,6 +217,8 @@ Consumer CSS needs the `dsCustomMedia()` PostCSS helper (see [Quick start](#quic
 
 `SiteHeader` (brand mark, nav, theme toggle, socials) and `SiteFooter` (`rich` / `minimal`) stitch the ecosystem webs together; the list of linked sites comes from `site-registry.ts` (`ECOSYSTEM_SITES` = sites with `chrome: true`, currently 9; SEO covers 11 including `talks` and `brand`). Field guide: [`docs/ecosystem-chrome.md`](docs/ecosystem-chrome.md).
 
+The sibling-site logos in the footer (`logoSrc` in the registry, e.g. Simple Scrum Poker's mark) are resolved by `SiteFooter` to the SVGs in `assets/logos/<id>/` and bundled by Vite, so consumers don't copy any `/logos/` files.
+
 `SEOHead` (Astro) and `renderSEOHeadHTML()` (anything else) emit the whole head block — title, description, canonical, OG, Twitter, favicons, manifest, theme color, ecosystem alternates and JSON-LD — from the per-site defaults in [`seo/defaults.mjs`](seo/defaults.mjs). See [`seo/README.md`](seo/README.md).
 
 ---
@@ -222,15 +229,29 @@ Requires [Bun](https://bun.sh/) (the build scripts run with `bun`).
 
 ```bash
 bun install
-bun run build        # emit seo/site-registry-runtime.generated.mjs, then dist/tokens.css + dist/breakpoints.css
-bun run check:slop   # node scripts/check-slop.mjs [dir] — scans ./dist by default; point it at a consumer's build
+bun run build                  # emit seo/site-registry-runtime.generated.mjs, then dist/tokens.css + dist/breakpoints.css
+bun run check                  # registry drift, SiteId unions and the ecosystem catalog (incl. logo files)
+bun run generate:icons         # favicon / touch / manifest icons from assets/logos/favicon.svg (sharp)
+bun run generate:icon-preview  # rebuild assets/icons/preview.html
 ```
 
 `dist/` is git-ignored, so run `bun run build` after cloning — `web.css` and the `postcss` helper import from it.
 
 To try changes in a consumer before publishing, link the package (`bun link` / `npm link`) or point the consumer's dependency at a local path.
 
-> The other scripts in `scripts/` (`check-recipes`, `check-ecosystem-chrome`, `check-seo`, `check-docs-linter-coherence`, …) were carried over from the original monorepo. They are not wired into `package.json` and currently fail when run from this repo (they expect the monorepo layout).
+### Consumer scripts
+
+Shipped in the package and run from the consumer's root:
+
+| Script | What it does |
+|---|---|
+| `scripts/sync-dir.mjs <assets-subdir> <target>` | Copies a directory from `assets/` (e.g. `fonts public/fonts`). |
+| `scripts/copy-asset.mjs <package-path> <target>` | Copies one file from the package. |
+| `scripts/seo-prebuild.mjs --site <id> [--public public]` | Writes favicons, `og/<id>.webp`, `manifest.webmanifest` and `robots.txt` into `public/`. `--disallow`, `--noindex`, `--sitemap`, `--no-*` flags. |
+| `scripts/check-seo.mjs --site <id> [--dir dist]` | Lints the built HTML, sitemap and robots against the cross-web SEO contract. Exits 1 on errors. |
+| `scripts/check-slop.mjs [dir]` | Reports "template look" patterns (see [`docs/anti-patterns.md`](docs/anti-patterns.md)). Never fails. |
+
+The scripts that only made sense in the old monorepo (`check-recipes`, `check-docs-linter-coherence`, `check-workspace-conventions`, `process-icons`, `generate-og`) were removed; they're in the git history.
 
 ---
 
@@ -246,11 +267,12 @@ Before adding a role, ask: is it really new, or a variant of an existing one? Wi
 
 ## Releasing
 
-Published to npm as [`@chimichurricode/design-system`](https://www.npmjs.com/package/@chimichurricode/design-system) (semver, `0.x`). Only the paths in `package.json` → `files` are shipped — notably not `scripts/` except `check-slop.mjs`.
+Published to npm as [`@chimichurricode/design-system`](https://www.npmjs.com/package/@chimichurricode/design-system) (semver, `0.x`). Only the paths in `package.json` → `files` are shipped — of `scripts/`, only the [consumer scripts](#consumer-scripts).
 
 ```bash
 # bump "version" in package.json, then
 bun run build        # dist/ must exist: it's in the tarball but not in git
+bun run check
 npm publish          # registry from .npmrc; 2FA OTP required
 ```
 
@@ -260,8 +282,14 @@ Consumers pin a caret range (`cv-blog` `^0.8.0`, `cv-brand` `^0.7.5`, `cv-talks`
 
 ## Status and known gaps
 
+Fixed in 0.8.1: the footer no longer requests `/logos/simple-scrum-poker/favicon{,-dark}.svg` from each consumer (404 on every site that didn't copy them); `check-seo`, `seo-prebuild`, `sync-dir` and `copy-asset` work from `node_modules` and are shipped; `check-ecosystem-chrome` derives from the registry; the dead monorepo scripts are gone.
+
+Still open:
+
 - Spacing isn't tokenized yet (`--stack-*` lives in `web.css`, raw px elsewhere) — see [`docs/gaps.md`](docs/gaps.md).
 - The talks mobile viewer uses viewport units rather than DS breakpoints, so `dist/breakpoints.css` is webs-only today.
+- No automated tests: the monorepo's `node:test` suites weren't carried over. `bun run check` covers the registry and catalog contracts only.
+- `docs/anti-patterns.md` and parts of `docs/recipes.md` are still in Spanish.
 
 ## License
 
