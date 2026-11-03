@@ -14,31 +14,30 @@
  *   - `/mask-icon.svg`             (DS, copied)
  *   - `/icon-192.png`              (DS, copied)
  *   - `/icon-512.png`              (DS, copied)
- *   - `/og/<siteId>.png`           (DS, copied)
- *   - `/logos/<id>/{logo,favicon}.svg` (DS, copied for every site that has
- *                                       per-site logos under `assets/logos/<id>/`,
- *                                       so the SiteFooter ecosystem strip
- *                                       can render any sibling's mark)
+ *   - `/og/<siteId>.webp`          (DS, copied; `.png` fallback)
  *   - `/manifest.webmanifest`      (rendered from siteId)
  *   - `/robots.txt`                (rendered from siteId, with optional `--disallow` paths)
  *
- * Usage:
- *   node seo-prebuild.mjs --site blog --public public
- *   node seo-prebuild.mjs --site simple-scrum-poker --public public --disallow /r/ --disallow /preview/
+ * Usage (from the consumer site):
+ *   node node_modules/@chimichurricode/design-system/scripts/seo-prebuild.mjs --site blog --public public
+ *   node node_modules/@chimichurricode/design-system/scripts/seo-prebuild.mjs --site simple-scrum-poker --disallow /r/ --disallow /preview/
+ *
+ * The SiteFooter ecosystem logos are bundled by Vite from `assets/logos/`,
+ * so they are not copied here.
  *
  * `--public` is resolved relative to `process.cwd()` (the consumer
  * package). The script also accepts `--no-icons`, `--no-og`,
  * `--no-manifest`, `--no-robots` for piecemeal overrides.
  */
 
-import { mkdir, copyFile, writeFile, readdir, stat } from "node:fs/promises";
+import { mkdir, copyFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { resolve, dirname, basename } from "node:path";
+import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { renderRobotsTxt } from "../seo/robots.mjs";
 import { renderManifestJson } from "../seo/manifest.mjs";
-import { isSiteId } from "../seo/defaults.mjs";
+import { isSiteId, SEO_SITE_CATALOG } from "../seo/defaults.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const DS_ROOT = resolve(dirname(__filename), "..");
@@ -90,7 +89,7 @@ if (args.help) {
 
 if (!args.site || !isSiteId(args.site)) {
   console.error(
-    `[seo-prebuild] --site is required and must be one of: blog, techconf, recall-for-papers, simple-pdf-converter, simple-scrum-poker, simple-json-diff, simple-web-validator, talks, brand. Got "${args.site ?? ""}".`,
+    `[seo-prebuild] --site is required and must be one of: ${Object.keys(SEO_SITE_CATALOG).join(", ")}. Got "${args.site ?? ""}".`,
   );
   process.exit(2);
 }
@@ -122,27 +121,6 @@ if (!args.skip.icons) {
     console.log(`[seo-prebuild] favicon override → ${args.publicDir}/favicon.svg (from logos/${args.site}/)`);
   }
 
-  // Ecosystem logos: every site that has a logos/<id>/ directory in the DS
-  // gets *all* of its .svg files mirrored to `public/logos/<id>/`. This lets
-  // `SiteFooter` reference `/logos/<sibling>/logo.svg` (and optional
-  // `logo-dark.svg`, etc) confidently — every consumer ships every
-  // sibling's mark variants, regardless of which site is being built. The
-  // bundle cost is small (each SVG is a few KB).
-  const ecosystemLogos = await listEcosystemLogoDirs();
-  if (ecosystemLogos.length > 0) {
-    const logosOut = resolve(publicAbs, "logos");
-    for (const id of ecosystemLogos) {
-      const srcDir = resolve(LOGOS_DIR, id);
-      const dest = resolve(logosOut, id);
-      await mkdir(dest, { recursive: true });
-      const files = await readdir(srcDir);
-      for (const file of files) {
-        if (!file.endsWith(".svg")) continue;
-        await copyFile(resolve(srcDir, file), resolve(dest, file));
-      }
-    }
-    console.log(`[seo-prebuild] ecosystem logos → ${args.publicDir}/logos/ (${ecosystemLogos.join(", ")})`);
-  }
 }
 
 if (!args.skip.og) {
@@ -185,18 +163,3 @@ if (!args.skip.robots) {
 
 console.log(`[seo-prebuild] done for site=${args.site}`);
 
-/**
- * Return the list of site ids that have a per-site logo directory under
- * `assets/logos/<id>/`. The set is discovered from disk (no coupling to
- * `ECOSYSTEM_SITES`, which lives in TypeScript and isn't directly importable
- * from this `.mjs` script). Sibling logos at the root of `assets/logos/`
- * (`favicon.svg`, `logo-character.svg`, `logo-circle.svg`, `logo-code.svg`)
- * are ignored — they're DS-canonical, not per-site.
- *
- * @returns {Promise<string[]>}
- */
-async function listEcosystemLogoDirs() {
-  if (!existsSync(LOGOS_DIR)) return [];
-  const entries = await readdir(LOGOS_DIR, { withFileTypes: true });
-  return entries.filter((e) => e.isDirectory()).map((e) => e.name).sort();
-}
