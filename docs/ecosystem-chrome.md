@@ -2,32 +2,28 @@
 
 > **Canonical contract**: `openspec/specs/ecosystem-chrome/spec.md`. This page is the field guide; the spec is the normative document. If they ever drift, the spec wins and this page must be updated to match.
 
-The shared chrome that stitches the five aplicación webs of Chimichurri Code into a single ecosystem: the cross-web catalog (`ECOSYSTEM_SITES`), the topbar (`SiteHeader`), and the footer (`SiteFooter`).
+The shared chrome that stitches the Chimichurri Code webs into a single ecosystem: the cross-web catalog (`ECOSYSTEM_SITES`), the topbar (`SiteHeader`), and the footer (`SiteFooter`).
 
 ---
 
 ## The catalog
 
-`ECOSYSTEM_SITES` is a closed five-entry catalog exported from `@chimi/design-system/ecosystem`. Every entry has the same four fields, all non-empty, with `https://` URLs and **no** trailing slashes.
+`ECOSYSTEM_SITES` (exported from `@chimichurricode/design-system/ecosystem`) is derived from [`site-registry.ts`](../site-registry.ts): every registry entry with `chrome: true`, in registry order — 9 sites today (`blog`, `techconf`, `recall-for-papers`, `simple-pdf-converter`, `simple-scrum-poker`, `simple-json-diff`, `simple-web-validator`, `simple-radar-skills`, `simple-font-tester`). Every entry has non-empty `id`, `name`, `url` and `description`, an `https://` URL with **no** trailing slash, and optionally `logoSrc`.
 
-| id | name | url | description |
-|---|---|---|---|
-| `blog` | Chimichurri Code | `https://chimi.pro` | Blog, podcast y charlas |
-| `techconf` | TechConf | `https://techconf.chimi.pro` | Conferencias técnicas en España |
-| `recall-for-papers` | reCall4Papers | `https://recall.chimi.pro` | Pulí tu propuesta de charla |
-| `simple-pdf-converter` | Simple PDF Converter | `https://pdf.chimi.pro` | PDF tools 100% en el navegador |
-| `simple-scrum-poker` | Simple Scrum Poker | `https://poker.chimi.pro` | Voto a ciegas, sin login |
+To add or change a site, edit the registry and run `bun run check` (which regenerates the runtime mirror and runs `check-ecosystem-chrome`).
 
-The list is **closed**: extending it requires a change OpenSpec that modifies the spec; the build-time linter `check-ecosystem-chrome.mjs` rejects drift.
+### Logos
 
-### Five vs seven (chrome catalog vs SEO catalog)
+`logoSrc` paths look like `/logos/<id>/<file>.svg` and must point at a file shipped in `assets/logos/<id>/`. `SiteFooter` resolves them to those files and Vite bundles them into the consumer's build, so consumers don't copy anything into `public/`. Sites without `logoSrc` render as a text label.
+
+### Chrome catalog vs SEO catalog
 
 There are two ecosystem catalogs in the design system, and the difference is intentional:
 
 | Catalog | Module | Entries | Audience |
 |---|---|---|---|
-| `ECOSYSTEM_SITES` | `components/ecosystem.ts` | **5** | end-user UI chrome (footer switcher) |
-| `SEO_SITE_CATALOG` | `seo/defaults.mjs` | **7** | meta tags, alternates, sitemaps |
+| `ECOSYSTEM_SITES` | `components/ecosystem.ts` | `chrome: true` (**9**) | end-user UI chrome (footer switcher) |
+| `SEO_SITE_CATALOG` | `seo/defaults.mjs` | `seo: true` (**11**) | meta tags, alternates, sitemaps |
 
 The SEO catalog has two extra ids — `talks` and `brand` — that do **not** appear in the chrome because they are not products the visitor is meant to navigate to from the footer. `talks` is a live-presentation tool; `brand` is a brand book. Both have SEO surfaces (canonical URLs, OG images, JSON-LD) so they live in the SEO catalog. The cross-web SEO contract is defined in `openspec/specs/cross-web-seo/spec.md`.
 
@@ -37,7 +33,7 @@ The SEO catalog has two extra ids — `talks` and `brand` — that do **not** ap
 
 ```astro
 ---
-import SiteHeader from "@chimi/design-system/SiteHeader.astro";
+import SiteHeader from "@chimichurricode/design-system/SiteHeader.astro";
 ---
 
 <SiteHeader
@@ -46,7 +42,7 @@ import SiteHeader from "@chimi/design-system/SiteHeader.astro";
     { href: "/", label: "Home" },
     { href: "/about", label: "Cómo funciona" },
   ]}
-  socials={[/* SocialLink[] from "@chimi/design-system/ecosystem" */]}
+  socials={[/* SocialLink[] from "@chimichurricode/design-system/ecosystem" */]}
 />
 ```
 
@@ -81,7 +77,7 @@ Two variants. Pick `minimal` for productivity webs (default) and `rich` for the 
 
 ```astro
 ---
-import SiteFooter from "@chimi/design-system/SiteFooter.astro";
+import SiteFooter from "@chimichurricode/design-system/SiteFooter.astro";
 ---
 
 <SiteFooter
@@ -127,24 +123,20 @@ Extras vs minimal:
 `SiteFooter` filters the Chimiverse list using the helper:
 
 ```ts
-import { ecosystemLinksExcluding } from "@chimi/design-system/ecosystem";
+import { ecosystemLinksExcluding } from "@chimichurricode/design-system/ecosystem";
 
 const others = ecosystemLinksExcluding("simple-pdf-converter");
-// → 4 entries: blog, techconf, recall-for-papers, simple-scrum-poker
+// → every chrome site except simple-pdf-converter
 ```
 
-If you forget to pass `siteId`, the full five-entry list is rendered (including the current site). Always pass `siteId` from the consuming web.
+If you forget to pass `siteId`, the full list is rendered (including the current site). Always pass `siteId` from the consuming web.
 
 ---
 
-## Linter & tests
+## Linter
 
-Two scripts live alongside the contract:
-
-- `npm run check:ecosystem-chrome --workspace @chimi/design-system` — drift detector. Fails if the catalog leaves the canonical 5 ids, drops a field, ships a non-`https://` URL, or grows a trailing slash.
-- `npm run test:scripts --workspace @chimi/design-system` — unit tests for the linter (covers each contract check + the canonical catalog as the happy path).
-
-The drift detector is a pre-commit-friendly Node ESM script with no external dependencies; it parses `components/ecosystem.ts` via regex and validates the parsed catalog. Cosmetic drift in the source layout will trip the parser, which is the intended behaviour: any catalog edit must be paired with a spec update.
+- `bun run check:ecosystem-chrome` — drift detector. Imports `ECOSYSTEM_SITES` and the registry (Bun runs the TypeScript directly) and fails if they disagree, an entry drops a field, a URL isn't `https://` or has a trailing slash, or a `logoSrc` file is missing from `assets/logos/<id>/`.
+- `bun run check` runs it together with the registry and site-id drift checks.
 
 ---
 
@@ -152,5 +144,5 @@ The drift detector is a pre-commit-friendly Node ESM script with no external dep
 
 - `theme-toggle` — the toggle button mounted inside `SiteHeader` and (optionally) `SiteFooter`. Contract: `openspec/specs/theme-toggle/spec.md`.
 - `theming` — `[data-theme]` cascade that the toggle drives; both `SiteHeader` and `SiteFooter` consume `--chimi-color-*` semantic tokens that respect that cascade. Contract: `openspec/specs/theming/spec.md`.
-- `cross-web-seo` — SEO catalog distinction (5 vs 7) and the cross-web meta/alternates surface. Contract: `openspec/specs/cross-web-seo/spec.md`.
+- `cross-web-seo` — SEO catalog distinction (chrome vs SEO) and the cross-web meta/alternates surface. Contract: `openspec/specs/cross-web-seo/spec.md`.
 - `closed-recipe-model` — the recipe-driven color contract that the chrome's CSS rides on top of. Contract: `openspec/specs/closed-recipe-model/spec.md`.

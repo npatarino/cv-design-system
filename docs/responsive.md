@@ -1,8 +1,8 @@
 # Responsive foundation
 
-How the Chimi design system supports responsive web layouts. This document covers the breakpoints, the authoring rule (mobile-first), and the layout utilities every web in the monorepo consumes.
+How the Chimi design system supports responsive web layouts. This document covers the breakpoints, the authoring rule (mobile-first), and the layout utilities every Chimi web consumes.
 
-The slide layouts in `packages/talks` are out of scope here — they have their own viewer mode (see `mobile-viewer-talks` capability).
+The slide layouts in `cv-talks` are out of scope here — they have their own viewer mode (see `mobile-viewer-talks` capability).
 
 ## Breakpoints
 
@@ -146,32 +146,29 @@ For viewports 768px and below, every web meets:
 - Images/media respect `max-width: 100%`.
 - Navigation operable without hover (touch-friendly disclosure).
 
-Visual regression captures three viewports per page on every PR: `375×812` (mobile), `768×1024` (tablet), `1920×1080` (desktop). The screenshot harness lives in `packages/talks/scripts/screenshot-templates.mjs` and supports three sources:
+Visual regression captures three viewports per page on every PR: `375×812` (mobile), `768×1024` (tablet), `1920×1080` (desktop). The screenshot harness lives in the `cv-talks` repo (`scripts/screenshot-templates.mjs`; paths below are relative to that repo) and supports three sources:
 
 | `--source` | What it captures                                              | Default viewports     |
 | ---------- | ------------------------------------------------------------- | --------------------- |
-| `slides`   | Every template under `packages/talks/templates/*.md`          | `desktop`             |
+| `slides`   | Every template under `templates/*.md`                         | `desktop`             |
 | `web`      | The five webs (`blog`, `techconf`, `rfp`, `pdf`, `poker`)     | `mobile,tablet,desktop` |
 | `<url>`    | Any absolute URL (one page, multiple viewports)               | `mobile,tablet,desktop` |
 
-The webs source assumes each dev server is up on its canonical port — start them with `npm run dev:blog`, `npm run dev:techconf`, etc. before running the harness.
+The webs source assumes each site's dev server is up on its canonical port before running the harness.
 
 ```bash
-# Capture every web at all three viewports
-npm run screenshots:webs
-
 # Capture a single page at all three viewports
-node packages/talks/scripts/screenshot-templates.mjs \
+node scripts/screenshot-templates.mjs \
   --source http://localhost:4321/sobre-mi/ \
   --viewports all \
   --target current
 
 # Capture every slide template at the mobile viewport (validates viewer-mobile)
-node packages/talks/scripts/screenshot-templates.mjs \
+node scripts/screenshot-templates.mjs \
   --source slides --viewports mobile --target current
 ```
 
-Screenshots write to `packages/talks/tests/snapshots/<target>/<viewport>/<slug>.png`. Baselines live under `<target>=baseline`; the per-PR run writes to `<target>=current` for diffing.
+Screenshots write to `tests/snapshots/<target>/<viewport>/<slug>.png`. Baselines live under `<target>=baseline`; the per-PR run writes to `<target>=current` for diffing.
 
 ## When to escalate to the DS
 

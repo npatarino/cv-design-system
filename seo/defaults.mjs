@@ -37,7 +37,7 @@ import { SITE_REGISTRY_RUNTIME } from "./site-registry-runtime.generated.mjs";
  */
 
 /**
- * Full ecosystem catalog (9 entries).
+ * Full ecosystem catalog (every registry entry with `seo: true`).
  * Derived from the site registry.
  *
  * @type {Readonly<Record<SiteId, SEOSiteCatalogEntry>>}

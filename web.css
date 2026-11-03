@@ -10,14 +10,15 @@
  * Layered import:
  *   This file pulls in tokens.css and fonts.css automatically, so
  *   consumers only need:
- *     @import "@chimi/design-system/web.css";
+ *     @import "@chimichurricode/design-system/web.css";
  *
  *   Sites must also have the binary font files at /fonts/ on their
- *   served root. Run `sync-dir.mjs fonts public/fonts` in prebuild.
+ *   served root. Run `sync-dir.mjs fonts public/fonts` in prebuild
+ *   (node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs).
  *
  * Per-site overrides:
- *   --page-max defaults to 1120px. Sites with narrower content set their
- *   own value in their global.css after the import.
+ *   --page-max defaults to --bp-xl (1280px). Sites with narrower content set
+ *   their own value in their global.css after the import.
  *   Same for any --web-* size: redefine in :root and the cascade wins.
  */
 @import "./dist/tokens.css";
