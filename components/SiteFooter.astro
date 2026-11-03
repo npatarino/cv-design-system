@@ -55,6 +55,19 @@ const otherSites: EcosystemSite[] = siteId
 // the label when present (sites without a `logoSrc` show the textual label
 // only). When `logoDark` is provided, both <img>s ship and CSS swaps them
 // via `[data-theme="dark"]`; otherwise only `logo` renders for both themes.
+//
+// Registry logo paths look like `/logos/<id>/<file>.svg`. They are resolved
+// against the SVGs shipped in this package (`assets/logos/<id>/`), so Vite
+// bundles them into the consumer's build and no copy step into `public/` is
+// needed. Paths that don't match a shipped file are passed through untouched.
+const bundledLogos = import.meta.glob<string>("../assets/logos/*/*.svg", {
+  query: "?url",
+  import: "default",
+  eager: true,
+});
+const resolveLogo = (src?: string): string | undefined =>
+  src ? (bundledLogos[`../assets/logos/${src.replace(/^\/logos\//, "")}`] ?? src) : undefined;
+
 type EcosystemEntry = {
   href: string;
   label: string;
@@ -67,8 +80,8 @@ const ecosystemEntries: EcosystemEntry[] = showEcosystem && otherSites.length > 
       href: s.url,
       label: s.name,
       external: true,
-      logo: s.logoSrc?.logo,
-      logoDark: s.logoSrc?.logoDark,
+      logo: resolveLogo(s.logoSrc?.logo),
+      logoDark: resolveLogo(s.logoSrc?.logoDark),
     }))
   : [];
 

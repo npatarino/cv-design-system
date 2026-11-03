@@ -6,10 +6,10 @@ export interface EcosystemSite {
   url: string;
   description: string;
   /**
-   * Site-specific logo, served from the consumer's public root after
-   * `seo-prebuild` copies `design-system/assets/logos/<id>/*.svg` into
-   * `public/logos/<id>/`. Sites without a logo fall back to text-only
-   * rendering in `SiteHeader` and `SiteFooter`.
+   * Site-specific logo paths (`/logos/<id>/<file>.svg`). `SiteFooter`
+   * resolves them against `assets/logos/<id>/` in this package and lets
+   * Vite bundle the files, so consumers don't need to copy anything.
+   * Sites without a logo fall back to a text-only label.
    */
   logoSrc?: SiteEntry["logoSrc"];
 }
@@ -20,7 +20,7 @@ export interface SocialLink {
   icon: "youtube" | "twitter" | "linkedin" | "github";
 }
 
-/** @deprecated use `sitesWithRole("chrome")` from `@chimi/design-system/site-registry`. */
+/** @deprecated use `sitesWithRole("chrome")` from `@chimichurricode/design-system/site-registry`. */
 export const ECOSYSTEM_SITES: EcosystemSite[] = sitesWithRole("chrome").map((s) => ({
   id: s.id,
   name: s.name,
