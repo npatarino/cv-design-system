@@ -69,6 +69,10 @@
   "scripts": {
     "build:registry": "bun scripts/emit-site-registry-runtime.mjs",
     "build": "bun run build:registry && bun config.mjs",
+    "check": "bun run build:registry && bun run check:registry && bun run check:site-id-union && bun run check:ecosystem-chrome",
+    "check:registry": "bun scripts/check-site-registry-drift.mjs",
+    "check:site-id-union": "bun scripts/check-site-id-union.mjs",
+    "check:ecosystem-chrome": "bun scripts/check-ecosystem-chrome.mjs",
     "check:slop": "node scripts/check-slop.mjs"
   },
   "peerDependencies": {
