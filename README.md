@@ -103,7 +103,7 @@ Use the raw tokens without the web layer — `cv-talks` passthrough-copies `node
 | `fonts.css` | Hand-written `@font-face` for CHANEY, At Aero, Scilla Narrow, Thunder and Nudica Mono The font files are not in the package: see [Fonts](#fonts). |
 | `postcss` | `dsCustomMedia()` — PostCSS plugins that inline `@media (--md)` etc. |
 | `recipes` | `getTypeRecipes()` / `getTypeRecipeSummaries()` — type-family whitelist per recipe (from `tokens/type.recipe.json`). |
-| `*.astro` | `SiteHeader`, `SiteFooter`, `SocialIcons`, `ThemeBootstrap`, `ThemeIcons`, `SEOHead`, `BrandMark`, `BrandFavicon`, `BrandLogoWordmark`, `BrandLogoCircle`. Astro ≥ 5 is an optional peer dependency. |
+| `*.astro` | `SiteHeader`, `SiteFooter`, `SocialIcons`, `ThemeBootstrap`, `ThemeIcons`, `SEOHead`, `BrandMark`, `BrandFavicon`, `BrandLogoWordmark`, `BrandLogoCircle`. Astro 5, 6 or 7 is an optional peer dependency (`^5.0.0 || ^6.0.0 || ^7.0.0`). |
 | `ecosystem` | `ECOSYSTEM_SITES` (sites shown in the cross-web chrome), `DEFAULT_SOCIALS`, `ecosystemLinksExcluding()`. |
 | `site-registry`, `site-registry-runtime` | The canonical list of sites (`getSite`, `findSite`, `sitesWithRole("chrome" \| "seo")`) and its generated runtime copy. |
 | `seo`, `seo/*` | `buildJsonLd`, `defaultsForSite`, `renderSEOHeadHTML`, sitemap / robots / manifest renderers. See [`seo/README.md`](seo/README.md). |
