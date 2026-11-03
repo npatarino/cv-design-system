@@ -42,7 +42,7 @@ const SITE_REGISTRY: readonly SiteEntry[] = Object.freeze([
   {
     id: "techconf",
     name: "TechConf",
-    url: "https://techconf.chimi.pro",
+    url: "https://techconf.es",
     description: "Conferencias técnicas en España con foco en mobile, plataforma y backend.",
     chrome: true,
     seo: true,
