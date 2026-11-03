@@ -6,7 +6,7 @@ The design system ships **two themes**: `light` (default) and `dark`. They share
 
 - **Default is light.** When `<html>` has no `data-theme` attribute, the recipe-default values from `:root { … }` resolve to the **light** values for canvas-quiet/canvas-signal (since `ThemeBootstrap.astro` writes `data-theme="light"` eagerly when no preference is stored).
 - **Dark is opt-in via `<html data-theme="dark">`** (or by the OS preference `prefers-color-scheme: dark` triggering the bootstrap to leave the attribute absent — that resolves to dark via the recipe's `$value` defaults).
-- **Light overrides live on recipe tokens.** A second CSS block `:root[data-theme="light"] { … }` in `dist/tokens.css` overrides only the `--chimi-color-recipe-<id>-<role>` long-form vars whose values differ between themes; today that's `canvas-quiet.{surface,ink,em}` and `canvas-signal.{surface,ink,em}` — six entries.
+- **Light overrides live on recipe tokens.** A second CSS block `:root[data-theme="light"] { … }` in `dist/tokens.css` overrides only the `--chimi-color-recipe-<id>-<role>` long-form vars whose values differ between themes; today that's `canvas-quiet.{surface,ink,em,accent}` and `canvas-signal.{surface,ink,em,accent}`, eight entries.
 - **Unknown values fall back to default.** Anything other than `"light"` or `"dark"` (e.g., `data-theme="oceanic"`) is treated as no attribute.
 
 ## What flips
@@ -19,12 +19,15 @@ The design system ships **two themes**: `light` (default) and `dark`. They share
 | `canvas-signal` | `surface` | charcoal.100 | ivory.base |
 | `canvas-signal` | `ink` | ivory.base | charcoal.100 |
 | `canvas-signal` | `em` | lemon.base | red.base |
+| `canvas-quiet` | `accent` | patagonia.base | patagonia.deep |
+| `canvas-signal` | `accent` | patagonia.base | patagonia.deep |
 
 Rationale per role:
 
 - **`surface` and `ink`** flip together to keep AA contrast inverted (charcoal-on-ivory is the same eye-safe pair as ivory-on-charcoal).
 - **`em`** flips lemon → red because lemon-on-ivory falls below 1.5:1 (unreadable italic emphasis); red-on-ivory clears AA non-text.
-- **`accent` (patagonia)** and **`warn` (red)** keep their dark values — patagonia hits ~2.5:1 on ivory (UI/border AA, bordered-link acceptable per `web.css`'s patagonia-accent rule for paper recipes) and red clears AA on both surfaces.
+- **`accent`** flips patagonia.base → patagonia.deep because patagonia.base on ivory is 2.42:1 (fails even the 3:1 UI threshold); deep on ivory is 5.48:1.
+- **`warn` (red)** keeps its value. On ivory it is 5.87:1, but on charcoal it is only **2.78:1**: in dark mode `warn` is for markers, strokes and large display words, never for body-size text.
 
 The four other recipes (`paper`, `energy-loud`, `cool-fresh`, `critical`) declare **no `$extensions.chimi.theme.light` overrides**:
 
@@ -39,9 +42,9 @@ Ratios on canvas-quiet light:
 
 | Pair | Contrast | Meets AA normal (≥ 4.5:1) |
 | --- | ---: | :---: |
-| `--recipe-ink` (charcoal.100 `#1C1C1C`) on `--recipe-surface` (ivory.base `#FAFAF8`) | **15.79:1** | Yes |
-| `--recipe-em` (red.base `#A64132`) on `--recipe-surface` | **5.15:1** | Yes |
-| `--recipe-accent` (patagonia.base `#02B5B9`) on `--recipe-surface` | **2.49:1** | UI/border only (AA non-text 3:1 met for borders ≥ 3px) |
+| `--recipe-ink` (charcoal.100 `#1C1C1C`) on `--recipe-surface` (ivory.base `#FAFAF8`) | **16.31:1** | Yes |
+| `--recipe-em` (red.base `#A64132`) on `--recipe-surface` | **5.87:1** | Yes |
+| `--recipe-accent` (patagonia.deep `#017275`) on `--recipe-surface` | **5.48:1** | Yes |
 
 Body links must remain `--recipe-ink` with underline on light canvas (the patagonia-accent web.css override applies only to paper recipes).
 

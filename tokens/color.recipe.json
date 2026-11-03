@@ -1,5 +1,5 @@
 {
-  "_recipeComment": "Color recipes — 7 closed combinations of surface + ink + em + accent + warn. Each recipe is consumed by setting `data-recipe=\"<id>\"` on the slide root. The build emits a `:where([data-recipe=\"<id>\"])` block in dist/tokens.css that populates --recipe-* short vars. Layouts only consume --recipe-*. critical is bicara: as bg it's a full recipe; as fg it's a `.critical-fg-<role>` class that overrides --recipe-em or --recipe-warn to plasma. See docs/recipes.md.",
+  "_recipeComment": "Color recipes — 6 closed combinations of surface + ink + em + accent + warn. Each recipe is consumed by setting `data-recipe=\"<id>\"` on the slide root. The build emits a `:where([data-recipe=\"<id>\"])` block in dist/tokens.css that populates --recipe-* short vars. Layouts only consume --recipe-*. critical is bicara: as bg it's a full recipe; as fg it's a `.critical-fg-<role>` class that overrides --recipe-em or --recipe-warn to plasma. See docs/recipes.md.",
 
   "color": {
     "recipe": {
@@ -183,7 +183,7 @@
         "font-code": { "$value": "{font.family.code}" },
         "weight-code": { "$value": "{type.eyebrow.md.fontWeight}" },
         "_fgModifiers": {
-          "_description": "Sobre otra recipe portadora (canvas-quiet/signal, paper/cool), aplicá .critical-fg-<role> al root del slide.",
+          "_description": "Sobre otra recipe portadora (canvas-quiet, canvas-signal o paper), aplicá .critical-fg-<role> al root del slide.",
           "stat":         { "overrides": "em",   "color": "{primitives.color.plasma.base}" },
           "quote":        { "overrides": "em",   "color": "{primitives.color.plasma.base}" },
           "eyebrow":      { "overrides": "em",   "color": "{primitives.color.plasma.base}" },
