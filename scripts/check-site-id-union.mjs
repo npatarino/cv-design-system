@@ -150,7 +150,7 @@ export function validateFile(entry, text, canonical) {
         `${entry.relPath}:${lit.line}: hand-typed SiteId union detected (${lit.ids.length} ids).\n` +
           `    Replace with: import type { SiteId } from "../seo/defaults"\n` +
           `    (or @typedef {import("./defaults").SiteId} SiteId in JSDoc).\n` +
-          `    Source of truth: packages/design-system/seo/defaults.{mjs,d.ts}`,
+          `    Source of truth: seo/defaults.{mjs,d.ts}`,
       );
     }
   }

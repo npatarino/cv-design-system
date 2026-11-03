@@ -34,7 +34,7 @@ Every recipe also maps the five core font families to semantic roles. Components
 26: | `font-body` | Long-form reading, paragraphs. | `body` (At Aero) |
 27: | `font-editorial` | Quotes, testimonials, reflexions. | `editorial` (Scilla) |
 28: | `font-data` | Numbers, KPIs, technical figures. | `data` (Thunder) |
-29: | `font-code` | Monospaced snippets, metadata. | `code` (JetBrains Mono) |
+29: | `font-code` | Monospaced snippets, metadata. | `code` (Nudica Mono) |
 30: 
 31: > **Primary/Secondary aliases**: For convenience, recipes also define `font-primary` and `font-secondary` as the "main voice" and "secondary voice" of the mode. For example, in `canvas-quiet` (reading mode), primary is `body`; in `canvas-signal` (data mode), primary is `data`.
 32: 
@@ -296,16 +296,7 @@ Estos tres patrones **no se enforzan** en el linter actual — se reportan al fi
 
 ## Linter
 
-```bash
-npm run check:recipes
-```
-
-Valida:
-1. Cada `.md` de slide declara un `recipe:` que existe.
-2. Si declara `criticalFg`, el host no es `energy-loud` / `cool-fresh` / `critical`.
-3. Escanea las 6 webs (`packages/{blog,techconf,recall-for-papers,simple-pdf-converter,simple-scrum-poker,simple-json-diff}/src`) y reporta cualquier `var(--chimi-color-{text,surface,accent,emphasis,marker}-*)` directo como **error** (ya no como warning — el carve-out de `EventRow.astro` se cerró cuando recipes asumió el theme story; ver `recipes-light-theme-support` archive 2026-05-05). El namespace `--chimi-color-recipe-*` (long-form de `--recipe-*`) y `--chimi-primitives-color-*` (escape hatch documentado) NO se reportan.
-
-Está cableado al `prebuild` de cada web vía `npm --workspace @chimi/design-system run check:recipes -- --web <name>`, así que cualquier deploy de Vercel falla si una web introduce un leak.
+The monorepo had a recipe linter (`check-recipes.mjs`) that checked every slide template declared an existing `recipe:`, that `criticalFg` never sat on an `energy-loud` / `cool-fresh` / `critical` host, and that no web consumed `var(--chimi-color-{text,surface,accent,emphasis,marker}-*)` directly. It scanned the talks templates and the sibling webs' sources, so it was removed when the packages split into separate repos; the rules still apply and are enforced in review. `--chimi-color-recipe-*` (long form of `--recipe-*`) and `--chimi-primitives-color-*` (documented escape hatch) are allowed.
 
 ---
 
@@ -326,12 +317,6 @@ Color: los componentes son single-color (`fill="currentColor"`) salvo `BrandFavi
 
 ---
 
-## Tests visuales
+## Visual tests
 
-Las baselines pre-migration viven en [`packages/talks/tests/snapshots/baseline/`](../../talks/tests/snapshots/baseline/) (commiteadas). Para regenerar el estado actual:
-
-```bash
-npm --workspace @chimi/talks run snapshot:current
-```
-
-Eso escribe a `packages/talks/tests/snapshots/current/` (gitignored). Comparar manualmente o con un diff tool.
+The pre-migration baselines live in the `cv-talks` repo under `tests/snapshots/baseline/` (committed). The capture harness is documented in [`responsive.md`](responsive.md#mobile-usability-checklist); it writes the current state to `tests/snapshots/current/` (git-ignored) for diffing against the baselines.

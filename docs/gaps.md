@@ -67,16 +67,16 @@ Things the current system does **not** yet formalize. Each entry says what's mis
 ## Brand logo + font assets — DONE (consolidated into DS)
 
 **Status (resolved)**:
-- Canonical SVG logos (`logo-character`, `logo-circle`, `logo-code`, `favicon`) live in `packages/design-system/assets/logos/`.
-- Canonical font files (CHANEY, At Aero, Scilla Narrow, Thunder) live in `packages/design-system/assets/fonts/`.
+- Canonical SVG logos (`logo-character`, `logo-circle`, `logo-code`, `favicon`) live in `assets/logos/`.
+- Canonical font files (CHANEY, At Aero, Scilla Narrow, Thunder, Nudica Mono) live in `assets/fonts/`.
 
 Both used to live duplicated across `talks/`, `brand/shared/` and `brand/uploads/`. They are now single-source-of-truth in DS.
 
 **Consumer pattern**:
 - **Astro sites**: use the brand components — `BrandMark`, `BrandFavicon`, `BrandLogoWordmark`, `BrandLogoCircle` — which inline the SVG with theme-aware colors via `currentColor` or via props.
 - **Static sites that need the asset on disk** (e.g., `<link rel="icon">`, `@font-face url(...)`, `<img src=...>`):
-  - **Single file**: `node packages/design-system/scripts/copy-asset.mjs <ds-path> <target>`. Used by blog for the favicon.
-  - **Whole directory**: `node packages/design-system/scripts/sync-dir.mjs <subdir> <target-dir>`. Used by brand for both `logos` and `fonts`, and by talks for `fonts`.
+  - **Single file**: `node node_modules/@chimichurricode/design-system/scripts/copy-asset.mjs <ds-path> <target>`.
+  - **Whole directory**: `node node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs <subdir> <target-dir>` (e.g. `fonts public/fonts`).
 - Synced output paths are listed in `.gitignore` — they're regenerated at build time, not committed.
 
 **What's still pending**: `brand/shared/podcast-{dark,light}.png` are brand-guide-specific covers. They could move to `design-system/assets/podcast/` and be synced the same way, but they're not consumed by other sites today. Low priority.
@@ -91,7 +91,7 @@ Both used to live duplicated across `talks/`, `brand/shared/` and `brand/uploads
 - `config.mjs::THEME_SOURCES` reads recipe overrides directly; the walker is generic so future theme-aware token files just need to be appended.
 - Every consumer that referenced the semantic layer (`SiteHeader`, `SiteFooter`, `BrandMark`, `EventRow`, `talks/index.njk`, `talks/template-gallery.njk`, `web.css`, brand HTML pages) was migrated to `--recipe-*` short vars or `--chimi-primitives-color-*` escape hatches.
 - `tokens/color.semantic.json` was deleted.
-- `packages/design-system/scripts/check-recipes.mjs` now treats any direct `--chimi-color-{text,surface,accent,emphasis,marker}-*` reference as a build-breaking **error** — the previous warning carve-out for `EventRow.astro` is gone.
+- The recipe linter (`check-recipes.mjs`, monorepo era; removed from this repo, see the README) treated any direct `--chimi-color-{text,surface,accent,emphasis,marker}-*` reference as a build-breaking **error**.
 - Visible improvement: italic emphasis on canvas-quiet light pages flipped from lemon (1.4:1, unreadable) to red (5.15:1, AA).
 
 **What didn't migrate**: the 4 recipes whose chromatic identity is intentionally constant across themes — `paper`, `energy-loud`, `cool-fresh`, `critical`. They have no `$extensions.chimi.theme.light` blocks and need no consumer changes.

@@ -17,9 +17,9 @@
  */
 
 /**
- * Closed catalog of every web property the monorepo publishes (9 ids).
+ * Closed catalog of every web property in the ecosystem (11 ids).
  *
- * The 7 consumer-facing sites plus `talks` (the slide deck builder) and
+ * The 9 consumer-facing sites plus `talks` (the slide deck builder) and
  * `brand` (the brand book) — every site that has its own canonical URL,
  * sitemap, manifest, and OG image. The chrome catalog `ECOSYSTEM_SITES`
  * (`components/ecosystem.ts`) is a strict subset that excludes `talks`

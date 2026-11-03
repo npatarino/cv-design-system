@@ -61,7 +61,7 @@ Add a `$extensions.chimi.theme.<theme>` reference next to a recipe role's `$valu
 }
 ```
 
-The build (`packages/design-system/config.mjs`) reads these extensions and emits a per-theme override block. Roles whose theme value resolves to the same primitive as the default are dropped, so the override block only contains real differences.
+The build (`config.mjs`) reads these extensions and emits a per-theme override block. Roles whose theme value resolves to the same primitive as the default are dropped, so the override block only contains real differences.
 
 To add a third theme (e.g., `high-contrast`), append a sibling key under `chimi.theme`:
 
@@ -84,7 +84,7 @@ Before any stylesheet that depends on `data-theme`, render `<ThemeBootstrap />`.
 
 ```astro
 ---
-import ThemeBootstrap from "@chimi/design-system/ThemeBootstrap.astro";
+import ThemeBootstrap from "@chimichurricode/design-system/ThemeBootstrap.astro";
 ---
 <html lang="es">
   <head>
@@ -130,7 +130,7 @@ The `--chimi-color-{text,surface,accent,emphasis,marker}-*` semantic-layer names
 
 ## Opt-out (slides, single-theme contexts)
 
-The `talks` package renders slides and intentionally stays dark for projection. It doesn't import `@chimi/design-system/web.css` (it has its own slide-scoped CSS) and doesn't include `<ThemeBootstrap />` in slide layouts, so the toggle never appears and `data-theme` never gets set.
+The `talks` package renders slides and intentionally stays dark for projection. It doesn't import `@chimichurricode/design-system/web.css` (it has its own slide-scoped CSS) and doesn't include `<ThemeBootstrap />` in slide layouts, so the toggle never appears and `data-theme` never gets set.
 
 If a future surface needs to force a single theme:
 

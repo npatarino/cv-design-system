@@ -1,9 +1,9 @@
 /**
- * @file Public entrypoint for `@chimi/design-system/seo`.
+ * @file Public entrypoint for `@chimichurricode/design-system/seo`.
  *
  * Re-exports the helpers consumers need to wire SEO into a web. The
  * individual modules are also addressable by deep import (e.g.
- * `@chimi/design-system/seo/json-ld`) but most callers should pull
+ * `@chimichurricode/design-system/seo/json-ld`) but most callers should pull
  * everything from this barrel.
  */
 
