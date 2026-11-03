@@ -6,6 +6,16 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+## [0.8.2]
+
+### Changed
+
+- The optional `astro` peer range is `^5.0.0 || ^6.0.0 || ^7.0.0`. The Astro
+  components (`SiteHeader`, `SiteFooter`, `SEOHead`, `ThemeBootstrap`,
+  `ThemeIcons`, `SocialIcons` and the `Brand*` logos) compile unchanged with
+  Astro 7's Rust compiler and render the same HTML as on Astro 5 (checked
+  through `@chimichurricode/web-app-kit` 0.2.0's `BaseLayout`).
+
 ## [0.8.1]
 
 ### Fixed
