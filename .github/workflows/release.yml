@@ -46,8 +46,8 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
       - if: steps.auth.outputs.ok == 'true'
-        name: Use npm 11 (trusted publishing needs >= 11.5.1)
-        run: npm install -g npm@11
+        name: Use npm 12 (`npm stage publish`)
+        run: npm install -g npm@12
       - if: steps.auth.outputs.ok == 'true'
         run: bun install --frozen-lockfile
       - if: steps.auth.outputs.ok == 'true'
@@ -56,7 +56,9 @@ jobs:
         run: bun run check
 
       - if: steps.auth.outputs.ok == 'true'
-        name: Publish if this version is not on npm
+        # Trusted publishing may only *stage* versions: approve them with 2FA
+        # at npmjs.com > Staged Packages before they go live.
+        name: Stage this version if it is not on npm
         id: publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -74,7 +76,17 @@ jobs:
             echo "::error::Could not check $name@$version on npm: $out"
             exit 1
           fi
-          npm publish --access public --provenance
+          if ! out=$(npm stage publish --access public --provenance 2>&1); then
+            echo "$out"
+            if grep -qiE "E409|already (exists|staged)|cannot (publish|stage) over" <<<"$out"; then
+              echo "::notice::$name@$version is already staged, waiting for approval on npm."
+              echo "published=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            exit 1
+          fi
+          echo "$out"
+          echo "::notice title=Approve on npm::$name@$version is staged. Approve it with 2FA at https://www.npmjs.com (avatar > Staged Packages)."
           echo "published=true" >> "$GITHUB_OUTPUT"
 
       - if: steps.publish.outputs.published == 'true'

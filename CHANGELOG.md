@@ -53,8 +53,8 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
   with `CHIMI_FONTS_TOKEN` (cached per ref), or falls back to an installed
   ≤ 0.8.0 package; otherwise warns and succeeds (`--require` to fail). No
   dependencies; tested with `bun run test` (also in CI).
-- Manual workflow `deprecate-font-versions.yml` that deprecates the npm
-  versions ≤ 0.8.0 (they contain the font files) once 0.8.1 is published.
+- Release workflow stages versions with `npm stage publish` (npm Trusted
+  Publishing); a maintainer approves them with 2FA on npmjs.com.
 - `check-seo`, `seo-prebuild`, `sync-dir`, `copy-asset` and `seo/lint.mjs`
   are shipped in the package.
 - `node-html-parser` dependency (used by `check-seo`).

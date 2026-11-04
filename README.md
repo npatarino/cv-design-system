@@ -252,7 +252,7 @@ Where the files come from (first match wins):
 
 Files that are already identical in the target aren't rewritten, the target should be gitignored (`public/fonts/`), and the token is never printed. The fetcher has no dependencies (Node ≥ 18: `fetch`, `zlib` and a small tar reader). Tests: `bun run test`.
 
-`.gitignore` blocks `assets/fonts/` and font extensions so they can't be committed here again. Versions ≤ 0.8.0 on npm still contain the files; see [Releasing](#releasing) for the deprecation workflow.
+`.gitignore` blocks `assets/fonts/` and font extensions so they can't be committed here again. Versions ≤ 0.8.0 on npm still contain the files; see [Releasing](#releasing) for how they get deprecated.
 
 ## Local development
 
@@ -305,13 +305,19 @@ Published to npm as [`@chimichurricode/design-system`](https://www.npmjs.com/pac
 2. Merge to `main`.
 3. [`.github/workflows/release.yml`](.github/workflows/release.yml) runs on pushes to `main` that touch `package.json` (or by hand: Actions → Release → Run workflow). It runs `bun run build` and `bun run check`, and if `npm view @chimichurricode/design-system@<version>` doesn't find the version, it runs `npm publish --access public --provenance`, tags `v<version>` and creates a GitHub Release with generated notes. A version already on npm is skipped, so re-running is safe.
 
-**Required secret: `NPM_TOKEN`** (repo Settings → Secrets and variables → Actions). Create it on npmjs.com → Access Tokens → Generate New Token → *Granular Access Token*: packages and scopes `@chimichurricode/*` (or this package), permission *Read and write*. If the account requires 2FA for publishing, enable *Bypass two-factor authentication* on the token (granular tokens with that option, and legacy *Automation* tokens, publish without an OTP). Without the secret, a push to `main` skips the release with a notice and a manual run fails with an error saying what to add.
+**Publishing uses npm Trusted Publishing + staged publishing (no token).** On npmjs.com → the package → Settings → Trusted Publisher → GitHub Actions: owner `npatarino`, repository `cv-design-system`, workflow `release.yml`, environment empty. Then set the repository **variable** `NPM_TRUSTED_PUBLISHING=true` (Settings → Secrets and variables → Actions → Variables).
 
-More secure alternative, no token: [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers). On npmjs.com → the package → Settings → Trusted Publisher → GitHub Actions, enter owner `npatarino`, repository `cv-design-system` and workflow `release.yml`; then set the repository **variable** `NPM_TRUSTED_PUBLISHING=true` so the workflow runs without `NPM_TOKEN`.
+The trust relationship only allows `npm stage publish`, so the workflow **stages** the version: it isn't public yet. Approve it with 2FA at npmjs.com → avatar → *Staged Packages* (or `npm stage approve <id>`), and it goes live. The workflow creates the `v<version>` tag and GitHub Release when it stages. Running it again before you approve is harmless: an already staged version is skipped. A `NPM_TOKEN` secret still works as a fallback, but npm is restricting tokens that bypass 2FA.
 
 Publishing by hand still works (`bun run build && bun run check && npm publish`, with a 2FA OTP). `dist/` must exist: it's in the tarball but not in git.
 
-**Deprecating the versions that bundled the fonts.** Versions ≤ 0.8.0 contain the licensed font files. Once 0.8.1 is on npm, run Actions → *Deprecate font versions* → Run workflow ([`.github/workflows/deprecate-font-versions.yml`](.github/workflows/deprecate-font-versions.yml), manual only, uses the same `NPM_TOKEN`). It checks that 0.8.1 is published (and fails otherwise) and then runs `npm deprecate "@chimichurricode/design-system@<=0.8.0" "…"` so installs of those versions warn and point to ≥ 0.8.1. Deprecating doesn't remove the tarballs from npm; unpublishing is a separate decision (npm only allows it within 72 h or for packages without dependents).
+**Deprecating the versions that bundled the fonts.** Versions ≤ 0.8.0 contain the licensed font files. Once ≥ 0.8.1 is live, a maintainer runs this once from their machine (it asks for the 2FA code; trusted publishing can't deprecate):
+
+```bash
+npm deprecate "@chimichurricode/design-system@<=0.8.0" "Contains licensed font files that must not be redistributed. Upgrade to >=0.8.1 (fonts are fetched at build time)."
+```
+
+Deprecating doesn't remove the tarballs from npm; unpublishing is a separate decision.
 
 Consumers pin a caret range (`cv-blog` `^0.8.0`, `cv-brand` `^0.7.5`, `cv-talks` `^0.7.6`), so bump them after a minor release.
 
