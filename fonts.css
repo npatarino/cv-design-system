@@ -13,12 +13,13 @@
  *      token for npatarino/cv-fonts) or CHIMI_FONTS_DIR (a local clone's
  *      fonts/); without either the site falls back to system fonts.
  *      See "Fonts" in the package README.
- *   2. Import this stylesheet in your global.css *after* web.css:
- *        @import "@chimichurricode/design-system/web.css";
+ *   2. Nothing to import: web.css already imports this file. Import it
+ *      on its own only when you skip web.css (e.g. slides that link
+ *      dist/tokens.css directly):
  *        @import "@chimichurricode/design-system/fonts.css";
  *
- *   Together: tokens (web.css) declare which font-family names exist;
- *   this file declares where their files live and how to load them.
+ *   Together: tokens declare which font-family names exist; this file
+ *   declares where their files live and how to load them.
  *
  * Notes:
  *   - Paths are root-absolute (/fonts/…) so they work from any route.
