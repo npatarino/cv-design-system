@@ -59,8 +59,38 @@ import { ensureArray } from "./json-ld.mjs";
  * @property {string}  [preloadImage]                            - Hero / LCP image (absolute or path); also rendered with `fetchpriority="high"` by the consumer.
  * @property {{ favicon?: string; favicon32?: string; appleTouchIcon?: string; maskIcon?: string; manifest?: string }} [icons]
  * @property {string}  [titleTemplate]                           - When provided, used as `template.replace("%s", title)`. Defaults to `"<title> · <siteName>"` (with the home page using just `<siteName>`).
+ * @property {string | ThemeColorScheme} [themeColor]          - Override for `<meta name="theme-color">`. A string emits one tag (as before); `{ light, dark }` emits a `prefers-color-scheme` pair. When omitted, the site's registry `themeColorScheme` is used if present, else its single `themeColor`.
  * @property {boolean} [isHome]                                  - When true and `titleTemplate` is omitted, the rendered title is just `<siteName>` (avoids "Chimichurri Code · Chimichurri Code" duplication on the root URL).
  */
+
+/**
+ * @typedef ThemeColorScheme
+ * @property {string} light - Browser UI colour for `(prefers-color-scheme: light)`.
+ * @property {string} dark  - Browser UI colour for `(prefers-color-scheme: dark)`.
+ */
+
+/**
+ * Resolve the `<meta name="theme-color">` tags for a page.
+ *
+ * Precedence: the `themeColor` prop (string or `{ light, dark }`), then
+ * the site's optional `themeColorScheme`, then its single `themeColor`.
+ * A single colour renders exactly the one tag the helper always emitted.
+ *
+ * @param {string | ThemeColorScheme | undefined} override
+ * @param {{ themeColor: string; themeColorScheme?: ThemeColorScheme }} d
+ * @returns {string[]}
+ */
+function renderThemeColorTags(override, d) {
+  const value = override ?? d.themeColorScheme ?? d.themeColor;
+  if (value && typeof value === "object" && value.light && value.dark) {
+    return [
+      `<meta name="theme-color" content="${attr(value.light)}" media="(prefers-color-scheme: light)">`,
+      `<meta name="theme-color" content="${attr(value.dark)}" media="(prefers-color-scheme: dark)">`,
+    ];
+  }
+  const single = typeof value === "string" && value ? value : d.themeColor;
+  return [`<meta name="theme-color" content="${attr(single)}">`];
+}
 
 const DEFAULT_FONT_URLS = [
   "/fonts/AtAero-Regular.otf",
@@ -227,7 +257,7 @@ export function renderSEOHeadHTML(props) {
   lines.push(`<link rel="apple-touch-icon" sizes="180x180" href="${attr(icons.appleTouchIcon)}">`);
   lines.push(`<link rel="mask-icon" href="${attr(icons.maskIcon)}" color="${attr(d.maskIconColor)}">`);
   lines.push(`<link rel="manifest" href="${attr(icons.manifest)}">`);
-  lines.push(`<meta name="theme-color" content="${attr(d.themeColor)}">`);
+  lines.push(...renderThemeColorTags(props.themeColor, d));
   lines.push(`<meta name="msapplication-TileColor" content="${attr(d.themeColor)}">`);
 
   const fontUrls = props.preloadFontUrls ?? DEFAULT_FONT_URLS;
