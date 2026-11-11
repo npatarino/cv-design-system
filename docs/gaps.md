@@ -1,114 +1,107 @@
 # Open gaps in the design system
 
-Things the current system does **not** yet formalize. Each entry says what's missing, why it wasn't added in the first pass, and what it would take to close.
+Things the current system does **not** yet formalize. Each open entry says what's missing, why it wasn't added yet, and what it would take to close. Closed entries stay at the end with what closed them.
+
+Paths: this repo is `cv-design-system`. The slides live in the `cv-talks` repo and the brand book in `cv-brand`; the old monorepo folders (`talks/…`, `brand/shared/…`) no longer exist.
 
 ---
 
-## Spacing scale
+## Open
 
-**Status**: absent. Layouts use raw px values — `96px`, `140px`, `40px`, `24px`, `60px`, …
+### Shadow / elevation
 
-**Why not yet**: the existing values don't form a consistent rhythm. Adding a made-up scale would impose a structure the product doesn't actually have yet, and would force changes to 28 layouts.
+**Status**: absent. The package has one shadow (the desktop submenu of `SiteHeader`, `0 12px 32px -8px` black at 40%); the sites draw their own.
 
-**To close**: audit every spacing value in `talks/theme/styles/slides/*.css`, cluster them into 4–6 steps, give them names (`space.slide-padding`, `space.heading-gap`, `space.block-gap`, …), and migrate one layout at a time.
+**Why not yet**: the anti-patterns rule out decorative and colored shadows, so the legitimate uses are few (floating menus, maybe dialogs). Two or three named elevations would be enough, but there aren't enough uses to pick the values.
 
----
+**To close**: when a second floating surface appears, add `--chimi-shadow-{float,…}` to `tokens/foundation.semantic.json` (offset + soft blur, ink-based, never a colored halo) and move the submenu to it.
 
-## Radius / border / shadow
+### Web type scale as tokens
 
-**Status**: absent. A handful of layouts use borders (kpi-grid's 4px top border) and one uses a full-circle avatar, but there's no shared vocabulary.
+**Status**: the web sizes are `--web-*` composites written by hand in `web.css` (`clamp()` per step), and `.prose` adds its own relative sizes. They are not in `tokens/`. The sites add their own on top (the October audit counted 53 distinct `font-size` values in the blog and 92 in the brand book).
 
-**Why not yet**: not enough uses to generalize. Premature abstraction.
+**Why not yet**: the slide scale (`--chimi-type-*`, 1920×1080) is tokenized, but a web scale needs a decision on steps and fluid ranges first.
 
-**To close**: revisit once there are 3+ distinct values for any of these in production layouts.
+**To close**: decide 6–8 web steps (with their `clamp()` ranges), emit them from `tokens/` as `--chimi-web-type-*`, alias the `--web-*` composites to them and migrate the sites' one-off sizes.
 
----
+### Type-scale rationalization (slides)
 
-## Motion
-
-**Status**: lives in `brand/shared/motion.css` and the keyframes inside `talks/theme/styles/base.css` (streaming-text reveal, slide enter/exit). Not tokenized.
-
-**Why not yet**: the motion system is small and coherent — two durations, one easing. Not worth a token layer until a third use case appears.
-
-**To close**: when the deck grows more animation moments, extract `motion.duration.*` and `motion.easing.*` to primitives.
-
----
-
-## Type-scale rationalization
-
-**Status**: font sizes are named by T-shirt (`xs`, `sm`, `md`, …), but the scale isn't mathematical — it follows the sizes currently in use, which were picked by eye. Ratios between steps vary.
+**Status**: slide font sizes are named by T-shirt (`xs`, `sm`, `md`, …), but the scale isn't mathematical — it follows the sizes currently in use, which were picked by eye. Ratios between steps vary.
 
 **Why not yet**: forcing the scale onto a modular ratio (e.g. 1.25x) would change the look of every slide. That's a design decision, not a tooling one.
 
 **To close**: a design pass that decides whether to regularize the scale. If yes, edit `size.primitive.json` and accept visual changes across the deck.
 
----
+### Slide spacing and motion
 
-## Dark / light mode per slide
+**Status**: the web foundations are tokens now (see Closed), but the slides in `cv-talks` still use raw px for padding and gaps, and their keyframes (streaming-text reveal, slide enter/exit) live in the talks theme.
 
-**Status**: every slide picks its own surface (canvas, paper, accent-cool, etc.) and matching text colors explicitly. There's no "mode" concept.
+**Why not yet**: the slide values don't form a consistent rhythm, and moving them would touch every layout.
 
-**Why not yet**: slides aren't apps. Theming the whole deck based on a single switch doesn't match how talks work — moments are chosen, not toggled.
+**To close**: audit the slide CSS in `cv-talks`, map the values that match onto `--chimi-space-*` / `--chimi-duration-*`, and add slide-only steps only where none fits.
+
+### Recipes that ignore the theme
+
+**Status**: only `canvas-quiet` and `canvas-signal` change with the theme; `paper`, `energy-loud`, `cool-fresh` and `critical` look the same in both. Open decision, see [theming.md](theming.md#open-decision-recipes-that-ignore-the-theme).
+
+### Brand book palette
+
+**Status**: `cv-brand` still carries page-level CSS with its own values (about 3.7k lines inside the pages at the last audit) next to the shared tokens.
+
+**To close**: in `cv-brand`, replace local colors with `--recipe-*` and the foundations, and the inline recipe styles with `.recipe-scope`.
+
+### Emphasis depends on text color, not just surface
+
+**Status**: `em` is one color per recipe. Its readability depends on both the surface and the default text color on it.
+
+**Concrete case**: on `cool-fresh` `em` is ivory, correct when the text is charcoal (the divider slide). On a slide that sets ivory text on the patagonia surface, ivory `em` disappears; the talks theme overrides it locally (big-list bullets).
+
+**Why not yet**: modeling emphasis per (surface, text color) pair doubles the matrix, for two known collisions.
+
+**To close**: if a third case appears, add an `em` variant per text color to the recipes, or a contrast-aware resolution step in the build.
+
+### Dark / light mode per slide
+
+**Status**: every slide picks its own recipe. There's no deck-wide "mode".
+
+**Why not yet**: slides aren't apps; moments are chosen, not toggled.
 
 **To close**: not planned. Document the decision if it comes up again.
 
 ---
 
-## Brand tokens
+## Closed
 
-**Status**: `brand/shared/styles.css` still has its own palette, duplicated from the pre-library values. It hasn't been migrated.
+### Spacing scale (web) — closed in Unreleased
 
-**Why not yet**: out of scope of the first PR — the user explicitly said "solo talks, luego migramos lo otro."
+`--chimi-space-1…9` (4, 8, 12, 16, 24, 32, 48, 96, 144 px) in `tokens/foundation.semantic.json`. `--stack-*` in `web.css` are aliases of them. Line measure too: `--chimi-measure-{narrow,lede,prose}` (30, 56, 70ch).
 
-**To close**: replace `:root` in `brand/shared/styles.css` with an `@import` of the generated tokens + aliases, same pattern as `talks/theme/styles/tokens.css`. Then drop the aliases from both once every consumer uses `--chimi-*` directly.
+### Radius and border — closed in Unreleased
 
----
+`--chimi-radius-{sm,md,lg,xl,pill}` (2, 4, 8, 12, 999 px) and `--chimi-border-{1,2}` (1, 2 px). The package's components and `web.css` use them; values match the literals they replaced, so nothing moved. Shadow is still open (above).
 
-## Brand logo + font assets — DONE (consolidated into DS)
+### Motion and stacking (web) — closed in Unreleased
 
-**Status (resolved)**:
+`--chimi-duration-{fast,base,slow}` (120, 150, 200 ms), `--chimi-ease-standard`, `--chimi-z-{header,dropdown,skip}` (10, 20, 100). `web.css` honours `prefers-reduced-motion`. The header's 180 ms menu fade and the 80 ms press nudge have no token yet and stay literal.
+
+### Brand logo + font assets — closed
+
 - Canonical SVG logos (`logo-character`, `logo-circle`, `logo-code`, `favicon`) live in `assets/logos/`.
-- Canonical font files (CHANEY, At Aero, Scilla Narrow, Thunder, Nudica Mono) are licensed and live in the private repo `npatarino/cv-fonts` (since 0.8.1; they were in `assets/fonts/` before). Sites fetch them at build time with `chimi-fetch-fonts` (see "Fonts" in the README).
+- The licensed font files (CHANEY, At Aero, Scilla Narrow, Thunder, Nudica Mono) live in the private repo `npatarino/cv-fonts` (since 0.8.1). Sites fetch them at build time with `chimi-fetch-fonts` (see "Fonts" in the README).
 
-Both used to live duplicated across `talks/`, `brand/shared/` and `brand/uploads/`. They are now single-source-of-truth in DS.
+Consumer pattern:
 
-**Consumer pattern**:
-- **Astro sites**: use the brand components — `BrandMark`, `BrandFavicon`, `BrandLogoWordmark`, `BrandLogoCircle` — which inline the SVG with theme-aware colors via `currentColor` or via props.
-- **Static sites that need the asset on disk** (e.g., `<link rel="icon">`, `@font-face url(...)`, `<img src=...>`):
-  - **Single file**: `node node_modules/@chimichurricode/design-system/scripts/copy-asset.mjs <ds-path> <target>`.
-  - **Whole directory**: `node node_modules/@chimichurricode/design-system/scripts/sync-dir.mjs <subdir> <target-dir>` (e.g. `icons public/icons`). Fonts: `chimi-fetch-fonts public/fonts`.
-- Synced output paths are listed in `.gitignore` — they're regenerated at build time, not committed.
+- **Astro sites**: the brand components — `BrandMark`, `BrandFavicon`, `BrandLogoWordmark`, `BrandLogoCircle` — inline the SVG with theme-aware colors via `currentColor` or props.
+- **Static sites that need the asset on disk**: `scripts/copy-asset.mjs <package-path> <target>` for one file, `scripts/sync-dir.mjs <subdir> <target-dir>` for a directory, `chimi-fetch-fonts public/fonts` for the fonts. Synced output is git-ignored and regenerated at build time.
 
-**What's still pending**: `brand/shared/podcast-{dark,light}.png` are brand-guide-specific covers. They could move to `design-system/assets/podcast/` and be synced the same way, but they're not consumed by other sites today. Low priority.
+### Light theme over recipes — closed (2026-05-01)
 
----
+Closed by the `recipes-light-theme-support` change: `tokens/color.recipe.json` carries `$extensions.chimi.theme.light` overrides on the canvas recipes (`surface`, `ink`, `em`, `accent`, and since Unreleased the derived `accent-text`, `on-accent` and `status-*`); the semantic color layer (`tokens/color.semantic.json`) was deleted and its consumers moved to `--recipe-*`.
 
-## Light theme over recipes — DONE (2026-05-01)
+### Text-safe accent and AA muted text — closed in Unreleased
 
-**Status (resolved)**: closed by the `recipes-light-theme-support` change.
+`--recipe-accent-text`, `--recipe-on-accent` and `--status-*` per recipe and theme; `--muted` ≥4.5:1 everywhere; `test/contrast.test.mjs` guards every pair.
 
-- `tokens/color.recipe.json` now carries `$extensions.chimi.theme.light` overrides on the canvas-quiet and canvas-signal recipes' `surface`, `ink`, and `em` roles (the four paper/accent recipes are theme-agnostic by design).
-- `config.mjs::THEME_SOURCES` reads recipe overrides directly; the walker is generic so future theme-aware token files just need to be appended.
-- Every consumer that referenced the semantic layer (`SiteHeader`, `SiteFooter`, `BrandMark`, `EventRow`, `talks/index.njk`, `talks/template-gallery.njk`, `web.css`, brand HTML pages) was migrated to `--recipe-*` short vars or `--chimi-primitives-color-*` escape hatches.
-- `tokens/color.semantic.json` was deleted.
-- The recipe linter (`check-recipes.mjs`, monorepo era; removed from this repo, see the README) treated any direct `--chimi-color-{text,surface,accent,emphasis,marker}-*` reference as a build-breaking **error**.
-- Visible improvement: italic emphasis on canvas-quiet light pages flipped from lemon (1.4:1, unreadable) to red (5.15:1, AA).
+### Shared web components — closed in Unreleased
 
-**What didn't migrate**: the 4 recipes whose chromatic identity is intentionally constant across themes — `paper`, `energy-loud`, `cool-fresh`, `critical`. They have no `$extensions.chimi.theme.light` blocks and need no consumer changes.
-
-**Future tweaks** (not gaps, just polish):
-- A slightly darker `paper.em` (currently patagonia, ~2.5:1 on ivory — borderline for italic body text) could be added as a light override if a use case appears.
-- A third theme (`high-contrast`, `auto`) would just need a sibling key under `chimi.theme` on the relevant recipe roles; the build pipeline already supports it.
-
----
-
-## Emphasis depends on text color, not just surface
-
-**Status**: `color.emphasis.on-*` is keyed only by surface (canvas, paper, accent-cool, …). But emphasis readability depends on *both* the surface and the default text color on it.
-
-**Concrete case**: `color.emphasis.on-accent-cool = ivory`. That's correct when the default text is charcoal (big-concept divider). But on big-list bullets — where default text is ivory — the ivory `em` disappears. We worked around it by overriding to `accent.energy` (lemon) locally in `big-list.css` and noting it in the pairing.
-
-**Why not yet**: a full fix means modeling emphasis per (surface, text-color) pair, which doubles the matrix. At two known collisions it's cheaper to override per layout and record it in the pairing notes.
-
-**To close**: if a third case appears, split `emphasis.on-{surface}` into `emphasis.on-{surface}.light-text` and `.dark-text`, or switch to a contrast-aware token resolution step.
-
+`web.css` ships `.prose`, form fields, `.list-rows`, `.recipe-scope`, button modifiers and `.skip-link`; `SiteFooter` has a `person` variant. Still site-owned on purpose: cards, the feed's thumbnail grid, video embeds, the numbered display list.
