@@ -405,7 +405,7 @@ const showMobileToggle = mobileMenu && showNav;
   .site-header {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: var(--chimi-z-header);
     /* Solid surface. Frosted glass (backdrop-filter) is on the anti-patterns
        list: see docs/anti-patterns.md. */
     background: var(--recipe-surface);
@@ -433,7 +433,7 @@ const showMobileToggle = mobileMenu && showNav;
     white-space: nowrap;
   }
   .brand-mark {
-    color: var(--recipe-accent);
+    color: var(--recipe-accent-text);
     font-family: var(--chimi-font-family-code);
     font-size: 18px;
   }
@@ -452,6 +452,8 @@ const showMobileToggle = mobileMenu && showNav;
     width: auto;
     display: block;
   }
+  /* "Code" in the brand name is identity: it keeps the brand accent, not
+     the text-safe --recipe-accent-text. */
   .brand-name em {
     color: var(--recipe-accent);
     font-style: normal;
@@ -514,7 +516,7 @@ const showMobileToggle = mobileMenu && showNav;
        accessibility tree. The visibility flip waits for the fade-out to
        finish when closing and happens at once when opening. */
     visibility: hidden;
-    transition: transform 180ms ease, opacity 180ms ease, visibility 0s linear 180ms;
+    transition: transform 180ms var(--chimi-ease-standard), opacity 180ms var(--chimi-ease-standard), visibility 0s linear 180ms;
     min-width: 0;
   }
   .site-nav.open {
@@ -522,7 +524,7 @@ const showMobileToggle = mobileMenu && showNav;
     opacity: 1;
     pointer-events: auto;
     visibility: visible;
-    transition: transform 180ms ease, opacity 180ms ease, visibility 0s linear 0s;
+    transition: transform 180ms var(--chimi-ease-standard), opacity 180ms var(--chimi-ease-standard), visibility 0s linear 0s;
   }
   /* No hamburger to open it (mobileMenu={false}, or no JavaScript — see the
      `scripting: none` block below): render the nav in flow under the brand
@@ -564,7 +566,7 @@ const showMobileToggle = mobileMenu && showNav;
     color: var(--recipe-ink);
     border-bottom-color: var(--recipe-accent);
   }
-  .nav-link:hover { color: var(--recipe-accent-text, var(--recipe-accent)); }
+  .nav-link:hover { color: var(--recipe-accent-text); }
   /*
     CTA pill — uses --recipe-em as the chrome color. On canvas-quiet/signal
     that's lemon in dark and red in light (recipe handles the swap via
@@ -582,7 +584,7 @@ const showMobileToggle = mobileMenu && showNav;
   .nav-link.cta {
     color: var(--recipe-em);
     border: 1px solid color-mix(in srgb, var(--recipe-em) 50%, transparent);
-    border-radius: 999px;
+    border-radius: var(--chimi-radius-pill);
     padding: 8px 14px;
   }
   .nav-link.cta:hover {
@@ -614,12 +616,12 @@ const showMobileToggle = mobileMenu && showNav;
     font-size: 9px;
     margin-left: 4px;
     color: var(--muted);
-    transition: transform 150ms ease;
+    transition: transform var(--chimi-duration-base) var(--chimi-ease-standard);
   }
   .nav-item.has-children:hover .nav-chevron,
   .nav-item.has-children.is-open .nav-chevron {
     transform: rotate(180deg);
-    color: var(--recipe-accent);
+    color: var(--recipe-accent-text);
   }
   .nav-submenu {
     position: static;
@@ -641,14 +643,14 @@ const showMobileToggle = mobileMenu && showNav;
     transform: none;
     /* Collapsed links stay out of the tab order (see .site-nav). */
     visibility: hidden;
-    transition: max-height 200ms ease, visibility 0s linear 200ms;
-    z-index: 20;
+    transition: max-height var(--chimi-duration-slow) var(--chimi-ease-standard), visibility 0s linear var(--chimi-duration-slow);
+    z-index: var(--chimi-z-dropdown);
   }
   .nav-item.has-children.is-open .nav-submenu {
     max-height: 500px;
     pointer-events: auto;
     visibility: visible;
-    transition: max-height 200ms ease, visibility 0s linear 0s;
+    transition: max-height var(--chimi-duration-slow) var(--chimi-ease-standard), visibility 0s linear 0s;
   }
   .nav-item.has-children.is-open .nav-submenu-toggle {
     transform: rotate(180deg);
@@ -656,23 +658,23 @@ const showMobileToggle = mobileMenu && showNav;
   .nav-sublink {
     display: block;
     padding: 8px 12px;
-    border-radius: 4px;
+    border-radius: var(--chimi-radius-md);
     font: var(--web-meta);
     color: var(--muted-strong);
-    transition: background 120ms ease, color 120ms ease;
+    transition: background var(--chimi-duration-fast) var(--chimi-ease-standard), color var(--chimi-duration-fast) var(--chimi-ease-standard);
   }
   .nav-sublink:hover,
   .nav-sublink:focus-visible {
     background: color-mix(in srgb, var(--recipe-accent) 12%, transparent);
-    color: var(--recipe-accent-text, var(--recipe-accent));
+    color: var(--recipe-accent-text);
   }
   /* Inset ring: the mobile accordion clips anything outside the submenu. */
   .nav-sublink:focus-visible {
-    outline: 2px solid var(--recipe-accent-text, var(--recipe-accent));
+    outline: 2px solid var(--recipe-accent-text);
     outline-offset: -2px;
   }
   .nav-sublink.active {
-    color: var(--recipe-accent-text, var(--recipe-accent));
+    color: var(--recipe-accent-text);
   }
   /* On mobile, the chevron toggle button opens the submenu; on desktop it is
      hidden and hover/.is-open drives the floating dropdown. */
@@ -709,9 +711,9 @@ const showMobileToggle = mobileMenu && showNav;
     height: 44px;
     margin: -6px;
     color: var(--muted-strong);
-    border-radius: 999px;
+    border-radius: var(--chimi-radius-pill);
   }
-  .social-link:hover { color: var(--recipe-accent-text, var(--recipe-accent)); }
+  .social-link:hover { color: var(--recipe-accent-text); }
 
   /* Theme toggle — icon-only. On mobile it stacks under the socials with a
      shared top hairline; on desktop it sits to the right with a vertical
@@ -737,24 +739,24 @@ const showMobileToggle = mobileMenu && showNav;
     width: 44px;
     height: 44px;
     margin: -6px;
-    border-radius: 999px;
+    border-radius: var(--chimi-radius-pill);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: var(--muted-strong);
     cursor: pointer;
-    transition: color 150ms ease, transform 80ms ease;
+    transition: color var(--chimi-duration-base) var(--chimi-ease-standard), transform 80ms var(--chimi-ease-standard);
   }
   .nav-actions > :global(a) { text-decoration: none; }
   .nav-actions > :global(a) :global(svg),
   .nav-actions > :global(button) :global(svg) { display: block; }
   .theme-toggle:hover,
   .nav-actions > :global(a:hover),
-  .nav-actions > :global(button:hover) { color: var(--recipe-accent-text, var(--recipe-accent)); }
+  .nav-actions > :global(button:hover) { color: var(--recipe-accent-text); }
   .theme-toggle:focus-visible,
   .nav-actions > :global(a:focus-visible),
   .nav-actions > :global(button:focus-visible) {
-    outline: 2px solid var(--recipe-accent-text, var(--recipe-accent));
+    outline: 2px solid var(--recipe-accent-text);
     outline-offset: 2px;
   }
   .theme-toggle:active,
@@ -786,7 +788,7 @@ const showMobileToggle = mobileMenu && showNav;
     width: 22px;
     height: 2px;
     background: var(--recipe-ink);
-    transition: transform 180ms ease, opacity 180ms ease;
+    transition: transform 180ms var(--chimi-ease-standard), opacity 180ms var(--chimi-ease-standard);
   }
   .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
@@ -888,7 +890,7 @@ const showMobileToggle = mobileMenu && showNav;
       background: var(--surface-raised);
       border: 1px solid var(--hairline);
       border-left: 1px solid var(--hairline);
-      border-radius: 8px;
+      border-radius: var(--chimi-radius-lg);
       box-shadow: 0 12px 32px -8px color-mix(in srgb, #000 40%, transparent);
       max-height: none;
       overflow: visible;
@@ -898,7 +900,7 @@ const showMobileToggle = mobileMenu && showNav;
       /* Desktop keeps the panel reachable by Tab: focusing the parent link
          (:focus-within) reveals it before focus moves into it. */
       visibility: visible;
-      transition: opacity 150ms ease, transform 150ms ease;
+      transition: opacity var(--chimi-duration-base) var(--chimi-ease-standard), transform var(--chimi-duration-base) var(--chimi-ease-standard);
     }
     .nav-item.has-children:hover .nav-submenu,
     .nav-item.has-children:focus-within .nav-submenu,
