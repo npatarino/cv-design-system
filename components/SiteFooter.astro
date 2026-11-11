@@ -18,6 +18,28 @@ export interface MetaLink {
   external?: boolean;
 }
 
+/** Built-in strings of the footer. All optional; defaults below. */
+export interface SiteFooterLabels {
+  /** aria-label of the socials list (rich variant). */
+  socials?: string;
+  /** Visible title and aria-label of the ecosystem strip. */
+  ecosystem?: string;
+  /** Text before the heart in the minimal variant's byline. */
+  poweredWith?: string;
+  /** Text between the heart and the `poweredBy` link. */
+  poweredBy?: string;
+  /** Default copyright of the rich variant, after "© <year>" (ignored when `copyright` is set). */
+  rights?: string;
+}
+
+const DEFAULT_LABELS: Required<SiteFooterLabels> = {
+  socials: "Redes sociales",
+  ecosystem: "Chimiverse",
+  poweredWith: "Powered with",
+  poweredBy: "by",
+  rights: "Nicolás Patarino. Todos los derechos reservados.",
+};
+
 interface Props {
   variant?: "rich" | "minimal";
   siteId?: string;
@@ -29,6 +51,7 @@ interface Props {
   metaLinks?: MetaLink[];
   poweredBy?: { label: string; href: string } | null;
   copyright?: string;
+  labels?: SiteFooterLabels;
 }
 
 const {
@@ -42,7 +65,9 @@ const {
   metaLinks = [],
   poweredBy = { label: "Chimichurri Code", href: "https://chimi.pro" },
   copyright,
+  labels: labelOverrides = {},
 } = Astro.props;
+const labels: Required<SiteFooterLabels> = { ...DEFAULT_LABELS, ...labelOverrides };
 
 const year = new Date().getFullYear();
 const otherSites: EcosystemSite[] = siteId
@@ -90,7 +115,7 @@ const ecosystemEntries: EcosystemEntry[] = showEcosystem && otherSites.length > 
 const ecosystemColumn: FooterColumn | null =
   ecosystemEntries.length > 0
     ? {
-        title: "Chimiverse",
+        title: labels.ecosystem,
         links: ecosystemEntries.map((e) => ({ href: e.href, label: e.label, external: e.external })),
       }
     : null;
@@ -110,7 +135,7 @@ const isCurrentSiteByline = (href: string) =>
           {brandName && <h3 class="footer-brand">{brandName}</h3>}
           {brandDescription && <p class="footer-desc">{brandDescription}</p>}
           {socials.length > 0 && (
-            <ul class="footer-socials" aria-label="Redes sociales">
+            <ul class="footer-socials" aria-label={labels.socials}>
               {socials.map((s) => (
                 <li>
                   <a href={s.href} target="_blank" rel="noopener" aria-label={s.label}>
@@ -142,8 +167,8 @@ const isCurrentSiteByline = (href: string) =>
     {ecosystemEntries.length > 0 && (
       <div class="container">
         <hr class="footer-hairline" />
-        <nav class="footer-ecosystem-strip" aria-label="Chimiverse">
-          <span class="footer-ecosystem-title">Chimiverse</span>
+        <nav class="footer-ecosystem-strip" aria-label={labels.ecosystem}>
+          <span class="footer-ecosystem-title">{labels.ecosystem}</span>
           <ul>
             {ecosystemEntries.map((l, i) => (
               <li>
@@ -184,7 +209,7 @@ const isCurrentSiteByline = (href: string) =>
     )}
     <div class="container copyright">
       <hr class="footer-hairline" />
-      <p>{copyright ?? `© ${year} Nicolás Patarino. Todos los derechos reservados.`}</p>
+      <p>{copyright ?? `© ${year} ${labels.rights}`}</p>
     </div>
   </footer>
 ) : (
@@ -192,8 +217,8 @@ const isCurrentSiteByline = (href: string) =>
     <div class="container">
       <hr class="footer-hairline" />
       {ecosystemEntries.length > 0 && (
-        <nav class="footer-ecosystem" aria-label="Chimiverse">
-          <span class="footer-ecosystem-title">Chimiverse</span>
+        <nav class="footer-ecosystem" aria-label={labels.ecosystem}>
+          <span class="footer-ecosystem-title">{labels.ecosystem}</span>
           <ul>
             {ecosystemEntries.map((l) => (
               <li>
@@ -246,7 +271,7 @@ const isCurrentSiteByline = (href: string) =>
         </p>
         {poweredBy && !isCurrentSiteByline(poweredBy.href) && (
           <p class="footer-meta">
-            Powered with <span aria-hidden="true">♥</span> by
+            {labels.poweredWith} <span aria-hidden="true">♥</span> {labels.poweredBy}
             <a href={poweredBy.href} target="_blank" rel="noopener">{poweredBy.label}</a>
           </p>
         )}
@@ -305,29 +330,41 @@ const isCurrentSiteByline = (href: string) =>
   .site-footer--rich .footer-socials {
     list-style: none;
     padding: 0;
-    margin: 0;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 10px;
+    /* Links are 44×44 touch targets drawing a 36px ring (see below); the
+       -4px margin and 2px gap keep the rings exactly where they were
+       (36px rings, 10px apart, flush with the column). */
+    gap: 2px;
+    margin: -4px;
   }
   .footer-socials li { display: inline-flex; }
   .footer-socials a {
+    position: relative;
     display: inline-flex;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    border: 1px solid var(--hairline);
     color: var(--muted-strong);
-    transition: color 150ms ease, border-color 150ms ease, transform 150ms ease;
+    transition: color 150ms ease, transform 150ms ease;
+  }
+  .footer-socials a::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 999px;
+    border: 1px solid var(--hairline);
+    transition: border-color 150ms ease;
+    pointer-events: none;
   }
   .footer-socials a:hover {
     color: var(--recipe-accent);
-    border-color: var(--recipe-accent);
     transform: translateY(-2px);
   }
+  .footer-socials a:hover::before { border-color: var(--recipe-accent); }
   .footer-kicker {
     font: var(--web-eyebrow);
     letter-spacing: 0.18em;
