@@ -13,11 +13,15 @@
  *   ink, accent-text, muted, muted-strong, status-* on surface;
  *   on-accent on accent and on the hover/active accent fills.
  *
+ * Fails if the form-control outline (--field-border) drops below 3:1
+ * (WCAG 1.4.11) against the surface or the control's fill.
+ *
  * One documented exception: critical.ink (ivory on plasma) is 3.50:1, a
  * brand-identity pair that is only valid for large text (≥24px / 18.66px
  * bold). It is held to the 3:1 large-text floor so it cannot get worse.
  *
- * `CONTRAST_REPORT=1 bun test test/contrast.test.mjs` prints the table.
+ * `CONTRAST_REPORT=1 bun test test/contrast.test.mjs` prints the table
+ * (plus em, accent and warn on surface, informational: they carry no floor).
  */
 import { beforeAll, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
@@ -30,6 +34,7 @@ const RECIPES = ["canvas-quiet", "canvas-signal", "paper", "energy-loud", "cool-
 const THEMES = { dark: {}, light: { "data-theme": "light" } };
 const AA = 4.5;
 const LARGE_TEXT = 3;
+const UI = 3; // WCAG 1.4.11 non-text contrast
 const LARGE_TEXT_ONLY = new Set(["critical:ink"]);
 
 // ─────────────────────────────────────────────────────────── color math
@@ -303,6 +308,26 @@ function pairsFor(props) {
   ];
 }
 
+/**
+ * Non-text pairs (WCAG 1.4.11, ≥3:1): the outline of a form control
+ * (.input) against the surface around it and against the control's own
+ * fill (--surface-raised over the surface).
+ */
+function uiPairsFor(props) {
+  const c = (name) => {
+    const v = props[name];
+    if (v == null || v === "") throw new Error(`${name} is not defined`);
+    return parseColor(v);
+  };
+  const surface = c("--recipe-surface");
+  const fill = over(c("--surface-raised"), surface);
+  const border = c("--field-border");
+  return [
+    ["field-border", over(border, surface), surface],
+    ["field-border/fill", over(border, fill), fill],
+  ];
+}
+
 describe("contrast: every recipe × theme", () => {
   for (const recipe of [...RECIPES, null]) {
     for (const [theme, attrs] of Object.entries(THEMES)) {
@@ -316,6 +341,16 @@ describe("contrast: every recipe × theme", () => {
           row[pair] = Math.floor(ratio * 100) / 100;
           const floor = LARGE_TEXT_ONLY.has(`${recipe}:${pair}`) ? LARGE_TEXT : AA;
           if (ratio < floor) failures.push(`${pair} ${ratio.toFixed(2)}:1 < ${floor}:1 (${toHex(over(fg, bg))} on ${toHex(bg)})`);
+        }
+        for (const [pair, fg, bg] of uiPairsFor(props)) {
+          const ratio = contrast(fg, bg);
+          row[pair] = Math.floor(ratio * 100) / 100;
+          if (ratio < UI) failures.push(`${pair} ${ratio.toFixed(2)}:1 < ${UI}:1 (${toHex(fg)} on ${toHex(bg)})`);
+        }
+        // Informational only (decorative roles, no floor): em, accent, warn.
+        for (const role of ["em", "accent", "warn"]) {
+          const v = props[`--recipe-${role}`];
+          if (v) row[role] = Math.floor(contrast(parseColor(v), parseColor(props["--recipe-surface"])) * 100) / 100;
         }
         table.push(row);
         expect(failures).toEqual([]);

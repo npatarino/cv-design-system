@@ -81,10 +81,11 @@ npm install @chimichurricode/design-system
    </html>
    ```
 
-   Component CSS then reads only `--recipe-*`:
+   Component CSS then reads only `--recipe-*` (fills use `accent`, the text on them `on-accent`, accent-colored text `accent-text`):
 
    ```css
-   .cta { background: var(--recipe-accent); color: var(--recipe-surface); }
+   .cta { background: var(--recipe-accent); color: var(--recipe-on-accent); }
+   .kicker { color: var(--recipe-accent-text); }
    ```
 
 ### Slides (what `cv-talks` does)
@@ -97,8 +98,8 @@ Use the raw tokens without the web layer — `cv-talks` passthrough-copies `node
 
 | Import path | What it is |
 |---|---|
-| `web.css` | Everything a web needs: imports `dist/tokens.css`, `dist/breakpoints.css` and `fonts.css`, then adds a reset, web-scale type composites (`--web-display-xl`, `--web-body-md`, …), role tokens (`--muted`, `--hairline`, …) and utilities (`.container`, `.stack-{sm,md,lg}`, `.hide-on-mobile/-desktop`, `.display-*`, `.editorial-*`, `.eyebrow`, `.btn`, `.btn-primary`, `.tag`, …). |
-| `tokens.css` → `dist/tokens.css` | Generated token variables + `[data-recipe]` selectors + the `:root[data-theme="light"]` overrides. No imports. |
+| `web.css` | Everything a web needs: imports `dist/tokens.css`, `dist/breakpoints.css` and `fonts.css`, then adds a reset, `color-scheme`, a global `:focus-visible` ring, `prefers-reduced-motion` and `forced-colors` handling, 44px tap targets below 1024px, web-scale type composites (`--web-display-xl`, `--web-body-md`, …), role tokens (`--muted`, `--hairline`, `--field-border`, …), utilities (`.container`, `.stack-{sm,md,lg}`, `.hide-on-mobile/-desktop`, `.display-*`, `.editorial-*`, `.eyebrow`, `.tag`, `.skip-link`) and shared components — see the table below. |
+| `tokens.css` → `dist/tokens.css` | Generated token variables + `[data-recipe]` selectors + the `:root[data-theme="light"]` overrides. Includes the **foundations**: `--chimi-space-1…9`, `--chimi-radius-{sm,md,lg,xl,pill}`, `--chimi-duration-{fast,base,slow}`, `--chimi-ease-standard`, `--chimi-z-{header,dropdown,skip}`, `--chimi-border-{1,2}`, `--chimi-measure-{narrow,lede,prose}` (`tokens/foundation.semantic.json`). No imports. |
 | `dist/breakpoints.css` | Generated `--bp-{sm,md,lg,xl}` properties and matching `@custom-media` queries. |
 | `fonts.css` | Hand-written `@font-face` for CHANEY, At Aero, Scilla Narrow, Thunder and Nudica Mono The font files are not in the package: see [Fonts](#fonts). |
 | `postcss` | `dsCustomMedia()` — PostCSS plugins that inline `@media (--md)` etc. |
@@ -111,6 +112,23 @@ Use the raw tokens without the web layer — `cv-talks` passthrough-copies `node
 | `scripts/*.mjs` (shipped) | Node CLIs a consumer runs from `node_modules/@chimichurricode/design-system/scripts/` — see [Consumer scripts](#consumer-scripts). |
 
 The full map is the `exports` field in [`package.json`](package.json).
+
+### Components in `web.css`
+
+| Class | Use |
+|---|---|
+| `.btn` + `.btn--primary` / `.btn--ghost` / `.btn--sm` | Outline pill button; accent fill (one per screen); quieter outline; compact size. Aliases with the same rendering: `.btn.primary`, `.btn-primary`, `.btn-ghost`, `.btn-sm` (the `.btn-*` aliases also work without `.btn`). Labels wrap below 480px. |
+| `.prose` (+ `.prose--display`) | Long-form reading: paragraphs, h2–h4, lists, quotes, inline and block code, `hr`, images, `figure`/`figcaption`, `.img-grid`, tables with their own scroll, underlined links; text capped at `--chimi-measure-prose`. `--display` sets the headings in CHANEY. |
+| `.field` · `.label` · `.input` · `.field-hint` · `.field-error` | Form field: label, control (`input`, `select`, `textarea`) with a ≥3:1 outline, focus, `aria-invalid="true"` and disabled states, hint and per-field error linked with `aria-describedby`. |
+| `.list-rows` (+ `--between`, `.list-rows-link`, `.list-rows-title`, `.list-rows-meta`) | List of rows separated by hairlines, no boxes; titles wrap long words. |
+| `.recipe-scope` | Makes an element with its own `data-recipe` paint that recipe's surface and ink. |
+| `.skip-link` | "Skip to content" link, visible on focus. |
+
+### Component props
+
+- `SiteHeader`: `labels` (every built-in string, for non-Spanish sites), slot `actions` (icon links/buttons next to the theme toggle, e.g. search), `aria-current` on the active link, accessible mobile menu (Escape closes, focus returns, closed menu out of the tab order).
+- `SiteFooter`: `variant="rich" | "minimal" | "person"`; `labels`; the `person` variant (identity line, newsletter, link groups with `aria-current`, socials, legal line) takes `identity`, `newsletter`, `navGroups`, `socials`, `feed`, `copyright` and the slots `identity`, `newsletter`, `socials`, `legal`.
+- `SEOHead` / `renderSEOHeadHTML`: `themeColor` accepts `{ light, dark }` and emits a `prefers-color-scheme` pair of `theme-color` tags.
 
 ---
 
@@ -125,7 +143,9 @@ Three layers, consumed top-down. Each layer may only reference the one above it.
                local palettes (duotone logos, brand marks).
 2. RECIPES     tokens/color.recipe.json — 6 closed surface+ink+em+accent+warn
                combos, with per-theme overrides. THE layer slides and webs consume,
-               via data-recipe="<id>" → --recipe-{surface,ink,em,accent,warn}.
+               via data-recipe="<id>" → --recipe-{surface,ink,em,accent,warn},
+               plus the derived --recipe-accent-text, --recipe-on-accent and
+               --status-{ok,bad,caution}.
 3. UTILITIES   web.css — web-scale type composites + layout/utility classes.
                Webs only; slides keep their own slide-scale typography.
 ```
@@ -137,6 +157,7 @@ Escape-hatch uses of primitives carry an inline `/* primitive escape hatch — <
 ```
 tokens/   color.primitive · color.recipe · font.primitive · font.semantic ·
           size.primitive · breakpoint.primitive · type-style.semantic ·
+          foundation.semantic (space, radius, motion, z, border, measure) ·
           type.recipe (metadata only, not emitted to CSS)
 dist/     tokens.css · breakpoints.css            (generated, git-ignored)
 components/  Astro components + ecosystem.ts
@@ -150,7 +171,7 @@ config.mjs   Style Dictionary build
 
 ## Recipes
 
-A recipe is a closed combination of five color roles plus a typography whitelist. A surface declares one — `<body data-recipe="paper">` or slide frontmatter `recipe: paper` — and reads only `--recipe-*`. There are exactly six ways to color a Chimi surface:
+A recipe is a closed combination of five base color roles (`surface`, `ink`, `em`, `accent`, `warn`), three derived ones (`accent-text`, `on-accent`, `status-{ok,bad,caution}`) and a typography whitelist. A surface declares one — `<body data-recipe="paper">` or slide frontmatter `recipe: paper` — and reads only `--recipe-*`. There are exactly six ways to color a Chimi surface:
 
 | Recipe | Use |
 |---|---|
@@ -178,7 +199,7 @@ CSS variables follow `--chimi-{category}-{role}-{variant}`:
 | `font.family.display` | `--chimi-font-family-display` |
 | `type.display.md.fontSize` | `--chimi-type-display-md-fontSize` |
 | *(shorthand)* `type.display.md` | `--chimi-type-display-md` |
-| *(consumer-facing)* | `--recipe-{surface,ink,em,accent,warn}` |
+| *(consumer-facing)* | `--recipe-{surface,ink,em,accent,warn,accent-text,on-accent}`, `--status-{ok,bad,caution}` |
 
 The `font:` shorthand composites are the most useful; letter-spacing and text-transform aren't part of `font:`, so apply them alongside:
 
@@ -195,7 +216,7 @@ The `font:` shorthand composites are the most useful; letter-spacing and text-tr
 
 ## Theming (dark + light)
 
-The token cascade's default is **dark**; `<html data-theme="light">` applies the light overrides (today only `surface`, `ink` and `em` of `canvas-quiet` and `canvas-signal` flip). `<ThemeBootstrap />` makes **light the effective default on webs**: it applies the saved `chimi-theme` choice, otherwise follows `prefers-color-scheme`, and writes `data-theme="light"` unless the user wants dark. Talks and brand don't include it and stay dark. `<SiteHeader />` renders the toggle (`themeToggle` prop).
+The token cascade's default is **dark**; `<html data-theme="light">` applies the light overrides (today only `canvas-quiet` and `canvas-signal` flip: `surface`, `ink`, `em`, `accent` and the derived `accent-text`, `on-accent` and `status-*`; the other four recipes look the same in both themes, an open decision documented in theming.md). `web.css` sets `color-scheme` to match. `<ThemeBootstrap />` makes **light the effective default on webs**: it applies the saved `chimi-theme` choice, otherwise follows `prefers-color-scheme`, and writes `data-theme="light"` unless the user wants dark. Talks and brand don't include it and stay dark. `<SiteHeader />` renders the toggle (`themeToggle` prop).
 
 Full contract: [`docs/theming.md`](docs/theming.md).
 
@@ -212,13 +233,13 @@ Mobile-first against four breakpoints — `--bp-sm` 480, `--bp-md` 768, `--bp-lg
 }
 ```
 
-Consumer CSS needs the `dsCustomMedia()` PostCSS helper (see [Quick start](#quick-start)); `web.css` and the components ship literal queries and need no tooling. The only `max-width` rule allowed is the `(max-width: 767.98px)` floor that pins buttons and nav links to 44×44 tap targets. Details: [`docs/responsive.md`](docs/responsive.md).
+Consumer CSS needs the `dsCustomMedia()` PostCSS helper (see [Quick start](#quick-start)); `web.css` and the components ship literal queries and need no tooling. `max-width` queries are allowed only for two documented exceptions in `web.css`: the `(max-width: 1023.98px)` tap-target rule (buttons, `[role="button"]` and nav links at least 44px, the range the header keeps its touch menu) and the `(max-width: 479.98px)` narrow-phone rule (`.btn` labels wrap, `.display-lg` scales with the viewport). Details: [`docs/responsive.md`](docs/responsive.md).
 
 ---
 
 ## Ecosystem chrome and SEO
 
-`SiteHeader` (brand mark, nav, theme toggle, socials) and `SiteFooter` (`rich` / `minimal`) stitch the ecosystem webs together; the list of linked sites comes from `site-registry.ts` (`ECOSYSTEM_SITES` = sites with `chrome: true`, currently 9; SEO covers 11 including `talks` and `brand`). Field guide: [`docs/ecosystem-chrome.md`](docs/ecosystem-chrome.md).
+`SiteHeader` (brand mark, nav, theme toggle, socials, `actions` slot) and `SiteFooter` (`rich` / `minimal` / `person`) stitch the ecosystem webs together; the list of linked sites comes from `site-registry.ts` (`ECOSYSTEM_SITES` = sites with `chrome: true`, currently 9; SEO covers 11 including `talks` and `brand`). Field guide: [`docs/ecosystem-chrome.md`](docs/ecosystem-chrome.md).
 
 The sibling-site logos in the footer (`logoSrc` in the registry, e.g. Simple Scrum Poker's mark) are resolved by `SiteFooter` to the SVGs in `assets/logos/<id>/` and bundled by Vite, so consumers don't copy any `/logos/` files.
 
@@ -319,7 +340,7 @@ npm deprecate "@chimichurricode/design-system@<=0.8.0" "Contains licensed font f
 
 Deprecating doesn't remove the tarballs from npm; unpublishing is a separate decision.
 
-Consumers pin a caret range (`cv-blog` `^0.8.0`, `cv-brand` `^0.7.5`, `cv-talks` `^0.7.6`), so bump them after a minor release.
+Consumers pin a caret range (`cv-blog` and `cv-brand` `^0.8.0`; check `cv-talks` in its own repo). On `0.x` a caret only accepts patch releases (`^0.8.0` = `>=0.8.0 <0.9.0`), so bump them after a minor release.
 
 ---
 
@@ -329,9 +350,9 @@ Fixed in 0.8.1: the footer no longer requests `/logos/simple-scrum-poker/favicon
 
 Still open:
 
-- Spacing isn't tokenized yet (`--stack-*` lives in `web.css`, raw px elsewhere) — see [`docs/gaps.md`](docs/gaps.md).
+- No shadow tokens and no web type scale as tokens yet (the `--web-*` composites live in `web.css`) — see [`docs/gaps.md`](docs/gaps.md).
 - The talks mobile viewer uses viewport units rather than DS breakpoints, so `dist/breakpoints.css` is webs-only today.
-- Few automated tests: the monorepo's `node:test` suites weren't carried over. `bun run check` covers the registry and catalog contracts, and `bun run test` the font fetcher.
+- Few automated tests: the monorepo's `node:test` suites weren't carried over. `bun run check` covers the registry and catalog contracts; `bun run test` covers the font fetcher, the SEO head renderer and contrast (every text role ≥4.5:1 and the field outline ≥3:1, in every recipe and theme). There is no visual regression suite.
 - `docs/anti-patterns.md` and parts of `docs/recipes.md` are still in Spanish.
 
 ## License
