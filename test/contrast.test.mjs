@@ -20,7 +20,8 @@
  * brand-identity pair that is only valid for large text (≥24px / 18.66px
  * bold). It is held to the 3:1 large-text floor so it cannot get worse.
  *
- * `CONTRAST_REPORT=1 bun test test/contrast.test.mjs` prints the table.
+ * `CONTRAST_REPORT=1 bun test test/contrast.test.mjs` prints the table
+ * (plus em, accent and warn on surface, informational: they carry no floor).
  */
 import { beforeAll, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
@@ -345,6 +346,11 @@ describe("contrast: every recipe × theme", () => {
           const ratio = contrast(fg, bg);
           row[pair] = Math.floor(ratio * 100) / 100;
           if (ratio < UI) failures.push(`${pair} ${ratio.toFixed(2)}:1 < ${UI}:1 (${toHex(fg)} on ${toHex(bg)})`);
+        }
+        // Informational only (decorative roles, no floor): em, accent, warn.
+        for (const role of ["em", "accent", "warn"]) {
+          const v = props[`--recipe-${role}`];
+          if (v) row[role] = Math.floor(contrast(parseColor(v), parseColor(props["--recipe-surface"])) * 100) / 100;
         }
         table.push(row);
         expect(failures).toEqual([]);
