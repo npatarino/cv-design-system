@@ -31,6 +31,25 @@ ecosystem honours.
   `chrome: true` sites (9) for the `SiteFooter` — SEO also covers
   `talks` and `brand`.
 
+## `theme-color` per colour scheme
+
+By default the head emits one `<meta name="theme-color">` with the
+site's registry `themeColor` (unchanged behaviour). Both
+`renderSEOHeadHTML` and `<SEOHead>` accept an optional `themeColor`:
+
+```js
+renderSEOHeadHTML({ site: "blog", /* … */ themeColor: { light: "#FAFAF8", dark: "#1C1C1C" } });
+// <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)">
+// <meta name="theme-color" content="#1C1C1C" media="(prefers-color-scheme: dark)">
+```
+
+- `{ light, dark }` emits the `prefers-color-scheme` pair; a string
+  emits a single tag with that colour.
+- Without the prop, `defaultsForSite(id).themeColorScheme` is used when
+  the registry entry declares one (optional field, none do today);
+  otherwise the single `themeColor`.
+- `msapplication-TileColor` and the manifest keep using `themeColor`.
+
 ## Why `.mjs` instead of `.ts`
 
 Talks (Eleventy) and brand (static-HTML build scripts) run plain Node
@@ -99,6 +118,6 @@ node node_modules/@chimichurricode/design-system/scripts/seo-prebuild.mjs --site
 
 ## Tests
 
-There is no test suite in this repo yet (the monorepo's `node:test`
-suites were not carried over). `bun run check` runs the registry,
-site-id and ecosystem drift checks.
+`bun test test/` covers the font fetcher and the `theme-color` output of
+`renderSEOHeadHTML` (`test/render-head.test.mjs`). `bun run check` runs
+the registry, site-id and ecosystem drift checks.
