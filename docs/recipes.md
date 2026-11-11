@@ -2,25 +2,35 @@
 
 > **Canonical contract**: the closed catalog lives in [`tokens/color.recipe.json`](../tokens/color.recipe.json) (six recipes). The original OpenSpec change that introduced the model is archived at `openspec/changes/archive/2026-04-30-add-closed-recipe-model-spec/`; it still lists seven recipes because it predates the merge of the two paper variants into `paper`. This page is the field guide; if it ever drifts from the tokens, the tokens win and this page must be updated to match.
 
-Canonical reference for the **recipe model** that drives Chimi colors and typography across slides and webs. Recipes are the **only consumed layer** — primitives and semantic exist below them as raw values and design roles, but no surface (slide template, Astro page, brand book) reads them directly.
+Canonical reference for the **recipe model** that drives Chimi colors and typography across slides and webs. Recipes are the **only consumed color layer**: the primitives (`tokens/color.primitive.json`) exist below them as raw values, but no surface (slide template, Astro page, brand book) reads them directly except through the documented escape hatches. (There used to be a semantic color layer between the two; it was removed in 2026-05, see [theming.md](theming.md).) Non-color foundations (spacing, radius, motion, z-index, borders, line measure) live in `tokens/foundation.semantic.json` as `--chimi-space-*`, `--chimi-radius-*`, etc.
 
-A recipe is a **closed combination** of five color roles + a typography whitelist. Each surface declares one recipe — slide frontmatter (`recipe: canvas-quiet`) or `<body data-recipe="canvas-quiet">` for webs — and the build emits a `:where([data-recipe="<id>"])` block that populates five short CSS variables (`--recipe-{surface,ink,em,accent,warn}`); surface CSS only ever consumes those.
+A recipe is a **closed combination** of five base color roles, three derived color roles and a typography whitelist. Each surface declares one recipe — slide frontmatter (`recipe: canvas-quiet`) or `<body data-recipe="canvas-quiet">` for webs — and the build emits a `:where([data-recipe="<id>"])` block that populates the short CSS variables (`--recipe-{surface,ink,em,accent,warn}`, `--recipe-accent-text`, `--recipe-on-accent` and `--status-{ok,bad,caution}`); surface CSS only ever consumes those.
 
 > **One surface, one recipe.** The rest derives.
 
 ---
 
-## The five roles
+## The color roles
 
-Every recipe defines exactly five roles. Anything outside them is "no pintita extra."
+Every recipe defines five base roles. Anything outside them is "no pintita extra."
 
 | Role | What it does |
 |---|---|
 | `surface` | Dominant background color. |
 | `ink` | Primary text color. |
 | `em` | Italic argumentativo — the accent color for `<em>`. |
-| `accent` | CTAs, links, eyebrows, KPI numerals. |
+| `accent` | The brand accent as a **fill or stroke**: primary button fill, active underline, borders, KPI numerals at display size. |
 | `warn` | Outliers, anti-patterns, contradiction. |
+
+Plus three derived roles, so that text never has to guess whether a base role is legible. Each one is ≥4.5:1 where it is meant to be read (checked by `test/contrast.test.mjs`):
+
+| Role | CSS variable | Use it for | Not for |
+|---|---|---|---|
+| `accent-text` | `--recipe-accent-text` | The accent **as text on the surface**: eyebrows, links, active nav, hover color of links and outline buttons, focus ring. | Fills (use `accent`). |
+| `on-accent` | `--recipe-on-accent` | Text and icons **on an accent fill**: the primary button label, the skip link. Also valid on the hover/active fills (`--accent-fill-hover`, `--accent-fill-active`). | Text on the surface. |
+| `status-ok` / `status-bad` / `status-caution` | `--status-ok`, `--status-bad`, `--status-caution` | State text on the surface: form errors (`.field-error`, invalid field border), success and warning messages. On the three campaign surfaces (`energy-loud`, `cool-fresh`, `critical`) all three are charcoal, so the state must also be said in words. | Decorative color, backgrounds. |
+
+`accent` and `accent-text` are the same color where the accent already reads as text (canvas recipes in both themes); they differ where it does not (`paper` slides, `cool-fresh`, `critical`, `energy-loud`). When in doubt: fill → `accent`, text → `accent-text`.
 
 ---
 
@@ -80,6 +90,8 @@ Misma paleta que `canvas-quiet` en los dos temas (lemon como `em` en oscuro, red
 | accent | `#1C1C1C` | charcoal |
 | warn | `#A64132` | red |
 
+**On webs** `web.css` remaps the three accent roles of `paper` to patagonia deep (`#017275`): `accent` and `accent-text` = `#017275`, `on-accent` = ivory. Slides keep the charcoal accent of the token.
+
 **Mood**: calidez sin saturación. Soporta doble énfasis: **patagonia** (vía `em`) para tono reflexivo/técnico y **red** (vía `warn` o `<i>` en web) para tono cálido/emocional. Accent colapsa en charcoal porque ivory no admite patagonia/lemon como CTA sin pelearse.
 
 ✓ Slides quote, prompts · testimonials · resource-cards · FAQ informativo · tickets, flyers print
@@ -111,10 +123,10 @@ Misma paleta que `canvas-quiet` en los dos temas (lemon como `em` en oscuro, red
 | surface | `#02B5B9` | patagonia |
 | ink | `#1C1C1C` | charcoal |
 | em | `#FAFAF8` | ivory |
-| accent | `#F9D71C` | lemon |
-| warn | `#1C1C1C` | charcoal |
+| accent | `#FAFAF8` | ivory |
+| warn | `#F9D71C` | lemon |
 
-El em es ivory (no lemon) porque la cool ya tiene cromaticidad — sumar lemon como italic la rompe.
+El em es ivory (no lemon) porque la cool ya tiene cromaticidad — sumar lemon como italic la rompe. `accent` (ivory) y `warn` (lemon) son colores de forma y de palabra display, no de texto: el texto de acento es `accent-text` (charcoal) y el texto sobre un relleno de acento es `on-accent` (charcoal).
 
 ✓ Slide-divider entre bloques · banners de feature
 ✗ Lectura larga · junto a `paper` (chocan en saturación)
@@ -153,31 +165,49 @@ Aplicá una clase `critical-fg-<role>` al root del slide. La clase overridea `--
 
 **Reglas del fg**:
 - Máximo 1 critical-fg por slide (numeral *o* quote *o* eyebrow, no los tres).
-- No se permite sobre hosts `energy-loud`, `cool-fresh` o `critical` (lemon/patagonia/plasma + plasma vibran). El [linter](#linter) bloquea esto.
+- No se permite sobre hosts `energy-loud`, `cool-fresh` o `critical` (lemon/patagonia/plasma + plasma vibran). Hoy no hay linter que lo bloquee: se revisa a mano (ver [Linter](#linter)).
 
 ---
 
 ## Contrast (WCAG 2.1)
 
-Ratios for each role on its own recipe surface, computed from the primitive hexes. AA needs 4.5:1 for body text and 3:1 for large text (≥ 24 px, or ≥ 18.7 px bold) and UI strokes.
+Generated from the tokens and `web.css` by `CONTRAST_REPORT=1 bun test test/contrast.test.mjs` (values floored to two decimals). The test fails the build if a text role drops below 4.5:1 or the field outline below 3:1, so this table can only get better; regenerate it when a role changes. AA needs 4.5:1 for body text, 3:1 for large text (≥ 24 px, or ≥ 18.7 px bold) and for UI boundaries.
 
-| Recipe | ink | em | accent | warn |
-|---|---:|---:|---:|---:|
-| `canvas-quiet` / `canvas-signal`, dark | 16.31 | 11.98 | 6.75 | **2.78** |
-| `canvas-quiet` / `canvas-signal`, light | 16.31 | 5.87 | 5.48 | 5.87 |
-| `paper` | 16.31 | **2.42** | 16.31 (web.css: 5.48 light, **2.42** dark) | 5.87 |
-| `energy-loud` | 11.98 | *4.31* | 11.98 | *4.31* |
-| `cool-fresh` | 6.75 | **2.42** | **2.42** | **1.78** |
-| `critical` | *3.50* | 4.65 | 4.65 | 4.65 |
+Text roles on the recipe surface (web values: `paper` already carries the patagonia remap; "dark" = no `data-theme`, "light" = `data-theme="light"`):
 
-Bold = fails 3:1 (decoration only). Italic = large text only. What that means in practice:
+| Recipe · theme | ink | accent-text | on-accent / accent | on-accent / hover | on-accent / active | muted | muted-strong | status-ok | status-bad | status-caution |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `canvas-quiet` / `canvas-signal` · dark | 16.30 | 6.74 | 6.74 | 7.90 | 8.75 | 6.96 | 10.77 | 8.63 | 6.10 | 11.98 |
+| `canvas-quiet` / `canvas-signal` · light | 16.30 | 5.48 | 5.48 | 6.94 | 8.03 | 5.03 | 6.58 | 6.07 | 5.86 | 5.78 |
+| `paper` · dark | 16.30 | 5.48 | 5.48 | 6.94 | 8.03 | 4.71 | 8.70 | 6.07 | 5.86 | 5.78 |
+| `paper` · light | 16.30 | 5.48 | 5.48 | 6.94 | 8.03 | 5.03 | 6.58 | 6.07 | 5.86 | 5.78 |
+| `energy-loud` · both | 11.98 | 11.98 | 11.98 | 9.00 | 7.17 | 5.03 | 7.17 | 11.98 | 11.98 | 11.98 |
+| `cool-fresh` · both | 6.74 | 6.74 | 16.30 | 10.77 | 8.11 | 4.84 | 5.82 | 6.74 | 6.74 | 6.74 |
+| `critical` · both | *3.50* | 4.65 | 16.30 | 8.70 | 5.74 | 4.65 | 4.65 | 4.65 | 4.65 | 4.65 |
 
+Italic = the one documented exception: `critical.ink` (ivory on plasma) is 3.50:1, valid **only for large text**. The test holds it to the 3:1 large-text floor.
+
+Non-text and decorative roles (no AA floor for the decorative ones; listed so nobody uses them as copy by accident):
+
+| Recipe · theme | field-border / surface | field-border / field fill | em | accent | warn |
+|---|---:|---:|---:|---:|---:|
+| `canvas-quiet` / `canvas-signal` · dark | 3.68 | 3.50 | 11.98 | 6.74 | **2.77** |
+| `canvas-quiet` / `canvas-signal` · light | 3.67 | 3.59 | 5.86 | 5.48 | 5.86 |
+| `paper` · dark | 3.67 | 3.55 | **2.41** | 5.48 | 5.86 |
+| `paper` · light | 3.67 | 3.59 | **2.41** | 5.48 | 5.86 |
+| `energy-loud` · dark / light | 5.03 | 4.75 / 4.84 | *4.31* | 11.98 | *4.31* |
+| `cool-fresh` · dark / light | 4.84 | 4.48 / 4.59 | **2.41** | **2.41** | **1.77** |
+| `critical` · dark / light | 4.65 | 4.81 / 4.75 | 4.65 | 4.65 | 4.65 |
+
+Bold = below 3:1 (decoration only). Italic = large text only. What that means in practice:
+
+- Text in the accent color is always `--recipe-accent-text`; text on an accent fill is always `--recipe-on-accent`. `--recipe-accent` is for fills and strokes.
 - `warn` on charcoal is a stroke/marker color, never body text in dark mode.
-- `paper` `em` (patagonia on ivory) is only for display-size italics (slides, ≥ 48 px). On webs use `--recipe-ink` or red for inline emphasis.
+- `paper` `em` (patagonia on ivory) is only for display-size italics (slides, ≥ 48 px). On webs use `--recipe-ink` or red for inline emphasis (`.prose em` keeps the ink).
 - `cool-fresh` text is `ink` (charcoal). Ivory `em`/`accent` and lemon `warn` are for display words and shapes, not for copy.
-- `critical` ink (ivory on plasma) is large-text only; keep disclaimers short and big.
+- `critical` ink (ivory on plasma) is large-text only; keep disclaimers short and big. Secondary text on plasma (`--muted`, `--muted-strong`) is charcoal.
 - `.critical-fg-*` on light surfaces (plasma on ivory, 3.50:1) is large-text only.
-- `--muted` at 55 % (light theme) lands at 3.79:1 on ivory: meta and captions only. `--muted-strong` passes everywhere except on `cool-fresh` and `critical`.
+- `--muted` and `--muted-strong` clear 4.5:1 in every recipe and theme (light theme at 64 %; the campaign recipes pin their own mix). `--field-border` is the outline for form controls (`.input`), ≥3:1 against the surface and the field fill; `--hairline` / `--hairline-strong` (~1.2–1.4:1) are separators, never the only boundary of a control.
 
 ---
 
@@ -240,7 +270,7 @@ section.slide.s-cover {
   font-family: var(--recipe-font-display);
   font-weight: var(--recipe-weight-display);
 }
-.s-cover .kicker { color: var(--recipe-accent); font: var(--web-eyebrow); }
+.s-cover .kicker { color: var(--recipe-accent-text); font: var(--web-eyebrow); }
 .s-cover h1 em  { color: var(--recipe-em); font-family: var(--recipe-font-editorial); }
 ```
 
@@ -250,7 +280,7 @@ Para opacidades/hairlines, componé con `color-mix`:
 .s-faq .qa { border-top: 2px solid color-mix(in srgb, var(--recipe-ink) 12%, transparent); }
 ```
 
-Si necesitás un color específico fuera del recipe (un avatar charcoal local, un browser frame ivory), usá `--chimi-primitives-*` directo. Esos son escape hatches conscientes — el linter los acepta.
+Si necesitás un color específico fuera del recipe (un avatar charcoal local, un browser frame ivory), usá `--chimi-primitives-*` directo. Esos son escape hatches conscientes, aceptados en review.
 
 ---
 
@@ -264,7 +294,7 @@ Tres patrones aparecen en múltiples templates y están documentados en [tokens/
 | `allowMultipleStats` | Más de un Thunder por slide | kpi-grid, comparison-table, chart-bar, chart-line, three-ideas |
 | `allowDeckOverride` | El deck puede overridear `recipe:` en el frontmatter | closing-socials |
 
-Estos tres patrones **no se enforzan** en el linter actual — se reportan al final de cada corrida como informativo. Si un template fuera de la whitelist usa los 4 roles, lo vamos a ver visualmente en el diff de baselines.
+Estos tres patrones **no se enforzan** automáticamente (no hay linter de recetas desde la separación en repos). Si un template fuera de la whitelist usa los 4 roles, se ve en el diff de baselines de `cv-talks` o en review.
 
 ---
 
