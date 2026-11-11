@@ -28,8 +28,10 @@ export interface SiteFooterLabels {
   poweredWith?: string;
   /** Text between the heart and the `poweredBy` link. */
   poweredBy?: string;
-  /** Default copyright of the rich variant, after "© <year>" (ignored when `copyright` is set). */
+  /** Default copyright of the rich and person variants, after "© <year>" (ignored when `copyright` is set). */
   rights?: string;
+  /** aria-label of the person variant's <nav>. */
+  nav?: string;
 }
 
 const DEFAULT_LABELS: Required<SiteFooterLabels> = {
@@ -38,10 +40,20 @@ const DEFAULT_LABELS: Required<SiteFooterLabels> = {
   poweredWith: "Powered with",
   poweredBy: "by",
   rights: "Nicolás Patarino. Todos los derechos reservados.",
+  nav: "Pie de página",
 };
 
+/** Newsletter sentence of the person variant: `text` then the link. */
+export interface FooterNewsletter {
+  text: string;
+  label: string;
+  href: string;
+  /** Opens in a new tab. Default true. */
+  external?: boolean;
+}
+
 interface Props {
-  variant?: "rich" | "minimal";
+  variant?: "rich" | "minimal" | "person";
   siteId?: string;
   brandName?: string;
   brandDescription?: string;
@@ -52,6 +64,18 @@ interface Props {
   poweredBy?: { label: string; href: string } | null;
   copyright?: string;
   labels?: SiteFooterLabels;
+  /** person: one line saying who this is, set in the display face. */
+  identity?: string;
+  /** person: newsletter sentence with its link (or use the `newsletter` slot). */
+  newsletter?: FooterNewsletter | null;
+  /** person: link groups, one list each inside a single <nav>; groups after
+   *  the first get a hairline above. The link to the current page gets
+   *  aria-current="page". */
+  navGroups?: MetaLink[][];
+  /** person: feed link shown as text at the end of the socials row. */
+  feed?: { href: string; label?: string } | null;
+  /** Path used for aria-current (person variant). Defaults to the page's. */
+  currentPath?: string;
 }
 
 const {
@@ -66,6 +90,11 @@ const {
   poweredBy = { label: "Chimichurri Code", href: "https://chimi.pro" },
   copyright,
   labels: labelOverrides = {},
+  identity,
+  newsletter = null,
+  navGroups = [],
+  feed = null,
+  currentPath,
 } = Astro.props;
 const labels: Required<SiteFooterLabels> = { ...DEFAULT_LABELS, ...labelOverrides };
 
@@ -125,9 +154,84 @@ const richColumns: FooterColumn[] = columns;
 
 const isCurrentSiteByline = (href: string) =>
   poweredBy && siteId === "blog" && href === poweredBy.href;
+
+// Person variant: exact-match aria-current on the footer nav.
+const normalizePath = (p: string) => p.replace(/\/$/, "") || "/";
+const here = normalizePath(currentPath ?? Astro.url.pathname);
+const ariaCurrent = (href: string) => (normalizePath(href) === here ? "page" : undefined);
+const hasNewsletter = Boolean(newsletter) || Astro.slots.has("newsletter");
+const hasIdentity = Boolean(identity) || Astro.slots.has("identity");
+const hasSocials = socials.length > 0 || Boolean(feed) || Astro.slots.has("socials");
 ---
 
-{variant === "rich" ? (
+{variant === "person" ? (
+  <footer class="site-footer site-footer--person">
+    <div class="container footer-person-inner">
+      {(hasIdentity || hasNewsletter) && (
+        <div class="footer-person-who">
+          {hasIdentity && (
+            <p class="footer-person-line"><slot name="identity">{identity}</slot></p>
+          )}
+          {hasNewsletter && (
+            <p class="footer-person-news">
+              <slot name="newsletter">
+                {newsletter && (
+                  <>
+                    {newsletter.text}{" "}
+                    <a
+                      href={newsletter.href}
+                      target={newsletter.external === false ? undefined : "_blank"}
+                      rel={newsletter.external === false ? undefined : "noopener"}
+                    >{newsletter.label}</a>
+                  </>
+                )}
+              </slot>
+            </p>
+          )}
+        </div>
+      )}
+
+      {navGroups.length > 0 && (
+        <nav class="footer-person-nav" aria-label={labels.nav}>
+          {navGroups.map((group) => (
+            <ul>
+              {group.map((l) => (
+                <li>
+                  <a
+                    href={l.href}
+                    target={l.external ? "_blank" : undefined}
+                    rel={l.external ? "noopener" : undefined}
+                    aria-current={ariaCurrent(l.href)}
+                  >{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </nav>
+      )}
+
+      {hasSocials && (
+        <ul class="footer-person-socials" aria-label={labels.socials}>
+          {socials.map((s) => (
+            <li>
+              <a href={s.href} target="_blank" rel="noopener" aria-label={s.label}>
+                <SocialIcons icon={s.icon} size={18} />
+              </a>
+            </li>
+          ))}
+          <slot name="socials" />
+          {feed && (
+            <li class="footer-person-feed"><a href={feed.href}>{feed.label ?? "RSS"}</a></li>
+          )}
+        </ul>
+      )}
+
+      <p class="footer-person-legal">
+        <slot name="legal">{copyright ?? `© ${year} ${labels.rights}`}</slot>
+      </p>
+    </div>
+  </footer>
+) : variant === "rich" ? (
   <footer class="site-footer site-footer--rich">
     <div class="container footer-inner" style={`--footer-cols: ${richColumns.length};`}>
       {(brandName || brandDescription || socials.length > 0) && (
@@ -347,21 +451,21 @@ const isCurrentSiteByline = (href: string) =>
     height: 44px;
     align-items: center;
     justify-content: center;
-    border-radius: 999px;
+    border-radius: var(--chimi-radius-pill);
     color: var(--muted-strong);
-    transition: color 150ms ease, transform 150ms ease;
+    transition: color var(--chimi-duration-base) var(--chimi-ease-standard), transform var(--chimi-duration-base) var(--chimi-ease-standard);
   }
   .footer-socials a::before {
     content: "";
     position: absolute;
     inset: 4px;
-    border-radius: 999px;
+    border-radius: var(--chimi-radius-pill);
     border: 1px solid var(--hairline);
-    transition: border-color 150ms ease;
+    transition: border-color var(--chimi-duration-base) var(--chimi-ease-standard);
     pointer-events: none;
   }
   .footer-socials a:hover {
-    color: var(--recipe-accent);
+    color: var(--recipe-accent-text);
     transform: translateY(-2px);
   }
   .footer-socials a:hover::before { border-color: var(--recipe-accent); }
@@ -369,7 +473,7 @@ const isCurrentSiteByline = (href: string) =>
     font: var(--web-eyebrow);
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--recipe-accent);
+    color: var(--recipe-accent-text);
     margin: 0 0 var(--stack-sm);
   }
   .site-footer--rich .col ul:not(.footer-socials) {
@@ -380,7 +484,7 @@ const isCurrentSiteByline = (href: string) =>
     gap: 10px;
   }
   .site-footer--rich .col a { color: var(--muted-strong); }
-  .site-footer--rich .col a:hover { color: var(--recipe-accent); }
+  .site-footer--rich .col a:hover { color: var(--recipe-accent-text); }
 
   /* Ecosystem strip: horizontal row between columns and copyright.
      Wraps gracefully as more sites are added. */
@@ -409,7 +513,7 @@ const isCurrentSiteByline = (href: string) =>
     font: var(--web-meta);
     color: var(--muted-strong);
   }
-  .footer-ecosystem-strip a:hover { color: var(--recipe-accent); }
+  .footer-ecosystem-strip a:hover { color: var(--recipe-accent-text); }
   .footer-ecosystem-strip .sep {
     color: var(--muted);
     user-select: none;
@@ -443,7 +547,7 @@ const isCurrentSiteByline = (href: string) =>
     gap: 10px;
   }
   .footer-meta a { color: var(--muted-strong); }
-  .footer-meta a:hover { color: var(--recipe-accent); }
+  .footer-meta a:hover { color: var(--recipe-accent-text); }
 
   .footer-ecosystem {
     padding-top: var(--stack-md);
@@ -456,7 +560,7 @@ const isCurrentSiteByline = (href: string) =>
     font: var(--web-eyebrow);
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--recipe-accent);
+    color: var(--recipe-accent-text);
   }
   .footer-ecosystem ul {
     list-style: none;
@@ -470,7 +574,104 @@ const isCurrentSiteByline = (href: string) =>
     font: var(--web-meta);
     color: var(--muted-strong);
   }
-  .footer-ecosystem a:hover { color: var(--recipe-accent); }
+  .footer-ecosystem a:hover { color: var(--recipe-accent-text); }
+
+  /* Person variant: a personal site's footer. Identity line, newsletter,
+     link groups, socials and legal line; no corporate columns, no
+     Chimiverse strip (docs/anti-patterns.md). */
+  .site-footer--person {
+    margin-top: var(--stack-xl);
+    padding-block: var(--stack-lg) var(--stack-xl);
+    border-top: var(--chimi-border-1) solid var(--hairline-strong);
+  }
+  .footer-person-inner {
+    display: grid;
+    gap: var(--stack-md);
+  }
+  .footer-person-line {
+    margin: 0 0 var(--stack-xs);
+    font-family: var(--chimi-font-family-display);
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    line-height: 1.25;
+    max-width: 40ch;
+  }
+  .footer-person-news {
+    margin: 0;
+    color: var(--muted-strong);
+    max-width: 60ch;
+  }
+  .footer-person-news :global(a),
+  .footer-person-legal :global(a) {
+    color: var(--recipe-ink);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: var(--chimi-border-1);
+  }
+  .footer-person-news :global(a:hover),
+  .footer-person-legal :global(a:hover) {
+    text-decoration-color: var(--recipe-accent);
+    text-decoration-thickness: var(--chimi-border-2);
+  }
+  .footer-person-nav {
+    display: grid;
+    gap: var(--chimi-space-1);
+  }
+  .footer-person-nav ul,
+  .footer-person-socials {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--chimi-space-1) var(--stack-md);
+    align-items: center;
+  }
+  .footer-person-nav ul + ul {
+    padding-top: var(--chimi-space-1);
+    border-top: var(--chimi-border-1) solid var(--hairline);
+  }
+  .footer-person-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+  }
+  .footer-person-nav a:hover { color: var(--recipe-accent-text); }
+  .footer-person-nav a[aria-current="page"] {
+    text-decoration: underline;
+    text-decoration-color: var(--recipe-accent);
+    text-decoration-thickness: var(--chimi-border-2);
+    text-underline-offset: 0.3em;
+  }
+  /* :global(a) also reaches <li><a> passed through the `socials` slot. */
+  .footer-person-socials :global(a) {
+    display: inline-grid;
+    place-items: center;
+    min-width: 44px;
+    min-height: 44px;
+    color: var(--muted-strong);
+  }
+  .footer-person-socials :global(a:hover) { color: var(--recipe-ink); }
+  .footer-person-feed a {
+    font: var(--web-eyebrow);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .footer-person-legal {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .footer-person-legal :global(a) { color: var(--muted-strong); }
+  @media (min-width: 768px) {
+    .footer-person-inner {
+      grid-template-columns: 1.2fr 1fr;
+      align-items: start;
+      column-gap: var(--stack-xl);
+    }
+    .footer-person-who { grid-row: span 2; }
+    .footer-person-legal { grid-column: 1 / -1; }
+  }
 
   /* Per-site logo + label combo. Used by the ecosystem strip in both rich
      and minimal variants when a sibling site has logoSrc declared in
