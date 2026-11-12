@@ -23,6 +23,11 @@ opted in. 0.9.0 was staged on npm but never approved; use 0.9.1.
 - `SiteHeader` with `mobileMenu={false}` keeps the nav hidden below 1024px
   again (0.9.0 rendered it in flow under the brand). It is hidden with
   `visibility`, so its links are also out of the tab order.
+- The state colours added in 0.9.0 (`red.soft`, `green.base`, `green.soft`,
+  `amber.deep`) move from `primitives.color` to a new `primitives.status`
+  group (`--chimi-primitives-status-*`). They are functional colours, not
+  brand families: under `color` the brand book listed them as part of the
+  palette (eight families instead of six).
 
 ## [0.9.0] - 2026-11-12
 

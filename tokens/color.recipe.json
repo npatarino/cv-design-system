@@ -31,16 +31,16 @@
           "$extensions": { "chimi.theme": { "light": "{primitives.color.ivory.base}" } }
         },
         "status-ok": {
-          "$value": "{primitives.color.green.soft}", "$type": "color",
-          "$extensions": { "chimi.theme": { "light": "{primitives.color.green.base}" } }
+          "$value": "{primitives.status.green.soft}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.status.green.base}" } }
         },
         "status-bad": {
-          "$value": "{primitives.color.red.soft}", "$type": "color",
+          "$value": "{primitives.status.red.soft}", "$type": "color",
           "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
         },
         "status-caution": {
           "$value": "{primitives.color.lemon.base}", "$type": "color",
-          "$extensions": { "chimi.theme": { "light": "{primitives.color.amber.deep}" } }
+          "$extensions": { "chimi.theme": { "light": "{primitives.status.amber.deep}" } }
         },
         "font-primary": { "$value": "{font.family.body}" },
         "weight-primary": { "$value": "{type.body.md.fontWeight}" },
@@ -89,16 +89,16 @@
           "$extensions": { "chimi.theme": { "light": "{primitives.color.ivory.base}" } }
         },
         "status-ok": {
-          "$value": "{primitives.color.green.soft}", "$type": "color",
-          "$extensions": { "chimi.theme": { "light": "{primitives.color.green.base}" } }
+          "$value": "{primitives.status.green.soft}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.status.green.base}" } }
         },
         "status-bad": {
-          "$value": "{primitives.color.red.soft}", "$type": "color",
+          "$value": "{primitives.status.red.soft}", "$type": "color",
           "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
         },
         "status-caution": {
           "$value": "{primitives.color.lemon.base}", "$type": "color",
-          "$extensions": { "chimi.theme": { "light": "{primitives.color.amber.deep}" } }
+          "$extensions": { "chimi.theme": { "light": "{primitives.status.amber.deep}" } }
         },
         "font-primary": { "$value": "{font.family.data}" },
         "weight-primary": { "$value": "{type.data.md.fontWeight}" },
@@ -128,9 +128,9 @@
         "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
         "accent-text": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "on-accent": { "$value": "{primitives.color.ivory.base}", "$type": "color" },
-        "status-ok": { "$value": "{primitives.color.green.base}", "$type": "color" },
+        "status-ok": { "$value": "{primitives.status.green.base}", "$type": "color" },
         "status-bad": { "$value": "{primitives.color.red.base}", "$type": "color" },
-        "status-caution": { "$value": "{primitives.color.amber.deep}", "$type": "color" },
+        "status-caution": { "$value": "{primitives.status.amber.deep}", "$type": "color" },
         "font-primary": { "$value": "{font.family.editorial}" },
         "weight-primary": { "$value": "{type.editorial.md.fontWeight}" },
         "letter-spacing-primary": { "$value": "0" },
