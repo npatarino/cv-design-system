@@ -98,11 +98,6 @@
  * the three accent roles move together to patagonia.deep, leaving
  * surface/ink/em/warn untouched.
  *
- * Paper is ivory in both themes, so this remap is theme-independent.
- * (Until 0.8.2 it aliased the canvas-quiet accent, which flips by theme:
- * patagonia.base in dark = 2.42:1 as text on ivory, and the charcoal label
- * on the patagonia.deep fill in light was 2.97:1.)
- *
  * Contrast on ivory.base: patagonia.deep as text 5.48:1; ivory label on
  * the patagonia.deep fill 5.48:1; on its hover fill (deep + 20% charcoal)
  * 6.95:1. Checked by test/contrast.test.mjs.
@@ -111,6 +106,34 @@
   --recipe-accent:      var(--chimi-primitives-color-patagonia-deep);
   --recipe-accent-text: var(--chimi-primitives-color-patagonia-deep);
   --recipe-on-accent:   var(--chimi-primitives-color-ivory-base);
+}
+
+/* ── web-only: paper as the PAGE recipe follows the theme ────────────────
+ * A reader who chose dark gets a dark article: when paper is the recipe of
+ * the page (<body> or <html>) and the theme is dark, the colour roles take
+ * canvas-quiet's dark values. What stays paper is the voice: the editorial
+ * type roles (Scilla for headings and display) are untouched, and em keeps
+ * paper's patagonia instead of canvas-quiet's lemon.
+ *
+ * Only the page recipe flips. A nested paper block
+ * (<div data-recipe="paper" class="recipe-scope">) is a deliberate sheet of
+ * ivory on the page and stays ivory in both themes; so do slides, which do
+ * not load web.css.
+ *
+ * Contrast on charcoal.100: ivory ink 16.3:1, patagonia.base as text and
+ * as em 6.74:1, charcoal label on the patagonia.base fill 6.74:1.
+ */
+:root:not([data-theme="light"])[data-recipe="paper"],
+:root:not([data-theme="light"]) body[data-recipe="paper"] {
+  --recipe-surface:     var(--chimi-primitives-color-charcoal-100);
+  --recipe-ink:         var(--chimi-primitives-color-ivory-base);
+  --recipe-em:          var(--chimi-primitives-color-patagonia-base);
+  --recipe-accent:      var(--chimi-primitives-color-patagonia-base);
+  --recipe-accent-text: var(--chimi-primitives-color-patagonia-base);
+  --recipe-on-accent:   var(--chimi-primitives-color-charcoal-100);
+  --status-ok:          var(--chimi-primitives-status-green-soft);
+  --status-bad:         var(--chimi-primitives-status-red-soft);
+  --status-caution:     var(--chimi-primitives-color-lemon-base);
 }
 
 /* ── role tokens (derived from --recipe-ink / --recipe-accent) ───────────
@@ -176,8 +199,9 @@
  * mix of the ink can reach 4.5:1. Secondary text on plasma uses charcoal
  * (the recipe's accent-text, 4.65:1) instead of a dimmed ink.
  */
-/* paper is ivory in both themes: its field outline keeps the light-theme
-   mix even when the page is dark (40% charcoal on ivory would be 2.46:1). */
+/* A nested paper block is ivory in both themes: its field outline keeps the
+   light-theme mix even when the page is dark (40% charcoal on ivory would
+   be 2.46:1). On a dark paper page the same 54% of ivory ink is 5.2:1. */
 [data-recipe="paper"],
 :root[data-theme] [data-recipe="paper"],
 :root[data-theme][data-recipe="paper"] {
@@ -303,6 +327,11 @@ img, svg { max-width: 100%; display: block; }
   --prose-display: var(--chimi-font-family-display);
   --prose-weight: 700;
 }
+/* Long reads in the dark theme: full ivory on charcoal (16.3:1) glows over
+   a whole article, so running text drops to 88% of the ink (12.6:1).
+   Headings, strong and quotes keep the full ink and carry the hierarchy. */
+:root:not([data-theme="light"]) .prose { color: color-mix(in srgb, var(--recipe-ink) 88%, transparent); }
+:root:not([data-theme="light"]) .prose :is(h2, h3, h4, strong) { color: var(--recipe-ink); }
 .prose > :first-child { margin-top: 0; }
 .prose p,
 .prose ul,

@@ -216,7 +216,7 @@ The `font:` shorthand composites are the most useful; letter-spacing and text-tr
 
 ## Theming (dark + light)
 
-The token cascade's default is **dark**; `<html data-theme="light">` applies the light overrides (today only `canvas-quiet` and `canvas-signal` flip: `surface`, `ink`, `em`, `accent` and the derived `accent-text`, `on-accent` and `status-*`; the other four recipes look the same in both themes, an open decision documented in theming.md). `web.css` sets `color-scheme` to match. `<ThemeBootstrap />` makes **light the effective default on webs**: it applies the saved `chimi-theme` choice, otherwise follows `prefers-color-scheme`, and writes `data-theme="light"` unless the user wants dark. Talks and brand don't include it and stay dark. `<SiteHeader />` renders the toggle (`themeToggle` prop).
+The token cascade's default is **dark**; `<html data-theme="light">` applies the light overrides (today only `canvas-quiet` and `canvas-signal` flip: `surface`, `ink`, `em`, `accent` and the derived `accent-text`, `on-accent` and `status-*`; a page on `paper` also turns dark, through a web-only rule in `web.css`; nested `paper` blocks and the three campaign recipes look the same in both themes, see theming.md). `web.css` sets `color-scheme` to match. `<ThemeBootstrap />` makes **light the effective default on webs**: it applies the saved `chimi-theme` choice, otherwise follows `prefers-color-scheme`, and writes `data-theme="light"` unless the user wants dark. Talks and brand don't include it and stay dark. `<SiteHeader />` renders the toggle (`themeToggle` prop).
 
 Full contract: [`docs/theming.md`](docs/theming.md).
 

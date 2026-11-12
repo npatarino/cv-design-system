@@ -6,6 +6,17 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-12
+
+### Changed
+
+- **`paper` pages follow the theme.** When `paper` is the recipe of the page (`<body>` or `<html>`) and the theme is dark, the colour roles resolve to charcoal surface, ivory ink and patagonia accent; the editorial type roles and the patagonia `em` stay. Before, a dark-theme reader got an ivory article and the toggle did nothing there. Nested `paper` blocks (`.recipe-scope`) and slides stay ivory. Sites that hardcode ivory-only colours under `[data-recipe="paper"]` should move them to the roles (`--recipe-accent-text`, `--recipe-on-accent`, `--status-*`).
+- `.prose` running text is set at 88% of the ink in the dark theme (12.6:1); headings, `strong` and quotes keep the full ink.
+
+### Fixed
+
+- `SiteHeader`: the CTA hover label on a dark `paper` page (it would have been ivory on patagonia, 2.42:1).
+
 ## [0.9.3] - 2026-11-12
 
 ### Fixed

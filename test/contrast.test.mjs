@@ -365,12 +365,17 @@ describe("contrast: every recipe × theme", () => {
     const cqDark = computeBody(rules, THEMES.dark, "canvas-quiet");
     expect(cqDark["--recipe-accent-text"]).toBe("#02b5b9");
     expect(cqDark["--recipe-on-accent"]).toBe("#1c1c1c");
-    // paper's web remap is theme-independent (paper is ivory in both themes).
-    for (const attrs of Object.values(THEMES)) {
-      const paper = computeBody(rules, attrs, "paper");
-      expect(paper["--recipe-accent"]).toBe("#017275");
-      expect(paper["--recipe-on-accent"]).toBe("#fafaf8");
-    }
+    // paper as the page recipe follows the theme: ivory in light, charcoal in dark.
+    const paperLight = computeBody(rules, THEMES.light, "paper");
+    expect(paperLight["--recipe-surface"]).toBe("#fafaf8");
+    expect(paperLight["--recipe-accent"]).toBe("#017275");
+    expect(paperLight["--recipe-on-accent"]).toBe("#fafaf8");
+    const paperDark = computeBody(rules, THEMES.dark, "paper");
+    expect(paperDark["--recipe-surface"]).toBe("#1c1c1c");
+    expect(paperDark["--recipe-ink"]).toBe("#fafaf8");
+    expect(paperDark["--recipe-em"]).toBe("#02b5b9");
+    expect(paperDark["--recipe-accent-text"]).toBe("#02b5b9");
+    expect(paperDark["--recipe-on-accent"]).toBe("#1c1c1c");
     // muted must stay a mix of ink on the canvas recipes, not a fixed color.
     expect(cqLight["--muted"]).toContain("color-mix(in srgb, #1c1c1c 64%, transparent)");
   });
