@@ -19,7 +19,7 @@ Con `--strict` hacen fallar la comprobación. Son las que no dependen del contex
 | Regla | Qué cuenta | Por qué | En su lugar |
 |---|---|---|---|
 | `rayas` | La raya larga y el guion medio con espacios, usados como inciso | En los textos largos de Nico no aparece ninguna | Dos frases, o una coma |
-| `vocabulario` | Las palabras prohibidas de Foundations: tips, hacks, mindset, sinergia, empoderar, «desbloquear tu potencial», «tu mejor versión», «agregar valor», «apasionado por la», «de alto rendimiento», «al siguiente nivel», «de vanguardia», «ecosistema tech» | Vocabulario de coaching y de LinkedIn corporativo | Lo que hiciste, con un dato real |
+| `vocabulario` | Las palabras prohibidas de Foundations: tips, hacks, sinergia, empoderar, «desbloquear tu potencial», «tu mejor versión», «agregar valor», «apasionado por la», «de alto rendimiento», «al siguiente nivel», «de vanguardia», «ecosistema tech» | Vocabulario de coaching y de LinkedIn corporativo. «Mindset» no está: Foundations lo permite cuando va con sustancia, y eso lo decide quien lee | Lo que hiciste, con un dato real |
 | `meta-anuncio` | «En este artículo vamos a ver», «a continuación te cuento», «hoy quiero hablarte de» | Anuncia en vez de contar | Arrancar directo con la historia |
 | `anzuelo` | «Te leo en comentarios», «¿qué opinás?», «compartí si te sirvió», «guardalo para después» | Pide interacción en vez de dar algo | Una decisión concreta para la semana |
 | `borrador` | Enlaces vacíos, «(link interno si aplica)», marcadores de pendiente en mayúsculas, texto de relleno, corchetes del tipo «[insertar…]», URL cortadas y frases de asistente («espero que esto te ayude») | Es texto que no era para quien lee | El enlace real, o borrar la línea |

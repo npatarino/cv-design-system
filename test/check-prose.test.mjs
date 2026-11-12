@@ -30,6 +30,8 @@ describe("checkText: enforced rules", () => {
     expect(count("— Hola, viejo.\n— Hola.", "rayas")).toBe(0);
     expect(count("– Mmmm, a quien intentó dártelo – respondió uno.\n\nLe miró y preguntó: – ¿Cuánto hace? – ¿Afilar? No tengo tiempo.", "rayas")).toBe(0);
     expect(count("- [Refactoring – Martin Fowler](https://example.com/r)\n- Refactoring – Martin Fowler", "rayas")).toBe(1);
+    expect(count("## Sukaro — Términos\n\nsep 2021 — jun 2026, dic 2020 — presente, 2007 — 2011, ene — may 2009.", "rayas")).toBe(0);
+    expect(count("Lo hicimos en 2020 — y salió bien.", "rayas")).toBe(1);
     expect(count("Usá `a — b` en el código.\n\n```\nx — y\n```", "rayas")).toBe(0);
   });
   test("vocabulario: brand banned words, with accents and without partial matches", () => {
@@ -92,7 +94,7 @@ describe("checkText: advisory rules", () => {
 
 describe("checkText: what is not the author's prose", () => {
   test("frontmatter, blockquotes, comments and URLs are skipped", () => {
-    const md = '---\ntitle: "Tips — y hacks"\n---\n\n> Cinco tips — dijo alguien.\n\n<!-- TODO(nico): tips -->\n\nMirá https://example.com/tips-y-hacks y [esto](https://example.com/mindset).';
+    const md = '---\ntitle: "Tips — y hacks"\n---\n\n> Cinco tips — dijo alguien.\n\n<!-- TODO(nico): tips -->\n\nMirá https://example.com/tips-y-hacks y [esto](https://example.com/sinergia).';
     expect(total(md)).toBe(0);
   });
   test("prose-ok on the line, or alone on the line before, skips that line only", () => {
@@ -117,6 +119,10 @@ describe("checkText: HTML", () => {
     expect(r.negritas.length).toBe(1);
     expect(r.secciones.length).toBe(1);
     expect(r.vocabulario.length).toBe(0);
+  });
+  test("dialogue, link labels and headings keep their dashes in HTML too", () => {
+    const r = checkText(page('<h1>Sukaro — Términos</h1><p>— ¿Pero papá, no escuchás la radio?</p><ul><li><a href="/x">Refactoring – Martin Fowler</a></li></ul><p>Bien — o casi.</p>'), { html: true });
+    expect(r.rayas.length).toBe(1);
   });
   test("data-prose-ok skips an element; locations survive the rewrite", () => {
     const html = page('<p>Bien.</p>\n<td data-prose-ok>tips, hacks, trucos de</td>\n<p>Cinco tips.</p>');

@@ -69,7 +69,7 @@ const PATTERNS = {
   rayas: /—| – /g,
   vocabulario: w(
     [
-      "hacks", "tips", "trucos (?:para|de)", "mindset", "sinergias?", "empoderar\\p{L}*", "empodera\\p{L}*",
+      "hacks", "tips", "trucos (?:para|de)", "sinergias?", "empoderar\\p{L}*", "empodera\\p{L}*",
       "desbloque(?:ar|á|a|es|en) (?:tu|su|el|todo)", "unlock", "(?:tu|su) (?:máximo |verdadero )?potencial",
       "(?:la |tu )?mejor versión(?: de (?:vos|ti|uno) mism[oa])?", "(?:agregar|aportar|añadir|generar) valor",
       "lo que nadie te (?:dice|cuenta)", "te lo cuento todo", "(?:el|un) método definitivo",
@@ -133,6 +133,7 @@ function prepareHtml(raw) {
   t = blank(t.slice(0, start)) + t.slice(start, end === -1 ? undefined : end) + blank(end === -1 ? "" : t.slice(end));
   t = t.replace(/<h[1-6]\b[^>]*>/gi, (m) => pad(m, "\n# "));
   t = t.replace(/<\/?(?:strong|b)>/gi, (m) => pad(m, "**"));
+  t = t.replace(/<a\b[^>]*>/gi, (m) => pad(m, "[")).replace(/<\/a>/gi, "](x"); // link labels, as in markdown
   t = t.replace(/<\/(?:p|h[1-6]|li|div|section|article|figcaption|td|th|dd|dt)>|<br\s*\/?>/gi, (m) => pad(m, "\n\n"));
   t = t.replace(/<[^>]*>/g, blank);
   return t.replace(/&(?:nbsp|amp|quot|#39|lt|gt|ldquo|rdquo|laquo|raquo|hellip|mdash|ndash);/g, (m) =>
@@ -168,23 +169,27 @@ export function checkText(raw, { html = false } = {}) {
     const before = text.slice(Math.max(0, index - 40), index).split("\n").pop();
     const after = text.slice(index, index + Math.max(length, 20) + 40).split("\n")[0];
     const excerpt = (before + after).replace(/\s+/g, " ").trim();
-    found[id].push({ line: li + 1, col, excerpt: excerpt.slice(0, 140) });
+    found[id].push({ line: li + 1, col, excerpt: excerpt.slice(0, 140), index });
   };
 
   // Vocabulary and phrase rules.
   for (const [id, re] of Object.entries(PATTERNS)) for (const m of text.matchAll(re)) add(id, m.index, m[0].length);
   for (const m of text.matchAll(MARKERS)) add("borrador", m.index, m[0].length);
   // The dash that opens a line of dialogue is how Spanish writes dialogue, not an aside.
-  // Nor is the one that opens speech mid-paragraph («preguntó: – ¿Cuánto…?»), nor the
-  // separator inside a link label («[Refactoring – Martin Fowler](…)»).
+  // Nor are: the one that opens speech mid-paragraph («preguntó: – ¿Cuánto…?»), the
+  // separator inside a link label («[Refactoring – Martin Fowler](…)») or a heading
+  // («Sukaro — Términos»), and a range («2018 — 2020», «dic 2020 — presente»).
   found.rayas = found.rayas.filter((h) => {
-    const line = rawLines[h.line - 1];
-    if (/^\s*(?:[-*+]\s+)?[—–]/.test(line)) return false;
-    const at = h.col - 1 + (line[h.col - 1] === " " ? 1 : 0);
-    if (/[.?!:…]["”»]?\s*$/.test(line.slice(0, at))) return false;
-    return !(/\[[^\]]*$/.test(line.slice(0, at)) && /^[^\[]*\]\(/.test(line.slice(at)));
+    const from = text.lastIndexOf("\n", h.index - 1) + 1;
+    const to = text.indexOf("\n", h.index);
+    const line = text.slice(from, to === -1 ? undefined : to);
+    const at = h.index - from + (text[h.index] === " " ? 1 : 0);
+    const before = line.slice(0, at), after = line.slice(at + 1);
+    if (/^\s*(?:[-*+]\s+)?[—–]/.test(line) || /^\s*#{1,6}\s/.test(line)) return false;
+    if (/[.?!:…]["”»]?\s*$/.test(before)) return false;
+    if (/\[[^\]]*$/.test(before) && /^[^\[]*\]\(/.test(after)) return false;
+    return !(/(?:\d{4}|\d{1,2}|(?<![\p{L}])\p{L}{3,4}\.?)\s*$/u.test(before) && /^\s*(?:(?:\p{L}{3,4}\.? )?\d{4}|\d{1,2}(?!\d)|presente|hoy|actualidad|now|present)/iu.test(after));
   });
-
   // Contrast: the three shapes overlap, so a hit inside the previous one is the same contrast.
   const contrasts = CONTRASTE.flatMap((re) => [...text.matchAll(re)]).sort((a, b) => a.index - b.index);
   let end = -1;
@@ -236,7 +241,9 @@ export function checkText(raw, { html = false } = {}) {
   }
 
   // Per-file allowance: under it, the file is clean for that rule.
-  for (const [id, [, , , allowance]] of Object.entries(RULES)) if (found[id].length <= allowance) found[id] = [];
+  for (const [id, [, , , allowance]] of Object.entries(RULES)) {
+    found[id] = found[id].length <= allowance ? [] : found[id].map(({ index, ...hit }) => hit);
+  }
   return found;
 }
 
