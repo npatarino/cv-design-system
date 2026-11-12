@@ -28,12 +28,15 @@ describe("checkText: enforced rules", () => {
   test("rayas: asides count, dialogue dashes and code do not", () => {
     expect(count("Todo lo demás — calendario, formato — se decide después.", "rayas")).toBe(2);
     expect(count("— Hola, viejo.\n— Hola.", "rayas")).toBe(0);
+    expect(count("– Mmmm, a quien intentó dártelo – respondió uno.\n\nLe miró y preguntó: – ¿Cuánto hace? – ¿Afilar? No tengo tiempo.", "rayas")).toBe(0);
+    expect(count("- [Refactoring – Martin Fowler](https://example.com/r)\n- Refactoring – Martin Fowler", "rayas")).toBe(1);
     expect(count("Usá `a — b` en el código.\n\n```\nx — y\n```", "rayas")).toBe(0);
   });
   test("vocabulario: brand banned words, with accents and without partial matches", () => {
     expect(count("Cinco tips para desbloquear tu potencial y ser tu mejor versión.", "vocabulario")).toBe(3);
     expect(count("Era uno de sus trucos habituales. Participé en un hackathon. Un equipo empoderado.", "vocabulario")).toBe(1);
     expect(count("Soy apasionado por la tecnología de vanguardia.", "vocabulario")).toBe(2);
+    expect(count("Un equipo de alto rendimiento. Un equipo remoto de alto rendimiento. Navegación de alto rendimiento.", "vocabulario")).toBe(2);
   });
   test("meta-anuncio and anzuelo", () => {
     expect(count("En este artículo vamos a ver cómo medir impacto.", "meta-anuncio")).toBe(1);
@@ -95,6 +98,9 @@ describe("checkText: what is not the author's prose", () => {
   test("prose-ok on the line, or alone on the line before, skips that line only", () => {
     expect(count("Cinco tips. <!-- prose-ok -->\n\nOtros tips.", "vocabulario")).toBe(1);
     expect(count("<!-- prose-ok -->\nCinco tips.\nOtros tips.", "vocabulario")).toBe(1);
+  });
+  test("prose-ok-file opts a whole document out", () => {
+    expect(total("<!-- prose-ok-file -->\n\nCinco tips — y hacks. Te leo en comentarios.")).toBe(0);
   });
   test("locations are 1-based and point into the original file", () => {
     const [hit] = checkText("---\nt: x\n---\n\nHola.\nCinco tips para vos.").vocabulario;
