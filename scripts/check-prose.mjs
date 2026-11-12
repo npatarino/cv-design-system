@@ -21,7 +21,8 @@
  * Exceptions: a line that carries `<!-- prose-ok -->`, or the line right after
  * a line that is only that comment, is not checked. In HTML, the content of an
  * element with a `data-prose-ok` attribute is not checked. Use them for quoted
- * counter-examples, not to silence a rule.
+ * counter-examples, not to silence a rule. A document that is about the rules
+ * themselves can opt out whole with `<!-- prose-ok-file -->`.
  *
  * Enforced rules (fail under --strict): rayas, vocabulario, meta-anuncio,
  * anzuelo, borrador, emoji-icono.
@@ -73,7 +74,7 @@ const PATTERNS = {
       "(?:la |tu )?mejor versión(?: de (?:vos|ti|uno) mism[oa])?", "(?:agregar|aportar|añadir|generar) valor",
       "lo que nadie te (?:dice|cuenta)", "te lo cuento todo", "(?:el|un) método definitivo",
       "(?:los |sus )?secretos (?:de|para)", "levantate a las", "no excuses", "discipline > motivation", "apasionad[oa]s? (?:por|de) (?:la|el|los|las)",
-      "de alto rendimiento", "al siguiente nivel", "de clase mundial", "de vanguardia", "ecosistema tech",
+      "equipos? (?:\\p{L}+ )?de alto rendimiento", "al siguiente nivel", "de clase mundial", "de vanguardia", "ecosistema tech",
     ].join("|"),
   ),
   "meta-anuncio": w(
@@ -147,6 +148,7 @@ function lineStarts(text) {
 
 /** Check one document. Returns { id: [{ line, col, excerpt }] }. */
 export function checkText(raw, { html = false } = {}) {
+  if (/<!--\s*prose-ok-file\s*-->/.test(raw)) return Object.fromEntries(Object.keys(RULES).map((id) => [id, []]));
   const text = html ? prepareHtml(raw) : prepareMarkdown(raw);
   const starts = lineStarts(raw);
   const rawLines = raw.split("\n");
@@ -173,7 +175,15 @@ export function checkText(raw, { html = false } = {}) {
   for (const [id, re] of Object.entries(PATTERNS)) for (const m of text.matchAll(re)) add(id, m.index, m[0].length);
   for (const m of text.matchAll(MARKERS)) add("borrador", m.index, m[0].length);
   // The dash that opens a line of dialogue is how Spanish writes dialogue, not an aside.
-  found.rayas = found.rayas.filter((h) => !/^\s*—/.test(rawLines[h.line - 1]));
+  // Nor is the one that opens speech mid-paragraph («preguntó: – ¿Cuánto…?»), nor the
+  // separator inside a link label («[Refactoring – Martin Fowler](…)»).
+  found.rayas = found.rayas.filter((h) => {
+    const line = rawLines[h.line - 1];
+    if (/^\s*(?:[-*+]\s+)?[—–]/.test(line)) return false;
+    const at = h.col - 1 + (line[h.col - 1] === " " ? 1 : 0);
+    if (/[.?!:…]["”»]?\s*$/.test(line.slice(0, at))) return false;
+    return !(/\[[^\]]*$/.test(line.slice(0, at)) && /^[^\[]*\]\(/.test(line.slice(at)));
+  });
 
   // Contrast: the three shapes overlap, so a hit inside the previous one is the same contrast.
   const contrasts = CONTRASTE.flatMap((re) => [...text.matchAll(re)]).sort((a, b) => a.index - b.index);

@@ -1,5 +1,7 @@
 # Prosa: lo que ningún texto Chimi hace
 
+<!-- prose-ok-file -->
+
 Reglas de escritura que se pueden medir, y el script que las mide. Es el hermano de [anti-patterns.md](anti-patterns.md), que cubre lo visual. La voz que estas reglas protegen está en el capítulo «Voz y tono» del brand book; acá vive solo lo que una máquina puede contar.
 
 Origen: las reglas de formato del brand book, la lista de palabras prohibidas de Foundations y la revisión del contenido del blog hecha con la skill humanizer en 2026, que catalogó las señales de texto de plantilla o generado.
@@ -74,6 +76,8 @@ Un contraejemplo citado («no escribas "tips"») tiene que poder existir.
 
 - En markdown, `<!-- prose-ok -->` al final de la línea, o solo en la línea anterior, salta esa línea.
 - En HTML, el contenido de un elemento con el atributo `data-prose-ok` no se revisa.
+
+Un documento que trata de las reglas, como este, puede salir entero con `<!-- prose-ok-file -->`.
 
 Son para citar lo que no hay que hacer. Si hacen falta para que pase un texto propio, el texto es el problema.
 
