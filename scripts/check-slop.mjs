@@ -47,7 +47,7 @@ export const RULES = {
 const BANNED_FONTS = /(["']?)\b(Inter|Geist(?: Sans| Mono)?|Space Grotesk|Instrument Serif)\b\1/i;
 const COPY = /\b(potenci(?:ar|amos|á) (?:tu|su|el|la) |soluciones (?:innovadoras|integrales|a medida)|apasionad[oa]s? (?:por|de)|de clase mundial|líder(?:es)? (?:en|del) (?:sector|mercado)|de vanguardia|(?:al|el) siguiente nivel)/gi;
 const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]|[◉◇★▶]/gu;
-const ACCENT_VAR = /var\(\s*--(?:recipe-(?:accent|em|warn)|accent|em|status-|chimi-primitives-(?!charcoal|ivory))/i;
+const ACCENT_VAR = /var\(\s*--(?:recipe-(?:accent|em|warn)|accent|em|status-|chimi-primitives-(?!(?:color-)?(?:charcoal|ivory)))/i;
 
 const walk = (dir, out = []) => {
   for (const name of readdirSync(dir)) {
