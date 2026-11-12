@@ -1,6 +1,6 @@
 # Anti-patterns: lo que ninguna superficie Chimi hace
 
-Lista de señales de "plantilla generada" que el design system evita a propósito. Aplica a todas las webs del Chimiverse (blog, techconf, herramientas) y a quien las construya, humano o agente. Complementa a [recipes.md](recipes.md) (qué sí) con el qué no.
+Lista de señales de "plantilla generada" que el design system evita a propósito. Aplica a todas las webs del Chimiverse (blog, techconf, herramientas) y a quien las construya, humano o agente. Complementa a [recipes.md](recipes.md) (qué sí) con el qué no. Lo equivalente para el texto está en [prose.md](prose.md).
 
 Origen: la auditoría del blog de octubre de 2026 y el catálogo de 16 patrones de [AI design slop and how to spot it](https://www.developersdigest.tech/blog/ai-design-slop-and-how-to-spot-it). El script `scripts/check-slop.mjs` detecta de forma determinista los que se pueden detectar.
 

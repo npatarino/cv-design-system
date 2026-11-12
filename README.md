@@ -303,6 +303,7 @@ Shipped in the package and run from the consumer's root:
 | `scripts/seo-prebuild.mjs --site <id> [--public public]` | Writes favicons, `og/<id>.webp`, `manifest.webmanifest` and `robots.txt` into `public/`. `--disallow`, `--noindex`, `--sitemap`, `--no-*` flags. |
 | `scripts/check-seo.mjs --site <id> [--dir dist]` | Lints the built HTML, sitemap and robots against the cross-web SEO contract. Exits 1 on errors. |
 | `chimi-check-slop [dir]` | Reports "template look" patterns with file, line and selector (see [`docs/anti-patterns.md`](docs/anti-patterns.md)). Exits 1 with `--strict` when an enforced rule is over its limit. |
+| `chimi-check-prose [paths]` | Reports template or machine prose and the brand's writing rules in `.md`, `.mdx` and `.html`, with file, line and sentence (see [`docs/prose.md`](docs/prose.md)). Exits 1 with `--strict` when an enforced rule is over its limit. |
 
 The scripts that only made sense in the old monorepo (`check-recipes`, `check-docs-linter-coherence`, `check-workspace-conventions`, `process-icons`, `generate-og`) were removed; they're in the git history.
 
