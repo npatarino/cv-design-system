@@ -13,6 +13,12 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
   `--strict=all` includes the advisory rules. `--max rule=n` raises a limit,
   `--all` prints every location and `--json` prints the report.
 - New `check-slop` rules: `banned-fonts`, `multi-primary` and `copy`.
+- `chimi-check-prose` bin and `./check-prose` export (`checkProse(paths, opts)`,
+  `checkText(text)`): the text sibling of `check-slop`. Reads `.md`, `.mdx`
+  and `.html`, reports file, line, column and sentence, and exits 1 under
+  `--strict`. Six enforced rules (`rayas`, `vocabulario`, `meta-anuncio`,
+  `anzuelo`, `borrador`, `emoji-icono`) and ten advisory ones. Documented in
+  `docs/prose.md`.
 
 ### Changed
 
