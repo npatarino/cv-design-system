@@ -26,8 +26,9 @@
  * Mobile menu contract: the closed menu is `visibility: hidden` (out of the
  * tab order and the accessibility tree). The toggle keeps `aria-expanded`
  * and its label in sync, Escape closes and returns focus to it, and
- * following a link closes the menu. Without JavaScript (or with
- * `mobileMenu={false}`) the nav renders in flow under the brand instead.
+ * following a link closes the menu. Without JavaScript the nav renders in
+ * flow under the brand instead. With `mobileMenu={false}` there is no
+ * hamburger and the nav stays hidden below 1024px, as in 0.8.x.
  */
 import SocialIcons from "./SocialIcons.astro";
 import ThemeIcons from "./ThemeIcons.astro";
@@ -526,20 +527,11 @@ const showMobileToggle = mobileMenu && showNav;
     visibility: visible;
     transition: transform 180ms var(--chimi-ease-standard), opacity 180ms var(--chimi-ease-standard), visibility 0s linear 0s;
   }
-  /* No hamburger to open it (mobileMenu={false}, or no JavaScript — see the
-     `scripting: none` block below): render the nav in flow under the brand
-     instead of as a hidden overlay. */
-  .site-nav--inline {
-    position: static;
-    flex-basis: 100%;
-    padding-inline: 0;
-    border-bottom: 0;
-    transform: none;
-    opacity: 1;
-    pointer-events: auto;
-    visibility: visible;
-    transition: none;
-  }
+  /* mobileMenu={false}: there is no hamburger, and below 1024px the nav
+     stays hidden as it did in 0.8.x (single-page tools keep a compact
+     header). It is hidden with `visibility`, so its links are out of the
+     tab order too. Without JavaScript the `scripting: none` block below
+     shows it in flow. */
   .nav-list {
     display: flex;
     flex-direction: column;
