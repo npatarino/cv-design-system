@@ -6,6 +6,31 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-11-12
+
+### Added
+
+- `chimi-check-slop` bin and `./check-slop` export (`checkSlop(dir, opts)`).
+- `check-slop --strict` exits 1 when an enforced rule is over its limit;
+  `--strict=all` includes the advisory rules. `--max rule=n` raises a limit,
+  `--all` prints every location and `--json` prints the report.
+- New `check-slop` rules: `banned-fonts`, `multi-primary` and `copy`.
+- `chimi-check-prose` bin and `./check-prose` export (`checkProse(paths, opts)`,
+  `checkText(text)`): the text sibling of `check-slop`. Reads `.md`, `.mdx`
+  and `.html`, reports file, line, column and sentence, and exits 1 under
+  `--strict`. Six enforced rules (`rayas`, `vocabulario`, `meta-anuncio`,
+  `anzuelo`, `borrador`, `emoji-icono`) and ten advisory ones. Documented in
+  `docs/prose.md`.
+
+### Changed
+
+- `check-slop` reads `<style>` blocks and `style` attributes of every `.html`
+  file, not only `.css` files and `index.html`.
+- `check-slop` reports file, line, column and selector for each finding.
+- `side-borders` also catches hex and `rgb()` colours, `border-left-color`
+  longhand and logical properties; `color-shadows` ignores grey shadows.
+- Rule names in the output are now ids (`side-borders`, `multi-h1`…).
+
 ## [0.9.1] - 2026-11-12
 
 Restores three 0.8.x behaviours that 0.9.0 changed for sites that had not
@@ -240,7 +265,8 @@ local patches:
 Consumer fixes, `docs/anti-patterns.md` and `check-slop`. Earlier versions
 were not tracked in a changelog.
 
-[Unreleased]: https://github.com/npatarino/cv-design-system/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/npatarino/cv-design-system/compare/v0.9.2...HEAD
+[0.9.2]: https://github.com/npatarino/cv-design-system/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/npatarino/cv-design-system/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/npatarino/cv-design-system/compare/v0.8.0...v0.9.0
 [0.8.1]: https://github.com/npatarino/cv-design-system/compare/v0.8.0...v0.8.1

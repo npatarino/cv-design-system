@@ -1,6 +1,6 @@
 {
   "name": "@chimichurricode/design-system",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Chimi design system — tokens (colors, typography, recipes) as CSS variables and ES modules, plus shared Astro components and SEO helpers.",
   "type": "module",
   "repository": {
@@ -31,6 +31,7 @@
     "seo/README.md",
     "postcss.mjs",
     "scripts/check-slop.mjs",
+    "scripts/check-prose.mjs",
     "scripts/check-seo.mjs",
     "scripts/seo-prebuild.mjs",
     "scripts/sync-dir.mjs",
@@ -41,13 +42,17 @@
     "docs/responsive.md"
   ],
   "bin": {
-    "chimi-fetch-fonts": "scripts/fetch-fonts.mjs"
+    "chimi-fetch-fonts": "scripts/fetch-fonts.mjs",
+    "chimi-check-slop": "scripts/check-slop.mjs",
+    "chimi-check-prose": "scripts/check-prose.mjs"
   },
   "exports": {
     "./tokens.css": "./dist/tokens.css",
     "./web.css": "./web.css",
     "./fonts.css": "./fonts.css",
     "./fetch-fonts": "./scripts/fetch-fonts.mjs",
+    "./check-slop": "./scripts/check-slop.mjs",
+    "./check-prose": "./scripts/check-prose.mjs",
     "./ecosystem": "./components/ecosystem.ts",
     "./SiteHeader.astro": "./components/SiteHeader.astro",
     "./SiteFooter.astro": "./components/SiteFooter.astro",
@@ -90,6 +95,7 @@
     "check:site-id-union": "bun scripts/check-site-id-union.mjs",
     "check:ecosystem-chrome": "bun scripts/check-ecosystem-chrome.mjs",
     "check:slop": "node scripts/check-slop.mjs",
+    "check:prose": "node scripts/check-prose.mjs",
     "generate:icons": "bun scripts/generate-icons.mjs",
     "generate:icon-preview": "bun scripts/generate-preview.mjs",
     "test": "bun test test/"
