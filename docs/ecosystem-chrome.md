@@ -49,7 +49,7 @@ import SiteHeader from "@chimichurricode/design-system/SiteHeader.astro";
 Default behaviour:
 
 - Brand link points to `/` of the current site (override via `brand.href`).
-- The mobile hamburger (below `--lg`) toggles `aria-expanded` and its label ("Abrir menú" / "Cerrar menú") on the trigger and the `.open` class on the nav. The closed menu is `visibility: hidden`, so its links are out of the tab order and the accessibility tree. Escape closes it and returns focus to the trigger; following a link closes it. Without JavaScript, or with `mobileMenu={false}`, the nav renders in flow under the brand. From `--lg` up the layout switches to inline.
+- The mobile hamburger (below `--lg`) toggles `aria-expanded` and its label ("Abrir menú" / "Cerrar menú") on the trigger and the `.open` class on the nav. The closed menu is `visibility: hidden`, so its links are out of the tab order and the accessibility tree. Escape closes it and returns focus to the trigger; following a link closes it. Without JavaScript the nav renders in flow under the brand. With `mobileMenu={false}` there is no hamburger and the nav stays hidden below `--lg` (out of the tab order too), as in 0.8.x. From `--lg` up the layout switches to inline.
 - Submenus open on hover/focus at `--lg`+ and on click below `--lg` (chevron is its own button with `aria-expanded`).
 - **`aria-current`**: the link to the current page gets `aria-current="page"` (exact match); a parent section of the current page gets `aria-current="true"`. The active link also keeps the `.active` class for styling. Sites no longer need a script to add it.
 - Theme toggle is mounted by default; pass `themeToggle={false}` to omit. The button is the contract surface required by the `theme-toggle` capability.
