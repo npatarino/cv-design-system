@@ -569,8 +569,9 @@ const showMobileToggle = mobileMenu && showNav;
     Hover fills the pill with em. The label on that fill is whichever of
     surface/ink contrasts more with em in the recipe:
       surface — canvas-quiet/signal dark 11.98:1, light 5.87:1; critical 4.65:1
-      ink     — paper (em = patagonia) 6.75:1; cool-fresh (em = ivory) 16.31:1
-    (surface on patagonia would be 2.42:1). energy-loud tops out at 4.31:1
+      ink     — paper on ivory (em = patagonia) 6.75:1; cool-fresh (em = ivory) 16.31:1
+    (ivory on patagonia would be 2.42:1). A paper page in the dark theme has
+    a charcoal surface, so it takes the default (surface, 6.74:1). energy-loud tops out at 4.31:1
     with either role; it needs a dedicated on-em role in the tokens.
   */
   .nav-link.cta {
@@ -585,7 +586,7 @@ const showMobileToggle = mobileMenu && showNav;
   }
   /* :where() keeps this at the base rule's specificity so a consumer's own
      CTA override still wins. */
-  :global(:where([data-recipe="paper"], [data-recipe="cool-fresh"])) .nav-link.cta:hover {
+  :global(:where(:root[data-theme="light"] [data-recipe="paper"], :root[data-theme="light"][data-recipe="paper"], [data-recipe="cool-fresh"])) .nav-link.cta:hover {
     color: var(--recipe-ink);
   }
 
