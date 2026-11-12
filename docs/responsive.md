@@ -152,7 +152,7 @@ Code review rejects `@media (max-width: …)` for layout. The only justified exc
 - **What it does not cover**: links inside running text (`.prose`, paragraphs) keep their natural size; WCAG exempts inline links, and inflating them would break the reading rhythm. Form controls (`.input`) are 44px tall at every width.
 - **From 1024px up** the rule stops: `.btn` is 38px (`.btn--sm` 30px), above the 24px minimum of WCAG 2.5.8 for pointer layouts.
 - **Components** keep their own touch boxes inside the same range: the header's icon buttons and socials are 44×44 with a negative margin that preserves the 32px layout box, `SiteFooter`'s socials are 44×44 in every width.
-- **Visible change for consumers**: native `<button>` elements now reach 44px below 1024px even without `.btn` (up to 0.8.2 the rule stopped at 768px and did not include `button`).
+- **Visible change for consumers**: native `<button>` elements now reach 44px below 1024px even without `.btn` (up to 0.8.x the rule stopped at 768px and did not include `button`).
 
 These two `max-width` queries are the only ones `web.css` uses; everything else is mobile-first `min-width`.
 

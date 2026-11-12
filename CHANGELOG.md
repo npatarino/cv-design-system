@@ -6,6 +6,8 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-12
+
 ### Added
 
 - **Text-safe color roles per recipe and theme.** `--recipe-accent-text`
@@ -213,6 +215,7 @@ local patches:
 Consumer fixes, `docs/anti-patterns.md` and `check-slop`. Earlier versions
 were not tracked in a changelog.
 
-[Unreleased]: https://github.com/npatarino/cv-design-system/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/npatarino/cv-design-system/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/npatarino/cv-design-system/compare/v0.8.0...v0.9.0
 [0.8.1]: https://github.com/npatarino/cv-design-system/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/npatarino/cv-design-system/releases/tag/v0.8.0
