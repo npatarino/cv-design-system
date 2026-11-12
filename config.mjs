@@ -1,7 +1,7 @@
 /**
  * Style Dictionary (v4) build for the Chimi design system.
  *
- * Inputs:  tokens/{color,font,size,type-style,breakpoint}.*.json
+ * Inputs:  tokens/{color,font,size,type-style,breakpoint,foundation}.*.json
  * Outputs: dist/tokens.css                     (CSS custom properties + type-style shorthands)
  *          dist/breakpoints.css                 (short --bp-* vars + @custom-media queries
  *                                                 for mobile-first authoring in webs)
@@ -32,7 +32,12 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TYPE_ROOT = "type";
 const THEME_EXT_KEY = "chimi.theme";
-const RECIPE_ROLES = ["surface", "ink", "em", "accent", "warn", "font-primary", "weight-primary", "letter-spacing-primary", "opacity-primary", "font-secondary", "weight-secondary", "letter-spacing-secondary", "opacity-secondary", "font-display", "weight-display", "font-body", "weight-body", "font-editorial", "weight-editorial", "font-data", "weight-data", "font-code", "weight-code"];
+const RECIPE_ROLES = ["surface", "ink", "em", "accent", "warn", "accent-text", "on-accent", "font-primary", "weight-primary", "letter-spacing-primary", "opacity-primary", "font-secondary", "weight-secondary", "letter-spacing-secondary", "opacity-secondary", "font-display", "weight-display", "font-body", "weight-body", "font-editorial", "weight-editorial", "font-data", "weight-data", "font-code", "weight-code"];
+
+// Status roles live on every recipe (color.recipe.<id>.status-*) but are
+// exposed under a recipe-agnostic name: --status-ok / --status-bad /
+// --status-caution. Value differs per recipe and per theme.
+const STATUS_ROLES = ["status-ok", "status-bad", "status-caution"];
 
 const RECIPE_SOURCE = resolve(HERE, "tokens/color.recipe.json");
 
@@ -59,6 +64,7 @@ const sd = new StyleDictionary({
     resolve(HERE, "tokens/size.primitive.json"),
     resolve(HERE, "tokens/type-style.semantic.json"),
     resolve(HERE, "tokens/breakpoint.primitive.json"),
+    resolve(HERE, "tokens/foundation.semantic.json"),
   ],
   platforms: {
     css: {
@@ -127,9 +133,10 @@ sd.registerFormat({
     }
 
     // 4. Per-recipe selector blocks: one :where([data-recipe="<id>"]) per
-    //    recipe under color.recipe.*. Each block populates the 5 short vars
-    //    --recipe-{surface,ink,em,accent,warn} from the long --chimi-color-recipe-*
-    //    tokens emitted in step 1. Layouts only consume --recipe-*.
+    //    recipe under color.recipe.*. Each block populates the short vars
+    //    --recipe-{surface,ink,em,accent,warn,accent-text,on-accent,…} and
+    //    --status-{ok,bad,caution} from the long --chimi-color-recipe-*
+    //    tokens emitted in step 1. Layouts only consume the short vars.
     const recipes = collectRecipeIds(dictionary);
     if (recipes.length) {
       out.push("");
@@ -138,6 +145,9 @@ sd.registerFormat({
         out.push(`:where([data-recipe="${id}"]) {`);
         for (const role of RECIPE_ROLES) {
           out.push(`  --recipe-${role}: var(--chimi-color-recipe-${id}-${role});`);
+        }
+        for (const role of STATUS_ROLES) {
+          out.push(`  --${role}: var(--chimi-color-recipe-${id}-${role});`);
         }
         out.push("}");
       }

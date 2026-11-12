@@ -49,9 +49,38 @@ import SiteHeader from "@chimichurricode/design-system/SiteHeader.astro";
 Default behaviour:
 
 - Brand link points to `/` of the current site (override via `brand.href`).
-- The mobile hamburger toggles `aria-expanded` on the trigger and the `.open` class on the nav (≤ `--lg`); from `--lg` up the layout switches to inline.
-- Submenus open on hover at `--lg`+ and on click below `--lg` (chevron is its own button with `aria-expanded`).
+- The mobile hamburger (below `--lg`) toggles `aria-expanded` and its label ("Abrir menú" / "Cerrar menú") on the trigger and the `.open` class on the nav. The closed menu is `visibility: hidden`, so its links are out of the tab order and the accessibility tree. Escape closes it and returns focus to the trigger; following a link closes it. Without JavaScript, or with `mobileMenu={false}`, the nav renders in flow under the brand. From `--lg` up the layout switches to inline.
+- Submenus open on hover/focus at `--lg`+ and on click below `--lg` (chevron is its own button with `aria-expanded`).
+- **`aria-current`**: the link to the current page gets `aria-current="page"` (exact match); a parent section of the current page gets `aria-current="true"`. The active link also keeps the `.active` class for styling. Sites no longer need a script to add it.
 - Theme toggle is mounted by default; pass `themeToggle={false}` to omit. The button is the contract surface required by the `theme-toggle` capability.
+- Touch targets: below 1024px the menu button, theme toggle, socials, `actions` children and nav links are at least 44×44.
+
+### Slot `actions`
+
+Icon actions next to the theme toggle (search, a language switch…). Direct `<a>`/`<button>` children get the toggle's box: icon centered, muted color, `--recipe-accent-text` on hover, focus ring, 32×32 on desktop and 44×44 below 1024px. Give each one an accessible name. Being real markup, they render without JavaScript and cause no layout shift.
+
+```astro
+<SiteHeader brand={brand} links={links}>
+  <a slot="actions" href="/buscar" aria-label="Buscar"><SearchIcon /></a>
+</SiteHeader>
+```
+
+### Prop `labels`
+
+Every built-in string, for sites that are not in Spanish. All optional; defaults in parentheses:
+
+| Key | Default | Where |
+|---|---|---|
+| `openMenu` / `closeMenu` | "Abrir menú" / "Cerrar menú" | hamburger `aria-label` |
+| `nav` | "Principal" | `<nav aria-label>` |
+| `home` | "Inicio" | brand link `aria-label` (`${brand.label} — ${home}`) |
+| `submenu` | "Mostrar submenú de {label}" | mobile submenu button |
+| `themeToLight` / `themeToDark` | "Activar modo claro" / "Activar modo oscuro" | toggle `aria-label` |
+| `themeTitle` | "Cambiar tema" | toggle tooltip |
+
+```astro
+<SiteHeader brand={brand} links={links} labels={{ openMenu: "Open menu", closeMenu: "Close menu", nav: "Main" }} />
+```
 
 Logo dual-theme variant:
 
@@ -71,7 +100,9 @@ Both `<img>` tags are rendered; CSS swaps them based on `[data-theme]` on `<html
 
 ## `SiteFooter`
 
-Two variants. Pick `minimal` for productivity webs (default) and `rich` for the blog / TechConf landing.
+Three variants. Pick `minimal` for productivity webs (default), `rich` for a landing with link columns (TechConf), and `person` for a personal site (the blog). `rich` and `minimal` are unchanged by `person`.
+
+All three take `labels` (all optional): `socials` ("Redes sociales"), `ecosystem` ("Chimiverse"), `poweredWith` ("Powered with"), `poweredBy` ("by"), `rights` ("Nicolás Patarino. Todos los derechos reservados.", the default copyright after "© <year>") and `nav` ("Pie de página", the `person` variant's `<nav>`).
 
 ### Minimal variant
 
@@ -91,7 +122,7 @@ import SiteFooter from "@chimichurricode/design-system/SiteFooter.astro";
 
 The minimal variant renders:
 
-1. A "Chimiverse" inline list of the **other 4 sites** (auto-reference filtered via `siteId`).
+1. A "Chimiverse" inline list of the **other chrome sites** (auto-reference filtered via `siteId`).
 2. The meta links inline with the current year.
 3. A `Powered with ♥ by Chimichurri Code` byline — **omitted automatically when `siteId === "blog"`** to avoid self-promotion.
 
@@ -118,6 +149,38 @@ Extras vs minimal:
 - A horizontal `Chimiverse` strip under the columns (same auto-reference filtering as minimal).
 - A copyright row at the bottom.
 
+### Person variant
+
+The footer of a personal site: one identity line, a newsletter sentence, the site's links in groups, socials and a legal line. No columns and no Chimiverse strip (see the "footer corporativo" rule in [anti-patterns.md](anti-patterns.md)).
+
+```astro
+<SiteFooter
+  variant="person"
+  identity="Nico Patarino · Staff+ Mobile Engineer, speaker y asador del software. Madrid."
+  newsletter={{ text: "Una historia por semana que te hace pensar la carrera.", label: "Suscribite a La Chimichurrería", href: NEWSLETTER_URL }}
+  navGroups={[
+    [{ href: "/historias", label: "Historias" }, { href: "/charlas", label: "Charlas" }, /* … */],
+    [{ href: "/archivo", label: "Archivo" }, { href: "/temas", label: "Temas" }, { href: "/conceptos", label: "Glosario" }],
+  ]}
+  socials={DEFAULT_SOCIALS}
+  feed={{ href: "/rss.xml" }}
+  copyright={`© ${year} Nicolás Patarino · Hecho con Astro en Madrid`}
+  labels={{ socials: "Redes" }}
+>
+  <Fragment slot="socials">{/* extra <li><a aria-label=…><svg/></a></li> items */}</Fragment>
+</SiteFooter>
+```
+
+| Prop / slot | What it renders |
+|---|---|
+| `identity` / slot `identity` | The first line, in the display face. |
+| `newsletter` (`{ text, label, href, external? }`) / slot `newsletter` | The sentence under it with an underlined link (new tab unless `external: false`). |
+| `navGroups` (`MetaLink[][]`) | One `<ul>` per group inside a single `<nav aria-label={labels.nav}>`; groups after the first get a hairline above. Links are 44px tall. The link whose `href` equals the current path gets `aria-current="page"` (path from `Astro.url`, or `currentPath`). |
+| `socials` + slot `socials` + `feed` | Icon links (44×44) in a list labelled `labels.socials`; the slot appends your own `<li>` items (icons the package does not ship); `feed` adds a text link ("RSS" by default) at the end. |
+| `copyright` / slot `legal` | The last line (default `© <year> ${labels.rights}`). |
+
+Layout: one column on mobile; from `--md`, identity + newsletter on the left (`1.2fr`) and links + socials on the right (`1fr`), legal line full width.
+
 ### Auto-reference filtering
 
 `SiteFooter` filters the Chimiverse list using the helper:
@@ -142,7 +205,7 @@ If you forget to pass `siteId`, the full list is rendered (including the current
 
 ## Related capabilities
 
-- `theme-toggle` — the toggle button mounted inside `SiteHeader` and (optionally) `SiteFooter`. Contract: `openspec/specs/theme-toggle/spec.md`.
+- `theme-toggle` — the toggle button mounted inside `SiteHeader`. Contract: `openspec/specs/theme-toggle/spec.md`.
 - `theming` — `[data-theme]` cascade that the toggle drives; both `SiteHeader` and `SiteFooter` consume `--recipe-*` tokens that respect that cascade. Contract: `openspec/specs/theming/spec.md`.
 - `cross-web-seo` — SEO catalog distinction (chrome vs SEO) and the cross-web meta/alternates surface. Contract: `openspec/specs/cross-web-seo/spec.md`.
 - `closed-recipe-model` — the recipe-driven color contract that the chrome's CSS rides on top of. Contract: `openspec/specs/closed-recipe-model/spec.md`.

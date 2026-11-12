@@ -65,7 +65,8 @@ Every web authors CSS mobile-first. The base rule (no media query) targets the s
 ```
 
 Code review rejects `@media (max-width: …)` for layout. The only justified exceptions today are:
-- Tap-target sizing on `nav a` / `.btn` (lives in `web.css`, scoped to `(max-width: 767.98px)`); the inline comment explains why min-width was insufficient.
+- Tap-target sizing on buttons and nav links (lives in `web.css`, scoped to `(max-width: 1023.98px)`); see [The 44px rule](#the-44px-rule).
+- The narrow-phone rule in `web.css` (`(max-width: 479.98px)`): button labels wrap and `.display-lg` scales with the viewport so nothing overflows a 320px screen.
 
 ## Canonical example — blog post header
 
@@ -129,11 +130,31 @@ Code review rejects `@media (max-width: …)` for layout. The only justified exc
   .hide-on-desktop { display: none; }
 }
 
-/* tap target ≥ 44×44 on mobile only (WCAG 2.5.5 / Apple HIG) */
-@media (max-width: 767.98px) {
-  .btn, [role="button"], nav a { min-height: 44px; }
+/* tap targets ≥ 44px wherever the layout is touch-first (WCAG 2.5.5 / Apple HIG) */
+@media (max-width: 1023.98px) {
+  .btn, .btn-ghost, .btn-primary, .btn-sm,
+  button, [role="button"], nav a, .nav a { min-height: 44px; }
+  button, [role="button"] { min-width: 44px; }   /* icon-only buttons */
+  nav a, .nav a { display: inline-flex; align-items: center; } /* so min-height applies */
+}
+
+/* narrow phones: long button labels wrap, .display-lg follows the viewport */
+@media (max-width: 479.98px) {
+  .btn, .btn-primary, .btn-ghost, .btn-sm { white-space: normal; max-width: 100%; text-align: center; }
+  .display-lg { font-size: min(48px, 12.5vw); }
 }
 ```
+
+### The 44px rule
+
+- **Range: below 1024px** (`max-width: 1023.98px`), not only below 768px. The header keeps its hamburger (a touch layout) up to 1024px, and tablets in that range are touch devices.
+- **What it covers**: `.btn` and its aliases, every native `<button>`, `[role="button"]`, and links inside `<nav>` (or `.nav`). Buttons also get `min-width: 44px` so icon-only controls (menu, theme toggle) are square targets. Nav links become `inline-flex` because an inline `<a>` ignores `min-height`.
+- **What it does not cover**: links inside running text (`.prose`, paragraphs) keep their natural size; WCAG exempts inline links, and inflating them would break the reading rhythm. Form controls (`.input`) are 44px tall at every width.
+- **From 1024px up** the rule stops: `.btn` is 38px (`.btn--sm` 30px), above the 24px minimum of WCAG 2.5.8 for pointer layouts.
+- **Components** keep their own touch boxes inside the same range: the header's icon buttons and socials are 44×44 with a negative margin that preserves the 32px layout box, `SiteFooter`'s socials are 44×44 in every width.
+- **Visible change for consumers**: native `<button>` elements now reach 44px below 1024px even without `.btn` (up to 0.8.x the rule stopped at 768px and did not include `button`).
+
+These two `max-width` queries are the only ones `web.css` uses; everything else is mobile-first `min-width`.
 
 Webs that need a narrower editorial column override `--page-max` in their own `:root` (e.g. blog at `1120px`, pdf at `880px`). They never re-declare `.container` itself — the utility stays canonical.
 
@@ -146,7 +167,7 @@ For viewports 768px and below, every web meets:
 - Images/media respect `max-width: 100%`.
 - Navigation operable without hover (touch-friendly disclosure).
 
-Visual regression captures three viewports per page on every PR: `375×812` (mobile), `768×1024` (tablet), `1920×1080` (desktop). The screenshot harness lives in the `cv-talks` repo (`scripts/screenshot-templates.mjs`; paths below are relative to that repo) and supports three sources:
+**There is no automated visual regression in CI.** This repo's CI runs `bun run build`, `bun run check` and `bun run test` (contrast, SEO head, font fetcher); nothing captures screenshots on a PR. Visual checks are manual, with the screenshot harness in the `cv-talks` repo at three viewports: `375×812` (mobile), `768×1024` (tablet), `1920×1080` (desktop). The harness lives in `cv-talks` (`scripts/screenshot-templates.mjs`; paths below are relative to that repo) and supports three sources:
 
 | `--source` | What it captures                                              | Default viewports     |
 | ---------- | ------------------------------------------------------------- | --------------------- |
@@ -168,7 +189,7 @@ node scripts/screenshot-templates.mjs \
   --source slides --viewports mobile --target current
 ```
 
-Screenshots write to `tests/snapshots/<target>/<viewport>/<slug>.png`. Baselines live under `<target>=baseline`; the per-PR run writes to `<target>=current` for diffing.
+Screenshots write to `tests/snapshots/<target>/<viewport>/<slug>.png`. Baselines live under `<target>=baseline`; a manual run writes to `<target>=current` for diffing.
 
 ## When to escalate to the DS
 

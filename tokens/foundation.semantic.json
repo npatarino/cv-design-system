@@ -1,0 +1,50 @@
+{
+  "_comment": "Foundations for web layout and interaction: spacing, radius, motion, stacking, borders and line measure. Emitted as --chimi-space-*, --chimi-radius-*, --chimi-duration-*, --chimi-ease-*, --chimi-z-*, --chimi-border-* and --chimi-measure-*. Values are the ones the package already used as literals (web.css, components/), so adopting a token never changes what renders. --stack-* in web.css are aliases of --chimi-space-*.",
+
+  "space": {
+    "1": { "$value": "4px",   "$type": "dimension", "$description": "Hairline gaps: tag padding, icon nudges." },
+    "2": { "$value": "8px",   "$type": "dimension", "$description": "Tight groups (= --stack-xs)." },
+    "3": { "$value": "12px",  "$type": "dimension", "$description": "Control padding (button block padding)." },
+    "4": { "$value": "16px",  "$type": "dimension", "$description": "Related items, meta (= --stack-sm)." },
+    "5": { "$value": "24px",  "$type": "dimension", "$description": "Related content blocks (= --stack-md)." },
+    "6": { "$value": "32px",  "$type": "dimension", "$description": "Between groups inside a section." },
+    "7": { "$value": "48px",  "$type": "dimension", "$description": "Distinct sections (= --stack-lg)." },
+    "8": { "$value": "96px",  "$type": "dimension", "$description": "Major section breaks (= --stack-xl)." },
+    "9": { "$value": "144px", "$type": "dimension", "$description": "Page-level breaks, footer offset (= --stack-2xl)." }
+  },
+
+  "radius": {
+    "sm":   { "$value": "2px",   "$type": "dimension", "$description": "Inline code chips, small marks." },
+    "md":   { "$value": "4px",   "$type": "dimension", "$description": "Menu items, inputs." },
+    "lg":   { "$value": "8px",   "$type": "dimension", "$description": "Panels, mobile menu sheet." },
+    "xl":   { "$value": "12px",  "$type": "dimension", "$description": "Large media and figure frames." },
+    "pill": { "$value": "999px", "$type": "dimension", "$description": "Buttons, tags, icon buttons." }
+  },
+
+  "duration": {
+    "fast": { "$value": "120ms", "$type": "duration", "$description": "Color/background feedback on links and menu items." },
+    "base": { "$value": "150ms", "$type": "duration", "$description": "Default state transition (buttons)." },
+    "slow": { "$value": "200ms", "$type": "duration", "$description": "Disclosure/panel transitions." }
+  },
+
+  "ease": {
+    "standard": { "$value": "ease", "$description": "The only easing the package uses today (CSS `ease`)." }
+  },
+
+  "z": {
+    "header":   { "$value": "10",  "$type": "number", "$description": "Sticky site header." },
+    "dropdown": { "$value": "20",  "$type": "number", "$description": "Menus and submenus opened from the header." },
+    "skip":     { "$value": "100", "$type": "number", "$description": "Skip link: always above the header when focused." }
+  },
+
+  "border": {
+    "1": { "$value": "1px", "$type": "dimension", "$description": "Hairlines, button and tag outlines." },
+    "2": { "$value": "2px", "$type": "dimension", "$description": "Focus ring, emphasized rules." }
+  },
+
+  "measure": {
+    "narrow": { "$value": "30ch", "$type": "dimension", "$description": "Captions, short columns, form hints." },
+    "lede":   { "$value": "56ch", "$type": "dimension", "$description": "Ledes and intro paragraphs." },
+    "prose":  { "$value": "70ch", "$type": "dimension", "$description": "Long-form body text (65–75ch band)." }
+  }
+}

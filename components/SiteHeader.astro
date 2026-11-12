@@ -1,4 +1,34 @@
 ---
+/**
+ * SiteHeader — shared ecosystem header (brand, primary nav, theme toggle,
+ * socials). Mobile (< 1024px): hamburger + overlay menu. Desktop (≥ 1024px):
+ * inline nav with hover/focus dropdowns.
+ *
+ * Props: `brand`, `links`, `socials`, `mobileMenu`, `themeToggle`, `labels`.
+ *
+ * `labels` (optional) translates every built-in string. Defaults are the
+ * Spanish texts the header has always shipped:
+ *   openMenu "Abrir menú" · closeMenu "Cerrar menú" · nav "Principal" ·
+ *   home "Inicio" (brand aria-label = `${brand.label} — ${home}`) ·
+ *   submenu "Mostrar submenú de {label}" · themeToLight "Activar modo claro" ·
+ *   themeToDark "Activar modo oscuro" · themeTitle "Cambiar tema".
+ *
+ * Slot `actions` (optional): icon actions rendered in the actions zone,
+ * before the theme toggle (e.g. a search link). Direct `<a>`/`<button>`
+ * children get the toggle's box: icon centred, muted colour, accent on
+ * hover, visible focus ring, 32×32 on desktop and a 44×44 touch area
+ * below 1024px. Give each one an accessible name (`aria-label`):
+ *
+ *   <SiteHeader brand={brand} links={links}>
+ *     <a slot="actions" href="/buscar" aria-label="Buscar"><SearchIcon /></a>
+ *   </SiteHeader>
+ *
+ * Mobile menu contract: the closed menu is `visibility: hidden` (out of the
+ * tab order and the accessibility tree). The toggle keeps `aria-expanded`
+ * and its label in sync, Escape closes and returns focus to it, and
+ * following a link closes the menu. Without JavaScript (or with
+ * `mobileMenu={false}`) the nav renders in flow under the brand instead.
+ */
 import SocialIcons from "./SocialIcons.astro";
 import ThemeIcons from "./ThemeIcons.astro";
 import BrandMark from "./BrandMark.astro";
@@ -32,12 +62,44 @@ export interface BrandConfig {
   logoHeight?: number;
 }
 
+/** Every built-in string of the header. All optional; see the defaults below. */
+export interface SiteHeaderLabels {
+  /** Hamburger aria-label while the menu is closed. */
+  openMenu?: string;
+  /** Hamburger aria-label while the menu is open. */
+  closeMenu?: string;
+  /** aria-label of the <nav>. */
+  nav?: string;
+  /** Suffix of the brand link aria-label (`${brand.label} — ${home}`). */
+  home?: string;
+  /** aria-label of the mobile submenu toggle; `{label}` is the parent link. */
+  submenu?: string;
+  /** Theme toggle aria-label while the dark theme is active. */
+  themeToLight?: string;
+  /** Theme toggle aria-label while the light theme is active. */
+  themeToDark?: string;
+  /** Theme toggle tooltip. */
+  themeTitle?: string;
+}
+
+const DEFAULT_LABELS: Required<SiteHeaderLabels> = {
+  openMenu: "Abrir menú",
+  closeMenu: "Cerrar menú",
+  nav: "Principal",
+  home: "Inicio",
+  submenu: "Mostrar submenú de {label}",
+  themeToLight: "Activar modo claro",
+  themeToDark: "Activar modo oscuro",
+  themeTitle: "Cambiar tema",
+};
+
 interface Props {
   brand: BrandConfig;
   links?: NavLink[];
   socials?: SocialLink[];
   mobileMenu?: boolean;
   themeToggle?: boolean;
+  labels?: SiteHeaderLabels;
 }
 
 const {
@@ -46,14 +108,22 @@ const {
   socials = [],
   mobileMenu = true,
   themeToggle = true,
+  labels: labelOverrides = {},
 } = Astro.props;
+const labels: Required<SiteHeaderLabels> = { ...DEFAULT_LABELS, ...labelOverrides };
 
-const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const normalizePath = (p: string) => p.replace(/\/$/, "") || "/";
+const path = normalizePath(Astro.url.pathname);
 const isActive = (href: string) =>
   href === "/" ? path === "/" : path.startsWith(href);
+/** aria-current for an active link: "page" on an exact match, "true" when
+ *  the current page lives under that section. */
+const currentAttr = (href: string, active: boolean) =>
+  active ? (normalizePath(href) === path ? "page" : "true") : undefined;
 
 const brandHref = brand.href ?? "/";
-const brandAria = brand.ariaLabel ?? `${brand.label} — Inicio`;
+const brandAria = brand.ariaLabel ?? `${brand.label} — ${labels.home}`;
+const brandCurrent = normalizePath(brandHref) === path ? "page" : undefined;
 
 function splitBrandLabel(label: string, em?: string): [string, string, string] {
   if (!em) return [label, "", ""];
@@ -63,13 +133,14 @@ function splitBrandLabel(label: string, em?: string): [string, string, string] {
 }
 const [brandPre, brandEm, brandPost] = splitBrandLabel(brand.label, brand.emText);
 
-const showNav = links.length > 0 || socials.length > 0 || themeToggle;
+const hasActions = Astro.slots.has("actions");
+const showNav = links.length > 0 || socials.length > 0 || themeToggle || hasActions;
 const showMobileToggle = mobileMenu && showNav;
 ---
 
 <header class="site-header">
   <div class="container header-inner">
-    <a href={brandHref} class:list={["brand", { "brand--logo": brand.logoSrc }]} aria-label={brandAria}>
+    <a href={brandHref} class:list={["brand", { "brand--logo": brand.logoSrc }]} aria-label={brandAria} aria-current={brandCurrent}>
       {brand.logoSrc ? (
         <>
           {/*
@@ -118,17 +189,23 @@ const showMobileToggle = mobileMenu && showNav;
         class="nav-toggle"
         aria-expanded="false"
         aria-controls="ds-primary-nav"
-        aria-label="Abrir menú"
+        aria-label={labels.openMenu}
+        data-label-open={labels.openMenu}
+        data-label-close={labels.closeMenu}
       >
         <span></span><span></span><span></span>
       </button>
     )}
 
     {showNav && (
-      <nav class="site-nav" id="ds-primary-nav" aria-label="Principal">
+      <nav
+        class:list={["site-nav", { "site-nav--inline": !showMobileToggle }]}
+        id="ds-primary-nav"
+        aria-label={labels.nav}
+      >
         {links.length > 0 && (
           <ul class="nav-list">
-            {links.map((l) => (
+            {links.map((l, i) => (
               <li class:list={["nav-item", { "has-children": l.children && l.children.length > 0 }]}>
                 {l.children && l.children.length > 0 ? (
                   <>
@@ -138,22 +215,22 @@ const showMobileToggle = mobileMenu && showNav;
                         "nav-link",
                         { active: !l.external && isActive(l.href), cta: l.cta },
                       ]}
-                      aria-haspopup="true"
-                      aria-expanded="false"
+                      aria-current={currentAttr(l.href, !l.external && isActive(l.href))}
                     >{l.label}<span class="nav-chevron" aria-hidden="true">▾</span></a>
                     <button
                       type="button"
                       class="nav-submenu-toggle"
-                      aria-label={`Mostrar submenú de ${l.label}`}
+                      aria-label={labels.submenu.replace("{label}", l.label)}
                       aria-expanded="false"
+                      aria-controls={`ds-primary-nav-sub-${i}`}
                     ><span aria-hidden="true">▾</span></button>
-                    <ul class="nav-submenu" role="menu">
+                    <ul class="nav-submenu" id={`ds-primary-nav-sub-${i}`}>
                       {l.children.map((c) => (
-                        <li role="none">
+                        <li>
                           <a
                             href={c.href}
-                            role="menuitem"
                             class:list={["nav-sublink", { active: isActive(c.href) }]}
+                            aria-current={currentAttr(c.href, isActive(c.href))}
                           >{c.label}</a>
                         </li>
                       ))}
@@ -168,25 +245,31 @@ const showMobileToggle = mobileMenu && showNav;
                       "nav-link",
                       { active: !l.external && isActive(l.href), cta: l.cta },
                     ]}
+                    aria-current={currentAttr(l.href, !l.external && isActive(l.href))}
                   >{l.label}</a>
                 )}
               </li>
             ))}
           </ul>
         )}
-        {themeToggle && (
-          <div class="nav-theme">
-            <button
-              type="button"
-              class="theme-toggle"
-              data-theme-toggle
-              aria-label="Activar modo claro"
-              title="Cambiar tema"
-            >
-              <span class="theme-toggle-icon" data-theme-icon="sun"><ThemeIcons icon="sun" size={18} /></span>
-              <span class="theme-toggle-icon" data-theme-icon="moon" hidden><ThemeIcons icon="moon" size={18} /></span>
-              <noscript><span class="theme-toggle-noscript">JS</span></noscript>
-            </button>
+        {(themeToggle || hasActions) && (
+          <div class="nav-theme nav-actions">
+            <slot name="actions" />
+            {themeToggle && (
+              <button
+                type="button"
+                class="theme-toggle"
+                data-theme-toggle
+                data-label-to-light={labels.themeToLight}
+                data-label-to-dark={labels.themeToDark}
+                aria-label={labels.themeToLight}
+                title={labels.themeTitle}
+              >
+                <span class="theme-toggle-icon" data-theme-icon="sun"><ThemeIcons icon="sun" size={18} /></span>
+                <span class="theme-toggle-icon" data-theme-icon="moon" hidden><ThemeIcons icon="moon" size={18} /></span>
+                <noscript><span class="theme-toggle-noscript">JS</span></noscript>
+              </button>
+            )}
           </div>
         )}
         {socials.length > 0 && (
@@ -211,25 +294,52 @@ const showMobileToggle = mobileMenu && showNav;
 
 {showMobileToggle && (
   <script is:inline>
-    const btn = document.querySelector(".site-header .nav-toggle");
-    const nav = document.getElementById("ds-primary-nav");
-    btn?.addEventListener("click", () => {
-      const open = btn.getAttribute("aria-expanded") === "true";
-      btn.setAttribute("aria-expanded", String(!open));
-      nav?.classList.toggle("open", !open);
-    });
+    (function () {
+      const btn = document.querySelector(".site-header .nav-toggle");
+      const nav = document.getElementById("ds-primary-nav");
+      if (!btn || !nav) return;
+      const labelOpen = btn.dataset.labelOpen || "Abrir menú";
+      const labelClose = btn.dataset.labelClose || "Cerrar menú";
+      const desktop = window.matchMedia("(min-width: 1024px)");
+      const isOpen = () => btn.getAttribute("aria-expanded") === "true";
 
-    // Submenu toggles (mobile only — desktop uses :hover).
-    // Each chevron button toggles its parent .nav-item.has-children.
-    document.querySelectorAll(".site-header .nav-submenu-toggle").forEach((toggle) => {
-      toggle.addEventListener("click", (e) => {
-        e.preventDefault();
-        const item = toggle.closest(".nav-item");
-        if (!item) return;
-        const isOpen = item.classList.toggle("is-open");
-        toggle.setAttribute("aria-expanded", String(isOpen));
+      function setOpen(open) {
+        btn.setAttribute("aria-expanded", String(open));
+        btn.setAttribute("aria-label", open ? labelClose : labelOpen);
+        nav.classList.toggle("open", open);
+      }
+
+      // The nav follows the button in the DOM, so once it is open (and
+      // visible) the next Tab lands on its first link.
+      btn.addEventListener("click", () => setOpen(!isOpen()));
+
+      // Escape closes the menu and hands focus back to the toggle.
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape" || !isOpen() || desktop.matches) return;
+        setOpen(false);
+        btn.focus();
       });
-    });
+
+      // Following a link closes the menu (also covers in-page anchors and
+      // pages restored from the back/forward cache).
+      nav.addEventListener("click", (e) => {
+        if (e.target instanceof Element && e.target.closest("a[href]")) setOpen(false);
+      });
+      window.addEventListener("pageshow", () => setOpen(false));
+      desktop.addEventListener("change", () => setOpen(false));
+
+      // Submenu toggles (mobile only — desktop uses :hover/:focus-within).
+      // Each chevron button toggles its parent .nav-item.has-children.
+      nav.querySelectorAll(".nav-submenu-toggle").forEach((toggle) => {
+        toggle.addEventListener("click", (e) => {
+          e.preventDefault();
+          const item = toggle.closest(".nav-item");
+          if (!item) return;
+          const open = item.classList.toggle("is-open");
+          toggle.setAttribute("aria-expanded", String(open));
+        });
+      });
+    })();
   </script>
 )}
 
@@ -271,11 +381,11 @@ const showMobileToggle = mobileMenu && showNav;
           // currently light — offer to switch to dark
           sun?.setAttribute("hidden", "");
           moon?.removeAttribute("hidden");
-          btn.setAttribute("aria-label", "Activar modo oscuro");
+          btn.setAttribute("aria-label", btn.dataset.labelToDark || "Activar modo oscuro");
         } else {
           sun?.removeAttribute("hidden");
           moon?.setAttribute("hidden", "");
-          btn.setAttribute("aria-label", "Activar modo claro");
+          btn.setAttribute("aria-label", btn.dataset.labelToLight || "Activar modo claro");
         }
       });
     }
@@ -295,7 +405,7 @@ const showMobileToggle = mobileMenu && showNav;
   .site-header {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: var(--chimi-z-header);
     /* Solid surface. Frosted glass (backdrop-filter) is on the anti-patterns
        list: see docs/anti-patterns.md. */
     background: var(--recipe-surface);
@@ -323,7 +433,7 @@ const showMobileToggle = mobileMenu && showNav;
     white-space: nowrap;
   }
   .brand-mark {
-    color: var(--recipe-accent);
+    color: var(--recipe-accent-text);
     font-family: var(--chimi-font-family-code);
     font-size: 18px;
   }
@@ -342,6 +452,8 @@ const showMobileToggle = mobileMenu && showNav;
     width: auto;
     display: block;
   }
+  /* "Code" in the brand name is identity: it keeps the brand accent, not
+     the text-safe --recipe-accent-text. */
   .brand-name em {
     color: var(--recipe-accent);
     font-style: normal;
@@ -400,13 +512,33 @@ const showMobileToggle = mobileMenu && showNav;
     transform: translateY(-8px);
     opacity: 0;
     pointer-events: none;
-    transition: transform 180ms ease, opacity 180ms ease;
+    /* Closed = visibility: hidden, so the links leave the tab order and the
+       accessibility tree. The visibility flip waits for the fade-out to
+       finish when closing and happens at once when opening. */
+    visibility: hidden;
+    transition: transform 180ms var(--chimi-ease-standard), opacity 180ms var(--chimi-ease-standard), visibility 0s linear 180ms;
     min-width: 0;
   }
   .site-nav.open {
     transform: translateY(0);
     opacity: 1;
     pointer-events: auto;
+    visibility: visible;
+    transition: transform 180ms var(--chimi-ease-standard), opacity 180ms var(--chimi-ease-standard), visibility 0s linear 0s;
+  }
+  /* No hamburger to open it (mobileMenu={false}, or no JavaScript — see the
+     `scripting: none` block below): render the nav in flow under the brand
+     instead of as a hidden overlay. */
+  .site-nav--inline {
+    position: static;
+    flex-basis: 100%;
+    padding-inline: 0;
+    border-bottom: 0;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transition: none;
   }
   .nav-list {
     display: flex;
@@ -434,24 +566,35 @@ const showMobileToggle = mobileMenu && showNav;
     color: var(--recipe-ink);
     border-bottom-color: var(--recipe-accent);
   }
-  .nav-link:hover { color: var(--recipe-accent); }
+  .nav-link:hover { color: var(--recipe-accent-text); }
   /*
     CTA pill — uses --recipe-em as the chrome color. On canvas-quiet/signal
     that's lemon in dark and red in light (recipe handles the swap via
     color.recipe.json's $extensions.chimi.theme.light overrides), so the CTA
     stays legible across both themes without a dedicated [data-theme="light"]
-    block. On paper em is red, on paper em is patagonia — both
-    keep AA-acceptable contrast against the ivory paper surface.
+    block.
+
+    Hover fills the pill with em. The label on that fill is whichever of
+    surface/ink contrasts more with em in the recipe:
+      surface — canvas-quiet/signal dark 11.98:1, light 5.87:1; critical 4.65:1
+      ink     — paper (em = patagonia) 6.75:1; cool-fresh (em = ivory) 16.31:1
+    (surface on patagonia would be 2.42:1). energy-loud tops out at 4.31:1
+    with either role; it needs a dedicated on-em role in the tokens.
   */
   .nav-link.cta {
     color: var(--recipe-em);
     border: 1px solid color-mix(in srgb, var(--recipe-em) 50%, transparent);
-    border-radius: 999px;
+    border-radius: var(--chimi-radius-pill);
     padding: 8px 14px;
   }
   .nav-link.cta:hover {
     background: var(--recipe-em);
     color: var(--recipe-surface);
+  }
+  /* :where() keeps this at the base rule's specificity so a consumer's own
+     CTA override still wins. */
+  :global(:where([data-recipe="paper"], [data-recipe="cool-fresh"])) .nav-link.cta:hover {
+    color: var(--recipe-ink);
   }
 
   /*
@@ -473,12 +616,12 @@ const showMobileToggle = mobileMenu && showNav;
     font-size: 9px;
     margin-left: 4px;
     color: var(--muted);
-    transition: transform 150ms ease;
+    transition: transform var(--chimi-duration-base) var(--chimi-ease-standard);
   }
   .nav-item.has-children:hover .nav-chevron,
   .nav-item.has-children.is-open .nav-chevron {
     transform: rotate(180deg);
-    color: var(--recipe-accent);
+    color: var(--recipe-accent-text);
   }
   .nav-submenu {
     position: static;
@@ -498,12 +641,16 @@ const showMobileToggle = mobileMenu && showNav;
     opacity: 1;
     pointer-events: none;
     transform: none;
-    transition: max-height 200ms ease;
-    z-index: 20;
+    /* Collapsed links stay out of the tab order (see .site-nav). */
+    visibility: hidden;
+    transition: max-height var(--chimi-duration-slow) var(--chimi-ease-standard), visibility 0s linear var(--chimi-duration-slow);
+    z-index: var(--chimi-z-dropdown);
   }
   .nav-item.has-children.is-open .nav-submenu {
     max-height: 500px;
     pointer-events: auto;
+    visibility: visible;
+    transition: max-height var(--chimi-duration-slow) var(--chimi-ease-standard), visibility 0s linear 0s;
   }
   .nav-item.has-children.is-open .nav-submenu-toggle {
     transform: rotate(180deg);
@@ -511,19 +658,23 @@ const showMobileToggle = mobileMenu && showNav;
   .nav-sublink {
     display: block;
     padding: 8px 12px;
-    border-radius: 4px;
+    border-radius: var(--chimi-radius-md);
     font: var(--web-meta);
     color: var(--muted-strong);
-    transition: background 120ms ease, color 120ms ease;
+    transition: background var(--chimi-duration-fast) var(--chimi-ease-standard), color var(--chimi-duration-fast) var(--chimi-ease-standard);
   }
   .nav-sublink:hover,
   .nav-sublink:focus-visible {
     background: color-mix(in srgb, var(--recipe-accent) 12%, transparent);
-    color: var(--recipe-accent);
-    outline: none;
+    color: var(--recipe-accent-text);
+  }
+  /* Inset ring: the mobile accordion clips anything outside the submenu. */
+  .nav-sublink:focus-visible {
+    outline: 2px solid var(--recipe-accent-text);
+    outline-offset: -2px;
   }
   .nav-sublink.active {
-    color: var(--recipe-accent);
+    color: var(--recipe-accent-text);
   }
   /* On mobile, the chevron toggle button opens the submenu; on desktop it is
      hidden and hover/.is-open drives the floating dropdown. */
@@ -535,6 +686,11 @@ const showMobileToggle = mobileMenu && showNav;
     padding: 8px;
     cursor: pointer;
     color: var(--muted-strong);
+    /* 44×44 touch target below 1024px (the button is hidden on desktop). */
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
   }
 
   .nav-socials {
@@ -549,44 +705,62 @@ const showMobileToggle = mobileMenu && showNav;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    /* 44×44 touch target below 1024px; the negative margin keeps the 32px
+       layout box (the desktop block restores 32×32). */
+    width: 44px;
+    height: 44px;
+    margin: -6px;
     color: var(--muted-strong);
-    border-radius: 999px;
+    border-radius: var(--chimi-radius-pill);
   }
-  .social-link:hover { color: var(--recipe-accent); }
+  .social-link:hover { color: var(--recipe-accent-text); }
 
   /* Theme toggle — icon-only. On mobile it stacks under the socials with a
      shared top hairline; on desktop it sits to the right with a vertical
      hairline separator. */
   .nav-theme {
     display: flex;
+    align-items: center;
+    gap: 12px;
     padding-left: 0;
     border-left: 0;
     border-top: 1px solid var(--hairline);
     padding-top: var(--stack-sm);
   }
-  .theme-toggle {
+  .theme-toggle,
+  .nav-actions > :global(a),
+  .nav-actions > :global(button) {
     appearance: none;
     background: transparent;
     border: 0;
     padding: 0;
-    width: 32px;
-    height: 32px;
-    border-radius: 999px;
+    /* 44×44 touch target below 1024px; the negative margin keeps the 32px
+       layout box (the desktop block restores 32×32). */
+    width: 44px;
+    height: 44px;
+    margin: -6px;
+    border-radius: var(--chimi-radius-pill);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: var(--muted-strong);
     cursor: pointer;
-    transition: color 150ms ease, transform 80ms ease;
+    transition: color var(--chimi-duration-base) var(--chimi-ease-standard), transform 80ms var(--chimi-ease-standard);
   }
-  .theme-toggle:hover { color: var(--recipe-accent); }
-  .theme-toggle:focus-visible {
-    outline: 2px solid var(--recipe-accent);
+  .nav-actions > :global(a) { text-decoration: none; }
+  .nav-actions > :global(a) :global(svg),
+  .nav-actions > :global(button) :global(svg) { display: block; }
+  .theme-toggle:hover,
+  .nav-actions > :global(a:hover),
+  .nav-actions > :global(button:hover) { color: var(--recipe-accent-text); }
+  .theme-toggle:focus-visible,
+  .nav-actions > :global(a:focus-visible),
+  .nav-actions > :global(button:focus-visible) {
+    outline: 2px solid var(--recipe-accent-text);
     outline-offset: 2px;
   }
-  .theme-toggle:active { transform: translateY(1px); }
+  .theme-toggle:active,
+  .nav-actions > :global(button:active) { transform: translateY(1px); }
   .theme-toggle-icon[hidden] { display: none; }
   .theme-toggle-icon { display: inline-flex; }
   .theme-toggle-noscript {
@@ -595,12 +769,16 @@ const showMobileToggle = mobileMenu && showNav;
     color: var(--muted);
   }
 
-  /* Hamburger button — visible on mobile, hidden at --lg (desktop). */
+  /* Hamburger button — visible on mobile, hidden at --lg (desktop).
+     44×44 touch target: the padding grows the hit area and the negative
+     margin gives it back, so the bars and the header row keep the 38×32
+     layout box they always had. */
   .nav-toggle {
     display: inline-flex;
     background: transparent;
     border: 0;
-    padding: 8px;
+    padding: 14px 11px;
+    margin: -6px -3px;
     cursor: pointer;
     flex-direction: column;
     gap: 5px;
@@ -610,7 +788,7 @@ const showMobileToggle = mobileMenu && showNav;
     width: 22px;
     height: 2px;
     background: var(--recipe-ink);
-    transition: transform 180ms ease, opacity 180ms ease;
+    transition: transform 180ms var(--chimi-ease-standard), opacity 180ms var(--chimi-ease-standard);
   }
   .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
@@ -624,6 +802,24 @@ const showMobileToggle = mobileMenu && showNav;
     .brand-name { font-size: 1em; }
   }
 
+  /* Without JavaScript the hamburger cannot open the overlay: hide it and
+     show the nav in flow (same as .site-nav--inline). Declared after the
+     .nav-toggle and .site-nav rules so it wins on equal specificity. */
+  @media (scripting: none) and (max-width: 1023.98px) {
+    .nav-toggle { display: none; }
+    .site-nav {
+      position: static;
+      flex-basis: 100%;
+      padding-inline: 0;
+      border-bottom: 0;
+      transform: none;
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+      transition: none;
+    }
+  }
+
   /*
     Desktop nav upgrade. Switches the overlay layout to inline horizontal
     nav, restores hairline dividers between sections, and promotes the
@@ -634,8 +830,19 @@ const showMobileToggle = mobileMenu && showNav;
   @media (min-width: 1024px) {
     .nav-toggle { display: none; }
 
-    .site-nav {
+    .theme-toggle,
+    .nav-actions > :global(a),
+    .nav-actions > :global(button),
+    .social-link {
+      width: 32px;
+      height: 32px;
+      margin: 0;
+    }
+
+    .site-nav,
+    .site-nav--inline {
       position: static;
+      flex-basis: auto;
       flex-direction: row;
       align-items: center;
       gap: clamp(16px, 2.5vw, 32px);
@@ -645,6 +852,7 @@ const showMobileToggle = mobileMenu && showNav;
       transform: none;
       opacity: 1;
       pointer-events: auto;
+      visibility: visible;
       transition: none;
     }
     .nav-list {
@@ -682,14 +890,17 @@ const showMobileToggle = mobileMenu && showNav;
       background: var(--surface-raised);
       border: 1px solid var(--hairline);
       border-left: 1px solid var(--hairline);
-      border-radius: 8px;
+      border-radius: var(--chimi-radius-lg);
       box-shadow: 0 12px 32px -8px color-mix(in srgb, #000 40%, transparent);
       max-height: none;
       overflow: visible;
       opacity: 0;
       pointer-events: none;
       transform: translateY(4px);
-      transition: opacity 150ms ease, transform 150ms ease;
+      /* Desktop keeps the panel reachable by Tab: focusing the parent link
+         (:focus-within) reveals it before focus moves into it. */
+      visibility: visible;
+      transition: opacity var(--chimi-duration-base) var(--chimi-ease-standard), transform var(--chimi-duration-base) var(--chimi-ease-standard);
     }
     .nav-item.has-children:hover .nav-submenu,
     .nav-item.has-children:focus-within .nav-submenu,

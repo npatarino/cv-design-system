@@ -34,14 +34,16 @@
    * Tighter mobile pad (16px) keeps the container readable below 480px.
    */
   --page-max: var(--bp-xl);
-  --page-pad: clamp(16px, 4vw, 56px);
+  --page-pad: clamp(var(--chimi-space-4), 4vw, 56px);
 
-  --stack-xs: 8px;
-  --stack-sm: 16px;
-  --stack-md: 24px;
-  --stack-lg: 48px;
-  --stack-xl: 96px;
-  --stack-2xl: 144px;
+  /* Vertical rhythm. Aliases of the --chimi-space-* scale
+     (tokens/foundation.semantic.json); kept for existing consumers. */
+  --stack-xs: var(--chimi-space-2);   /* 8px */
+  --stack-sm: var(--chimi-space-4);   /* 16px */
+  --stack-md: var(--chimi-space-5);   /* 24px */
+  --stack-lg: var(--chimi-space-7);   /* 48px */
+  --stack-xl: var(--chimi-space-8);   /* 96px */
+  --stack-2xl: var(--chimi-space-9);  /* 144px */
 
   /* ── role tokens: see the [data-recipe] block below ──────────────────
    * They are declared on :root only as a fallback for documents that never
@@ -82,30 +84,47 @@
   --recipe-em:      var(--chimi-color-recipe-canvas-quiet-em);
   --recipe-accent:  var(--chimi-color-recipe-canvas-quiet-accent);
   --recipe-warn:    var(--chimi-color-recipe-canvas-quiet-warn);
+  --recipe-accent-text: var(--chimi-color-recipe-canvas-quiet-accent-text);
+  --recipe-on-accent:   var(--chimi-color-recipe-canvas-quiet-on-accent);
+  --status-ok:      var(--chimi-color-recipe-canvas-quiet-status-ok);
+  --status-bad:     var(--chimi-color-recipe-canvas-quiet-status-bad);
+  --status-caution: var(--chimi-color-recipe-canvas-quiet-status-caution);
 }
 
-/* ── web-only override: paper recipes get patagonia accent ───────────────
- * Slides on paper use charcoal as accent because long-form
- * editorial reads cleaner without a chromatic CTA. Webs need a brand color
- * for nav/links/CTAs to stand out from body charcoal — without it, every
- * action collapses into the text. We re-map --recipe-accent here only,
- * leaving em/warn/ink/surface untouched (so the recipe's typographic
- * intent is preserved).
+/* ── web-only override: paper recipes get a patagonia accent ─────────────
+ * Slides on paper use charcoal as accent because long-form editorial reads
+ * cleaner without a chromatic CTA (that is the token value). Webs need a
+ * brand color for nav/links/CTAs to stand out from body charcoal, so here
+ * the three accent roles move together to patagonia.deep, leaving
+ * surface/ink/em/warn untouched.
  *
- * Contrast: patagonia (#02B5B9) on ivory (#FAFAF8) hits ~2.5:1 — fine for
- * UI/borders/icons (AA UI 3:1), but body links must stay charcoal-ink with
- * underline. .btn.primary in paper recipes uses ink text on accent fill
- * (charcoal on patagonia ≈ 5.7:1) — see button overrides below.
+ * Paper is ivory in both themes, so this remap is theme-independent.
+ * (Until 0.8.2 it aliased the canvas-quiet accent, which flips by theme:
+ * patagonia.base in dark = 2.42:1 as text on ivory, and the charcoal label
+ * on the patagonia.deep fill in light was 2.97:1.)
+ *
+ * Contrast on ivory.base: patagonia.deep as text 5.48:1; ivory label on
+ * the patagonia.deep fill 5.48:1; on its hover fill (deep + 20% charcoal)
+ * 6.95:1. Checked by test/contrast.test.mjs.
  */
 [data-recipe="paper"] {
-  --recipe-accent: var(--chimi-color-recipe-canvas-quiet-accent); /* patagonia */
+  --recipe-accent:      var(--chimi-primitives-color-patagonia-deep);
+  --recipe-accent-text: var(--chimi-primitives-color-patagonia-deep);
+  --recipe-on-accent:   var(--chimi-primitives-color-ivory-base);
 }
 
 /* ── role tokens (derived from --recipe-ink / --recipe-accent) ───────────
  * Declared on every element that carries a recipe so the mixes resolve
  * against *that* recipe's ink. Percentages tuned for ivory ink on charcoal
  * (canvas-quiet); the light block below re-tunes them for the inverted
- * contrast direction.
+ * contrast direction, and the per-recipe block after it pins the recipes
+ * whose surface does not flip.
+ *
+ * --accent-fill-hover / --accent-fill-active: the primary button fill on
+ * hover/press. The fill moves toward --recipe-ink, i.e. away from the
+ * --recipe-on-accent label, so the label keeps ≥4.5:1 (an alpha fade of the
+ * accent let the surface bleed through: 3.75:1 on light canvas, 2.01:1 on
+ * cool-fresh).
  */
 :root,
 [data-recipe] {
@@ -116,6 +135,12 @@
   --row-bg:          color-mix(in srgb, var(--recipe-ink) 4%, transparent);
   --row-bg-hover:    color-mix(in srgb, var(--recipe-accent) 8%, transparent);
   --surface-raised:  color-mix(in srgb, var(--recipe-ink) 6%, transparent);
+  --accent-fill-hover:  color-mix(in srgb, var(--recipe-accent) 80%, var(--recipe-ink));
+  --accent-fill-active: color-mix(in srgb, var(--recipe-accent) 68%, var(--recipe-ink));
+  /* Outline of form controls (.input). WCAG 1.4.11 asks ≥3:1 for the
+     boundary of a control; --hairline-strong is ~1.4:1, so fields get their
+     own role. Checked against the surface and the control's fill. */
+  --field-border:    color-mix(in srgb, var(--recipe-ink) 40%, transparent);
 }
 
 /* ── light-theme derived-token overrides ─────────────────────────────────
@@ -131,12 +156,66 @@
 :root[data-theme="light"] [data-recipe] {
   --hairline:        color-mix(in srgb, var(--recipe-ink) 8%, transparent);
   --hairline-strong: color-mix(in srgb, var(--recipe-ink) 16%, transparent);
-  --muted:           color-mix(in srgb, var(--recipe-ink) 55%, transparent);
+  /* 64% charcoal on ivory = 5.03:1 (was 55% = 3.79:1, below AA). */
+  --muted:           color-mix(in srgb, var(--recipe-ink) 64%, transparent);
   --muted-strong:    color-mix(in srgb, var(--recipe-ink) 72%, transparent);
   --row-bg:          color-mix(in srgb, var(--recipe-ink) 3%, transparent);
   --row-bg-hover:    color-mix(in srgb, var(--recipe-accent) 12%, transparent);
   --surface-raised:  color-mix(in srgb, var(--recipe-ink) 4%, transparent);
+  --field-border:    color-mix(in srgb, var(--recipe-ink) 54%, transparent);
 }
+
+/* ── per-recipe muted for the fixed-surface campaign recipes ─────────────
+ * energy-loud, cool-fresh and critical keep their surface in both themes,
+ * and their surfaces are mid-luminance, so the generic percentages fall
+ * below AA (62% charcoal on patagonia = 3.32:1). Pinned here for both
+ * themes; each selector list covers: no data-theme, data-theme on an
+ * ancestor, data-theme on the same root element.
+ *
+ * critical: ivory ink on plasma is only 3.50:1 (large-text only), so no
+ * mix of the ink can reach 4.5:1. Secondary text on plasma uses charcoal
+ * (the recipe's accent-text, 4.65:1) instead of a dimmed ink.
+ */
+/* paper is ivory in both themes: its field outline keeps the light-theme
+   mix even when the page is dark (40% charcoal on ivory would be 2.46:1). */
+[data-recipe="paper"],
+:root[data-theme] [data-recipe="paper"],
+:root[data-theme][data-recipe="paper"] {
+  --field-border: color-mix(in srgb, var(--recipe-ink) 54%, transparent); /* 3.67:1 */
+}
+[data-recipe="energy-loud"],
+:root[data-theme] [data-recipe="energy-loud"],
+:root[data-theme][data-recipe="energy-loud"] {
+  --muted:        color-mix(in srgb, var(--recipe-ink) 68%, transparent); /* 5.03:1 on lemon */
+  --muted-strong: color-mix(in srgb, var(--recipe-ink) 80%, transparent); /* 7.17:1 */
+  --field-border: var(--muted);
+  /* accent == ink (charcoal) here, so the generic hover mix would not move:
+     lighten toward the lemon label instead (still ≥4.5:1). */
+  --accent-fill-hover:  color-mix(in srgb, var(--recipe-accent) 88%, var(--recipe-on-accent));
+  --accent-fill-active: color-mix(in srgb, var(--recipe-accent) 80%, var(--recipe-on-accent));
+}
+[data-recipe="cool-fresh"],
+:root[data-theme] [data-recipe="cool-fresh"],
+:root[data-theme][data-recipe="cool-fresh"] {
+  --muted:        color-mix(in srgb, var(--recipe-ink) 80%, transparent); /* 4.84:1 on patagonia */
+  --muted-strong: color-mix(in srgb, var(--recipe-ink) 90%, transparent); /* 5.82:1 */
+  --field-border: var(--muted);
+}
+[data-recipe="critical"],
+:root[data-theme] [data-recipe="critical"],
+:root[data-theme][data-recipe="critical"] {
+  --muted:        var(--recipe-accent-text); /* charcoal on plasma, 4.65:1 */
+  --muted-strong: var(--recipe-accent-text);
+  --field-border: var(--recipe-accent-text);
+}
+
+/* ── color-scheme ──────────────────────────────────────────────────────
+ * Matches the theme contract: no data-theme attribute = dark (the token
+ * defaults), data-theme="light" = light (ThemeBootstrap writes it). Lets
+ * the UA paint scrollbars, form controls and the canvas to match.
+ */
+:root { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }
 
 /* ── reset + base ────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
@@ -151,12 +230,211 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-a { color: inherit; text-decoration: none; transition: color 120ms ease; }
-a:hover { color: var(--recipe-accent); }
+a { color: inherit; text-decoration: none; transition: color var(--chimi-duration-fast) var(--chimi-ease-standard); }
+a:hover { color: var(--recipe-accent-text); }
 
 img, svg { max-width: 100%; display: block; }
 
 [hidden] { display: none !important; }
+
+/* ── focus ───────────────────────────────────────────────────────────────
+ * One ring for everything focusable by keyboard. --recipe-accent-text is
+ * ≥4.5:1 on every recipe surface, so the ring clears the 3:1 non-text
+ * minimum wherever it lands. Mouse clicks do not show it (:focus-visible).
+ */
+:focus-visible {
+  outline: var(--chimi-border-2) solid var(--recipe-accent-text);
+  outline-offset: 2px;
+}
+
+/* ── skip link ───────────────────────────────────────────────────────────
+ * First focusable element of the page: <a class="skip-link" href="#main">.
+ * Sits above the viewport until it receives focus.
+ */
+.skip-link {
+  position: absolute;
+  top: var(--chimi-space-2);
+  left: var(--page-pad);
+  z-index: var(--chimi-z-skip);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--chimi-space-3) 20px;
+  border-radius: var(--chimi-radius-pill);
+  background: var(--recipe-accent);
+  color: var(--recipe-on-accent);
+  font: var(--web-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: translateY(calc(-100% - var(--chimi-space-5)));
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none;
+  color: var(--recipe-on-accent);
+}
+
+/* ── prose: long-form reading ────────────────────────────────────────────
+ * Wrap rendered Markdown/MDX in <div class="prose">. Covers paragraphs,
+ * h2–h4, lists, quotes, inline and block code, hr, images, figure /
+ * figcaption, image grids and tables (which scroll on their own instead of
+ * widening the page). Text blocks cap at --chimi-measure-prose (70ch);
+ * media may use the full wrapper (--prose-max, 720px).
+ *
+ * Headings use the recipe's display face (--recipe-font-display). Add
+ * .prose--display to set them in the brand display face (CHANEY) instead,
+ * as talks and episodes do on the blog. Override --prose-display /
+ * --prose-weight for anything else.
+ *
+ * Sizes are relative (em) so the block follows the reading size it sets.
+ */
+.prose {
+  --prose-display: var(--recipe-font-display);
+  --prose-weight: var(--recipe-weight-display);
+  --prose-max: 720px;
+  max-width: var(--prose-max);
+  font-family: var(--recipe-font-body);
+  font-weight: var(--recipe-weight-body);
+  font-size: clamp(1.0625rem, 0.4vw + 1rem, 1.1875rem);
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+.prose--display {
+  --prose-display: var(--chimi-font-family-display);
+  --prose-weight: 700;
+}
+.prose > :first-child { margin-top: 0; }
+.prose p,
+.prose ul,
+.prose ol,
+.prose blockquote,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose hr {
+  max-width: var(--chimi-measure-prose);
+}
+.prose p { margin: 0 0 1.3em; }
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--prose-display);
+  font-weight: var(--prose-weight);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.prose h2 { font-size: clamp(1.625rem, 2.8vw, 2.25rem); margin: 2em 0 0.6em; }
+.prose h3 { font-size: clamp(1.3rem, 2vw, 1.625rem); margin: 1.7em 0 0.5em; }
+.prose h4 { font-size: 1.15rem; margin: 1.5em 0 0.4em; }
+.prose ul,
+.prose ol { margin: 0 0 1.3em; padding-left: 1.4em; }
+.prose li { margin: 0 0 0.45em; }
+.prose li::marker { color: var(--muted-strong); }
+.prose li > p { margin-bottom: 0.5em; }
+.prose strong { font-weight: 700; }
+/* Emphasis keeps the ink color: --recipe-em on paper fails AA contrast. */
+.prose em { color: inherit; font-style: italic; }
+/* Quotes are set in Scilla italic, no box and no side rule
+   (docs/anti-patterns.md). */
+.prose blockquote {
+  margin: 1.8em 0;
+  padding: 0;
+  color: var(--recipe-ink);
+  font-family: var(--chimi-font-family-editorial);
+  font-style: italic;
+  font-size: 1.25em;
+  line-height: 1.35;
+  max-width: var(--chimi-measure-narrow);
+}
+.prose blockquote p:last-child { margin-bottom: 0; }
+.prose hr {
+  border: 0;
+  border-top: var(--chimi-border-1) solid var(--hairline-strong);
+  margin: 2.4em 0;
+}
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--chimi-radius-lg);
+}
+.prose p > img:only-child,
+.prose figure { margin: 1.8em 0; }
+.prose figure { padding: 0; }
+.prose figcaption {
+  margin-top: 0.6em;
+  font-size: 0.85em;
+  color: var(--muted-strong);
+}
+/* <div class="img-grid"> of images: 2 columns, 3 from --md. */
+.prose .img-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--chimi-space-3);
+  margin: 1.8em 0;
+}
+.prose .img-grid img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: var(--chimi-radius-lg);
+}
+@media (min-width: 768px) {
+  .prose .img-grid { grid-template-columns: repeat(3, 1fr); }
+}
+/* display: block gives the table its own horizontal scroll, so a wide
+   table never pushes the page sideways. */
+.prose table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.8em 0;
+  font-size: 0.95em;
+}
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 0.55em 0.8em;
+  border-bottom: var(--chimi-border-1) solid var(--hairline-strong);
+}
+.prose th { font-weight: 700; border-bottom-width: var(--chimi-border-2); }
+.prose code {
+  font-family: var(--recipe-font-code);
+  font-weight: var(--recipe-weight-code);
+  font-size: 0.88em;
+  background: var(--surface-raised);
+  padding: 0.12em 0.4em;
+  border-radius: var(--chimi-radius-md);
+}
+.prose pre {
+  font-family: var(--recipe-font-code);
+  font-weight: var(--recipe-weight-code);
+  font-size: 0.88em;
+  line-height: 1.55;
+  background: var(--surface-raised);
+  padding: 1em 1.2em;
+  border-radius: var(--chimi-radius-lg);
+  overflow-x: auto;
+  margin: 1.8em 0;
+  border: var(--chimi-border-1) solid var(--hairline);
+}
+.prose pre code { background: none; padding: 0; font-size: inherit; }
+
+/* Links: the reset above strips link styling for nav and card links.
+   Inside running text a link must be distinguishable without relying on
+   color alone, so .prose restores the underline. */
+.prose a {
+  color: var(--recipe-accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: var(--chimi-border-1);
+  text-underline-offset: 0.2em;
+}
+.prose a:hover {
+  color: var(--recipe-accent-text);
+  text-decoration-thickness: var(--chimi-border-2);
+}
 
 /* ── layout utilities ──────────────────────────────────────────────────
  * .container is the canonical width-bounded wrapper for editorial pages.
@@ -197,7 +475,7 @@ img, svg { max-width: 100%; display: block; }
   font: var(--web-eyebrow);
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--recipe-accent);
+  color: var(--recipe-accent-text);
 }
 
 .display-xl { font: var(--web-display-xl); letter-spacing: -0.015em; margin: 0; }
@@ -218,16 +496,16 @@ img, svg { max-width: 100%; display: block; }
 /* ── tags / pills ────────────────────────────────────────────────────── */
 .tag {
   display: inline-block;
-  padding: 4px 10px;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 999px;
+  padding: var(--chimi-space-1) 10px;
+  border: var(--chimi-border-1) solid var(--hairline-strong);
+  border-radius: var(--chimi-radius-pill);
   font: var(--web-eyebrow);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted-strong);
 }
 .tag.accent {
-  color: var(--recipe-accent);
+  color: var(--recipe-accent-text);
   border-color: color-mix(in srgb, var(--recipe-accent) 45%, transparent);
 }
 .tag.warm {
@@ -248,91 +526,287 @@ img, svg { max-width: 100%; display: block; }
 }
 
 /* ── hairline rule ───────────────────────────────────────────────────── */
-hr.hairline { border: 0; border-top: 1px solid var(--hairline); margin: 0; }
+hr.hairline { border: 0; border-top: var(--chimi-border-1) solid var(--hairline); margin: 0; }
 
-/* ── buttons (canonical = blog: outline pill + primary fill) ─────────── */
-.btn {
+/* ── buttons (canonical = blog: outline pill + primary fill) ───────────
+ * Canonical markup: `.btn` plus modifiers.
+ *   <a class="btn" …>               outline pill
+ *   <a class="btn btn--primary" …>  accent fill (one per screen)
+ *   <a class="btn btn--ghost" …>    quieter outline
+ *   <a class="btn btn--sm" …>       compact (combines with the others)
+ * Aliases kept for existing markup, same rendering:
+ *   .btn.primary and .btn-primary = .btn--primary
+ *   .btn-ghost = .btn--ghost, .btn-sm = .btn--sm
+ * The `.btn-*` aliases also work without `.btn` (they used to need it for
+ * the base box, except .btn-primary).
+ */
+.btn,
+.btn-primary,
+.btn-ghost,
+.btn-sm {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border-radius: 999px;
+  gap: var(--chimi-space-2);
+  padding: var(--chimi-space-3) 20px;
+  border-radius: var(--chimi-radius-pill);
   font: var(--web-eyebrow);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  border: 1px solid var(--hairline-strong);
+  border: var(--chimi-border-1) solid var(--hairline-strong);
   color: var(--recipe-ink);
   background: transparent;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 150ms ease, color 150ms ease, border-color 150ms ease, transform 80ms ease;
+  transition:
+    background var(--chimi-duration-base) var(--chimi-ease-standard),
+    color var(--chimi-duration-base) var(--chimi-ease-standard),
+    border-color var(--chimi-duration-base) var(--chimi-ease-standard),
+    transform 80ms var(--chimi-ease-standard);
 }
-.btn:hover {
+.btn:hover,
+.btn-primary:hover,
+.btn-ghost:hover,
+.btn-sm:hover {
   border-color: var(--recipe-accent);
-  color: var(--recipe-accent);
+  color: var(--recipe-accent-text);
 }
-.btn:active { transform: translateY(1px); }
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-ghost:focus-visible,
+.btn-sm:focus-visible {
+  outline: var(--chimi-border-2) solid var(--recipe-accent-text);
+  outline-offset: 2px;
+}
+.btn:active,
+.btn-primary:active,
+.btn-ghost:active,
+.btn-sm:active { transform: translateY(1px); }
 .btn[disabled],
-.btn[aria-disabled="true"] {
+.btn[aria-disabled="true"],
+.btn-primary[disabled],
+.btn-primary[aria-disabled="true"],
+.btn-ghost[disabled],
+.btn-ghost[aria-disabled="true"],
+.btn-sm[disabled],
+.btn-sm[aria-disabled="true"] {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
 
+/* Primary: accent fill, --recipe-on-accent label (≥4.5:1 on the fill and
+   on both state fills, in every recipe and theme). */
+.btn--primary,
 .btn.primary,
 .btn-primary {
   background: var(--recipe-accent);
-  color: var(--recipe-surface);
+  color: var(--recipe-on-accent);
   border-color: transparent;
 }
+.btn--primary:hover,
 .btn.primary:hover,
 .btn-primary:hover {
-  background: color-mix(in srgb, var(--recipe-accent) 80%, transparent);
-  color: var(--recipe-surface);
+  background: var(--accent-fill-hover);
+  color: var(--recipe-on-accent);
   border-color: transparent;
 }
-
-/* Paper recipes: --recipe-surface is ivory, so default `color: --recipe-surface`
-   on a patagonia fill gives ~2.5:1 (fails AA). Use ink (charcoal) instead —
-   charcoal on patagonia hits ~5.7:1. */
-[data-recipe="paper"] .btn.primary,
-[data-recipe="paper"] .btn-primary {
-  color: var(--recipe-ink);
-}
-[data-recipe="paper"] .btn.primary:hover,
-[data-recipe="paper"] .btn-primary:hover {
-  color: var(--recipe-ink);
+.btn--primary:active,
+.btn.primary:active,
+.btn-primary:active {
+  background: var(--accent-fill-active);
+  color: var(--recipe-on-accent);
 }
 
+.btn--ghost,
 .btn-ghost {
   background: transparent;
   color: var(--muted-strong);
   border-color: var(--hairline);
 }
+.btn--ghost:hover,
 .btn-ghost:hover {
   border-color: var(--recipe-accent);
-  color: var(--recipe-accent);
+  color: var(--recipe-accent-text);
 }
 
-/* ── tap targets (mobile only, WCAG 2.5.5 / Apple HIG ≥ 44×44) ───────────
+/* Small: 30px tall at --lg and up (12px label + 2×8px + 2×1px border); the
+   tap-target rule below still lifts it to 44px under 1024px. */
+.btn--sm,
+.btn-sm {
+  padding: var(--chimi-space-2) var(--chimi-space-3);
+}
+
+/* ── form fields ─────────────────────────────────────────────────────────
+ * One field = label + control + optional hint + optional error:
+ *
+ *   <div class="field">
+ *     <label class="label" for="email">Email</label>
+ *     <input class="input" id="email" type="email"
+ *            aria-describedby="email-hint email-error" aria-invalid="true">
+ *     <p class="field-hint" id="email-hint">Solo para responderte.</p>
+ *     <p class="field-error" id="email-error">Falta la arroba.</p>
+ *   </div>
+ *
+ * .input styles <input>, <select> and <textarea>. The outline is
+ * --field-border (≥3:1 against the surface and the field fill in every
+ * recipe and theme, test/contrast.test.mjs). Invalid = aria-invalid="true"
+ * on the control: the border turns --status-bad and the .field-error text
+ * (linked through aria-describedby) says what is wrong; keep the error
+ * element `hidden` while there is no error. Form-level messages are plain
+ * text too (a <p role="status"> or role="alert" with .field-hint /
+ * .field-error): no tinted box and no side rule (docs/anti-patterns.md).
+ */
+.field {
+  display: grid;
+  gap: var(--chimi-space-2);
+  min-width: 0;
+}
+.label,
+.field > label {
+  display: block;
+  font-weight: 600;
+}
+.input {
+  font: inherit;
+  color: var(--recipe-ink);
+  background: var(--surface-raised);
+  border: var(--chimi-border-1) solid var(--field-border);
+  border-radius: var(--chimi-radius-lg);
+  padding: var(--chimi-space-3) var(--chimi-space-4);
+  min-height: 44px;
+  width: 100%;
+  transition: border-color var(--chimi-duration-fast) var(--chimi-ease-standard);
+}
+textarea.input { resize: vertical; }
+.input::placeholder { color: var(--muted); opacity: 1; }
+.input:hover { border-color: var(--muted-strong); }
+.input:focus-visible {
+  outline: var(--chimi-border-2) solid var(--recipe-accent-text);
+  outline-offset: 2px;
+  border-color: var(--recipe-accent-text);
+}
+.input[aria-invalid="true"] { border-color: var(--status-bad); }
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.field-hint,
+.field-error {
+  margin: 0;
+  font: var(--web-meta);
+  max-width: var(--chimi-measure-lede);
+}
+.field-hint { color: var(--muted-strong); }
+.field-error { color: var(--status-bad); font-weight: 600; }
+
+/* ── list rows ───────────────────────────────────────────────────────────
+ * Lists of entries separated by hairlines, no boxes (the anti-patterns
+ * alternative to a card grid):
+ *
+ *   <ul class="list-rows">
+ *     <li><a class="list-rows-link" href="…">
+ *       <h3 class="list-rows-title">…</h3>
+ *       <p class="list-rows-meta">…</p>
+ *     </a></li>
+ *   </ul>
+ *
+ * Default: a line above every row and one closing the list. .list-rows--
+ * between draws lines only between rows. --list-rows-pad sets the row's
+ * vertical padding (default --chimi-space-5). Titles wrap long words
+ * instead of widening the page.
+ */
+.list-rows {
+  --list-rows-pad: var(--chimi-space-5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.list-rows > li {
+  border-top: var(--chimi-border-1) solid var(--hairline);
+  min-width: 0;
+}
+.list-rows > li:last-child { border-bottom: var(--chimi-border-1) solid var(--hairline); }
+.list-rows--between > li:first-child { border-top: 0; }
+.list-rows--between > li:last-child { border-bottom: 0; }
+/* Padding lives on the row, or on its link when the whole row is one
+   (two rules: a browser without :has() drops only the first). */
+.list-rows-link { padding-block: var(--list-rows-pad); }
+.list-rows > li:not(:has(> .list-rows-link)) { padding-block: var(--list-rows-pad); }
+.list-rows-link {
+  display: block;
+  transition: background var(--chimi-duration-base) var(--chimi-ease-standard);
+}
+.list-rows-link:hover { background: var(--row-bg-hover); }
+.list-rows-title {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  transition: color var(--chimi-duration-base) var(--chimi-ease-standard);
+}
+.list-rows-link:hover .list-rows-title { color: var(--recipe-accent-text); }
+.list-rows-meta {
+  margin: 0;
+  font: var(--web-meta);
+  color: var(--muted-strong);
+}
+
+/* ── nested recipe ───────────────────────────────────────────────────────
+ * data-recipe on an inner element switches the --recipe-* variables but
+ * paints nothing (only <body> gets surface and ink from the base rule).
+ * Add .recipe-scope to make the block paint its recipe:
+ *   <article data-recipe="paper" class="recipe-scope">…</article>
+ */
+.recipe-scope {
+  background: var(--recipe-surface);
+  color: var(--recipe-ink);
+}
+
+/* ── narrow phones (< --sm, 480px) ───────────────────────────────────────
+ * - .btn is nowrap; a long label ("Suscribite a La Chimichurrería") would
+ *   outgrow a 288px column at 320px and push the page sideways. Let it wrap.
+ * - .display-lg floors at 48px; one CHANEY word ("Chimichurri") is wider
+ *   than 288px at that size. Scale it with the viewport instead.
+ */
+@media (max-width: 479.98px) {
+  .btn,
+  .btn-primary,
+  .btn-ghost,
+  .btn-sm {
+    white-space: normal;
+    max-width: 100%;
+    text-align: center;
+  }
+  .display-lg { font-size: min(48px, 12.5vw); }
+}
+
+/* ── tap targets (touch layouts, WCAG 2.5.5 / Apple HIG ≥ 44×44) ─────────
  * Selective: applies to buttons, button-shaped controls and primary nav
  * anchors. Inline links inside paragraphs keep their natural size — they
  * are not the target of this rule (long-form reading would otherwise gain
  * unwanted vertical rhythm).
  *
  * Justified `max-width` exception (mobile-first rule explicitly exempts
- * tap-target sizing per design.md D6): on desktop, .btn already lands at
- * ~44px from its padding/font-size so the explicit min-height would only
- * inflate compact UI. We gate to viewports below --md.
+ * tap-target sizing per design.md D6). The range runs up to --lg because
+ * the header keeps its hamburger menu (touch layout) until 1024px. At
+ * --lg and above .btn renders 38px tall (12px label + 2×12px padding +
+ * 2×1px border), above the 24px WCAG 2.5.8 minimum for pointer layouts, so
+ * the min-height would only inflate compact UI there.
  */
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
   .btn,
   .btn-ghost,
   .btn-primary,
+  .btn-sm,
+  button,
   [role="button"],
   nav a,
   .nav a {
     min-height: 44px;
+  }
+  /* Icon-only buttons (menu, theme toggle) are narrower than tall. */
+  button,
+  [role="button"] {
+    min-width: 44px;
   }
   /* Pure inline elements ignore min-height; flip nav anchors to inline-flex
      so they actually grow. Body links inside paragraphs are unaffected. */
@@ -341,4 +815,85 @@ hr.hairline { border: 0; border-top: 1px solid var(--hairline); margin: 0; }
     display: inline-flex;
     align-items: center;
   }
+}
+
+/* ── reduced motion ──────────────────────────────────────────────────────
+ * Removes movement (smooth scroll, press nudge, animations) but keeps the
+ * short color transitions: they carry state feedback, not motion.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  .btn:active,
+  .btn-primary:active,
+  .btn-ghost:active,
+  .btn-sm:active { transform: none; }
+}
+
+/* ── forced colors (Windows High Contrast) ───────────────────────────────
+ * Fills and color-only states disappear in forced colors, so buttons and
+ * tags get a system-color outline and focus uses Highlight.
+ */
+@media (forced-colors: active) {
+  .btn,
+  .btn-ghost,
+  .btn-sm,
+  .btn.primary,
+  .btn--primary,
+  .btn-primary {
+    border: var(--chimi-border-1) solid ButtonText;
+    color: ButtonText;
+    background: ButtonFace;
+  }
+  .btn:hover,
+  .btn-ghost:hover,
+  .btn-sm:hover,
+  .btn.primary:hover,
+  .btn--primary:hover,
+  .btn-primary:hover {
+    border-color: Highlight;
+    color: Highlight;
+    background: ButtonFace;
+  }
+  .btn[disabled],
+  .btn[aria-disabled="true"],
+  .btn-primary[disabled],
+  .btn-primary[aria-disabled="true"],
+  .btn-ghost[disabled],
+  .btn-ghost[aria-disabled="true"],
+  .btn-sm[disabled],
+  .btn-sm[aria-disabled="true"],
+  .input:disabled {
+    border-color: GrayText;
+    color: GrayText;
+    opacity: 1;
+  }
+  .tag,
+  .tag.accent,
+  .tag.warm,
+  .tag.energy,
+  .tag.critical {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+  :focus-visible,
+  .btn:focus-visible {
+    outline: var(--chimi-border-2) solid Highlight;
+    outline-offset: 2px;
+  }
+  .skip-link {
+    border: var(--chimi-border-1) solid LinkText;
+    color: LinkText;
+    background: Canvas;
+  }
+  .prose a { color: LinkText; }
+  /* The fill and the border color are forced; keep the invalid state
+     visible with a thicker outline. */
+  .input[aria-invalid="true"] { outline: var(--chimi-border-2) solid CanvasText; outline-offset: 0; }
 }
