@@ -41,13 +41,15 @@
     "docs/responsive.md"
   ],
   "bin": {
-    "chimi-fetch-fonts": "scripts/fetch-fonts.mjs"
+    "chimi-fetch-fonts": "scripts/fetch-fonts.mjs",
+    "chimi-check-slop": "scripts/check-slop.mjs"
   },
   "exports": {
     "./tokens.css": "./dist/tokens.css",
     "./web.css": "./web.css",
     "./fonts.css": "./fonts.css",
     "./fetch-fonts": "./scripts/fetch-fonts.mjs",
+    "./check-slop": "./scripts/check-slop.mjs",
     "./ecosystem": "./components/ecosystem.ts",
     "./SiteHeader.astro": "./components/SiteHeader.astro",
     "./SiteFooter.astro": "./components/SiteFooter.astro",

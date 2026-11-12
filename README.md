@@ -302,7 +302,7 @@ Shipped in the package and run from the consumer's root:
 | `scripts/copy-asset.mjs <package-path> <target>` | Copies one file from the package. |
 | `scripts/seo-prebuild.mjs --site <id> [--public public]` | Writes favicons, `og/<id>.webp`, `manifest.webmanifest` and `robots.txt` into `public/`. `--disallow`, `--noindex`, `--sitemap`, `--no-*` flags. |
 | `scripts/check-seo.mjs --site <id> [--dir dist]` | Lints the built HTML, sitemap and robots against the cross-web SEO contract. Exits 1 on errors. |
-| `scripts/check-slop.mjs [dir]` | Reports "template look" patterns (see [`docs/anti-patterns.md`](docs/anti-patterns.md)). Never fails. |
+| `chimi-check-slop [dir]` | Reports "template look" patterns with file, line and selector (see [`docs/anti-patterns.md`](docs/anti-patterns.md)). Exits 1 with `--strict` when an enforced rule is over its limit. |
 
 The scripts that only made sense in the old monorepo (`check-recipes`, `check-docs-linter-coherence`, `check-workspace-conventions`, `process-icons`, `generate-og`) were removed; they're in the git history.
 

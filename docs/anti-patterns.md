@@ -41,10 +41,39 @@ Una superficie Chimi se reconoce por **una opinión fuerte y pocas excepciones**
 Después de construir un sitio:
 
 ```bash
-node node_modules/@chimichurricode/design-system/scripts/check-slop.mjs dist
+npx chimi-check-slop dist
 ```
 
-Cuenta degradados, `backdrop-filter`, sombras de color, bordes de color laterales, emojis en el HTML, filas de números, grids de icono-tarjeta y páginas con más de un `h1`. No falla el build: es un recordatorio para la revisión humana.
+Lee todos los `.css`, los bloques `<style>` y los atributos `style` de todos los `.html` (salta `pagefind/`). Cada aviso trae archivo, línea, columna y el selector, para encontrarlo aunque el CSS esté minificado.
+
+| Regla | Qué cuenta | Límite | Tipo |
+|---|---|---|---|
+| `gradients` | `linear-`, `radial-` y `conic-gradient` | 2 | obligatoria |
+| `glass` | `backdrop-filter` distinto de `none` | 1 | obligatoria |
+| `color-shadows` | `box-shadow` con un color que no sea gris | 1 | obligatoria |
+| `side-borders` | Borde izquierdo o superior de 2 px o más con color, en forma corta, en hex o como `border-left-color` | 0 | obligatoria |
+| `banned-fonts` | Inter, Geist, Space Grotesk o Instrument Serif en `font`, `font-family` o un enlace a Google Fonts | 0 | obligatoria |
+| `stat-rows` | Tres o más números sueltos seguidos | 0 | obligatoria |
+| `icon-cards` | Tres o más bloques hermanos con icono y título | 0 | obligatoria |
+| `multi-h1` | Páginas con más de un `h1` | 0 | obligatoria |
+| `uppercase` | Reglas `text-transform: uppercase` | 40 | orientativa |
+| `emoji` | Emojis o glifos dentro de `<main>` | 0 | orientativa |
+| `multi-primary` | Páginas con más de un botón primario dentro de `<main>` | 0 | orientativa |
+| `copy` | Frases hechas de landing dentro de `<main>` | 0 | orientativa |
+
+Las orientativas necesitan una lectura humana (un emoji en un post es legítimo), así que solo avisan.
+
+Opciones:
+
+- `--strict`: sale con código 1 si una regla obligatoria supera su límite. Es lo que va en CI.
+- `--strict=all`: las orientativas también hacen fallar.
+- `--max regla=n`: sube el límite de una regla cuando hay una excepción decidida (`--max gradients=4`). Se puede repetir.
+- `--all`: muestra todas las ubicaciones, no solo las cinco primeras por regla.
+- `--json`: informe para máquinas.
+
+Sin opciones no falla nunca: sigue sirviendo como recordatorio.
+
+Lo que no detecta, porque no se puede decidir sin mirar: badge sobre el `h1`, hero centrado, una palabra en itálica dentro de un titular, texto gris sobre oscuro (lo cubre el test de contraste del sistema), footer de cuatro columnas y el mate dibujado a mano.
 
 ## Histórico
 
