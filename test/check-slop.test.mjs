@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -116,6 +116,16 @@ describe("checkSlop", () => {
 
 describe("check-slop CLI", () => {
   const run = (...args) => spawnSync(process.execPath, [SCRIPT, ...args], { encoding: "utf8" });
+
+  test("runs when npm invokes it through the node_modules/.bin symlink", () => {
+    const dir = mkdtempSync(join(tmpdir(), "chimi-bin-"));
+    const link = join(dir, "chimi-check-slop");
+    symlinkSync(SCRIPT, link);
+    const r = spawnSync(process.execPath, [link, join(dir, "missing")], { encoding: "utf8" });
+    rmSync(dir, { recursive: true, force: true });
+    expect(r.status).toBe(2);
+    expect(r.stderr).toContain("check-slop");
+  });
   const bad = () => site({ "a.css": ".callout{border-left:3px solid var(--recipe-accent)}" });
 
   test("reports and exits 0 without --strict", () => {
