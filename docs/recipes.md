@@ -92,6 +92,8 @@ Misma paleta que `canvas-quiet` en los dos temas (lemon como `em` en oscuro, red
 
 **On webs** `web.css` remaps the three accent roles of `paper` to patagonia deep (`#017275`): `accent` and `accent-text` = `#017275`, `on-accent` = ivory. Slides keep the charcoal accent of the token.
 
+**In the dark theme**, a page whose recipe is `paper` turns charcoal: ivory ink, patagonia base for `em`, `accent` and `accent-text`, charcoal `on-accent`. The editorial type stays. A nested `paper` block (`.recipe-scope`) and slides stay ivory. See [theming.md](./theming.md).
+
 **Mood**: calidez sin saturación. Soporta doble énfasis: **patagonia** (vía `em`) para tono reflexivo/técnico y **red** (vía `warn` o `<i>` en web) para tono cálido/emocional. Accent colapsa en charcoal porque ivory no admite patagonia/lemon como CTA sin pelearse.
 
 ✓ Slides quote, prompts · testimonials · resource-cards · FAQ informativo · tickets, flyers print
@@ -179,8 +181,8 @@ Text roles on the recipe surface (web values: `paper` already carries the patago
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | `canvas-quiet` / `canvas-signal` · dark | 16.30 | 6.74 | 6.74 | 7.90 | 8.75 | 6.96 | 10.77 | 8.63 | 6.10 | 11.98 |
 | `canvas-quiet` / `canvas-signal` · light | 16.30 | 5.48 | 5.48 | 6.94 | 8.03 | 5.03 | 6.58 | 6.07 | 5.86 | 5.78 |
-| `paper` · dark | 16.30 | 5.48 | 5.48 | 6.94 | 8.03 | 4.71 | 8.70 | 6.07 | 5.86 | 5.78 |
-| `paper` · light | 16.30 | 5.48 | 5.48 | 6.94 | 8.03 | 5.03 | 6.58 | 6.07 | 5.86 | 5.78 |
+| `paper` (page) · dark | 16.30 | 6.74 | 6.74 | 7.90 | 8.75 | 6.96 | 10.77 | 8.63 | 6.10 | 11.98 |
+| `paper` · light, and nested `paper` | 16.30 | 5.48 | 5.48 | 6.94 | 8.03 | 5.03 | 6.58 | 6.07 | 5.86 | 5.78 |
 | `energy-loud` · both | 11.98 | 11.98 | 11.98 | 9.00 | 7.17 | 5.03 | 7.17 | 11.98 | 11.98 | 11.98 |
 | `cool-fresh` · both | 6.74 | 6.74 | 16.30 | 10.77 | 8.11 | 4.84 | 5.82 | 6.74 | 6.74 | 6.74 |
 | `critical` · both | *3.50* | 4.65 | 16.30 | 8.70 | 5.74 | 4.65 | 4.65 | 4.65 | 4.65 | 4.65 |
@@ -193,8 +195,8 @@ Non-text and decorative roles (no AA floor for the decorative ones; listed so no
 |---|---:|---:|---:|---:|---:|
 | `canvas-quiet` / `canvas-signal` · dark | 3.68 | 3.50 | 11.98 | 6.74 | **2.77** |
 | `canvas-quiet` / `canvas-signal` · light | 3.67 | 3.59 | 5.86 | 5.48 | 5.86 |
-| `paper` · dark | 3.67 | 3.55 | **2.41** | 5.48 | 5.86 |
-| `paper` · light | 3.67 | 3.59 | **2.41** | 5.48 | 5.86 |
+| `paper` (page) · dark | 5.60 | 5.14 | 6.74 | 6.74 | **2.77** |
+| `paper` · light, and nested `paper` | 3.67 | 3.59 | **2.41** | 5.48 | 5.86 |
 | `energy-loud` · dark / light | 5.03 | 4.75 / 4.84 | *4.31* | 11.98 | *4.31* |
 | `cool-fresh` · dark / light | 4.84 | 4.48 / 4.59 | **2.41** | **2.41** | **1.77** |
 | `critical` · dark / light | 4.65 | 4.81 / 4.75 | 4.65 | 4.65 | 4.65 |

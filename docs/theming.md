@@ -37,24 +37,26 @@ Rationale per role:
 - **`accent`** flips patagonia.base → patagonia.deep because patagonia.base on ivory is 2.42:1 (fails even the 3:1 UI threshold); deep on ivory is 5.48:1.
 - **`warn` (red)** keeps its value. On ivory it is 5.87:1, but on charcoal it is only **2.78:1**: in dark mode `warn` is for markers, strokes and large display words, never for body-size text.
 
-The four other recipes (`paper`, `energy-loud`, `cool-fresh`, `critical`) declare **no `$extensions.chimi.theme.light` overrides**: they look the same in both themes. The reasons given so far:
+`paper` follows the theme **when it is the recipe of the page** (`<body data-recipe="paper">` or `<html data-recipe="paper">`). This is a web-only rule in `web.css`, not a token override, because slides on paper must stay ivory:
 
-- `paper` is already light by construction (ivory surface, charcoal ink) and is the design's light-mode visual target.
-- The campaign recipes (lemon, patagonia, plasma surfaces) are intentionally fluorescent on both themes; that's their identity.
+| Role on a `paper` page | Dark | Light |
+|---|---|---|
+| `surface` | charcoal.100 | ivory.base |
+| `ink` | ivory.base | charcoal.100 |
+| `em` | patagonia.base | patagonia.base |
+| `accent`, `accent-text` | patagonia.base | patagonia.deep |
+| `on-accent` | charcoal.100 | ivory.base |
+| `status-ok` / `status-bad` / `status-caution` | green.soft / red.soft / lemon.base | green.base / red.base / amber.deep |
 
-In `web.css`, the derived role tokens (`--hairline`, `--muted`, `--surface-raised`, `--row-bg-hover`, `--field-border`, etc.) are tuned per theme via a `:root[data-theme="light"]` block: charcoal ink on ivory reads heavier than ivory ink on charcoal at the same alpha, so the percentages drop ~30–40%. The recipes whose surface does not flip pin their own values in both themes (`paper`'s field outline, the campaign recipes' muted text), so contrast holds whatever the theme.
+What stays `paper` in the dark is the voice: the editorial type roles (Scilla) are untouched, and `em` is patagonia where the canvas recipes use lemon. Going from a canvas page to an article no longer flips the screen to ivory.
 
-### Open decision: recipes that ignore the theme
+- **A nested `paper` block does not flip.** `<div data-recipe="paper" class="recipe-scope">` is a deliberate sheet of ivory on the page and stays ivory in both themes. Without `.recipe-scope` it paints nothing and inherits the page's surface, so always pair the two.
+- **Slides do not flip.** They do not load `web.css`, and the `paper` token values are still the ivory ones.
+- **Running text is softened in the dark.** `.prose` body text is set at 88% of the ink (12.6:1 instead of 16.3:1); headings, `strong` and quotes keep the full ink.
 
-**Not decided yet (Nico decides).** Only the two canvas recipes follow the theme. Consequences today:
+The campaign recipes (`energy-loud`, `cool-fresh`, `critical`) declare **no theme overrides**: lemon, patagonia and plasma surfaces are fluorescent on both themes, that is their identity. A page on one of them looks the same whatever the toggle says; they are meant for landing blocks and announcements, not for long reads.
 
-- **A dark-theme visitor reading a `paper` page sees ivory.** On the blog every article, talk and episode is `paper`, so the toggle changes nothing on most pages (144 of 162 at the last audit), and going from the home (charcoal) to an article flips the whole screen to ivory. The toggle looks broken there.
-- **Nested recipes do not follow the toggle either.** A `paper` or `energy-loud` block inside a dark page stays ivory or lemon; with `.recipe-scope` it paints its own surface, without it it inherits the page's surface and can end up ivory-on-ivory (the brand book's examples change with the viewer's OS for this reason).
-- **Header and footer follow the page recipe**, so on a `paper` page they stay ivory in dark mode as well.
-- **`color-scheme` and `theme-color` do follow the theme**, so on a `paper` page in dark mode the browser chrome and native controls are dark while the page is ivory.
-- Contrast is safe either way: every role is pinned per recipe and checked in both themes (`test/contrast.test.mjs`).
-
-The options on the table: give `paper` (and possibly the campaign recipes) a dark variant through `$extensions.chimi.theme`; or keep them single-theme and hide the toggle on pages whose recipe does not change with it; or keep them single-theme and say so in the UI. Until then, do not add theme overrides to these recipes ad hoc.
+In `web.css`, the derived role tokens (`--hairline`, `--muted`, `--surface-raised`, `--row-bg-hover`, `--field-border`, etc.) are tuned per theme via a `:root[data-theme="light"]` block: charcoal ink on ivory reads heavier than ivory ink on charcoal at the same alpha, so the percentages drop ~30–40%. The recipes whose surface does not flip pin their own values in both themes (the campaign recipes' muted text), so contrast holds whatever the theme. Every role is checked for every recipe in both themes by `test/contrast.test.mjs`.
 
 ## Light theme contrast (WCAG 2.1)
 
@@ -165,4 +167,3 @@ If a future surface needs to force a single theme:
 - A third `auto` toggle option that follows OS preference live (currently the bootstrap reads `prefers-color-scheme` once at first visit; subsequent flips are explicit).
 - A `high-contrast` theme — the build already supports `$extensions.chimi.theme.<name>` for any theme name on any recipe role.
 - Light overrides for `paper`'s patagonia em (currently it's the same patagonia in both themes; a slightly darker variant could reach AA non-text on ivory).
-- The open decision above (dark `paper`, or hiding the toggle on single-theme pages).
