@@ -1,5 +1,5 @@
 {
-  "_recipeComment": "Color recipes — 6 closed combinations of surface + ink + em + accent + warn. Each recipe is consumed by setting `data-recipe=\"<id>\"` on the slide root. The build emits a `:where([data-recipe=\"<id>\"])` block in dist/tokens.css that populates --recipe-* short vars. Layouts only consume --recipe-*. critical is bicara: as bg it's a full recipe; as fg it's a `.critical-fg-<role>` class that overrides --recipe-em or --recipe-warn to plasma. See docs/recipes.md.",
+  "_recipeComment": "Color recipes — 6 closed combinations of surface + ink + em + accent + warn, plus three derived color roles: accent-text (the accent when it is set as TEXT on surface, ≥4.5:1), on-accent (text set ON an accent fill, ≥4.5:1) and status-ok, status-bad and status-caution (state text on surface; ≥4.5:1 on canvas and paper, charcoal on the three campaign surfaces). Every color role is checked by test/contrast.test.mjs. Each recipe is consumed by setting `data-recipe=\"<id>\"` on the slide root. The build emits a `:where([data-recipe=\"<id>\"])` block in dist/tokens.css that populates --recipe-* short vars. Layouts only consume --recipe-*. critical is bicara: as bg it's a full recipe; as fg it's a `.critical-fg-<role>` class that overrides --recipe-em or --recipe-warn to plasma. See docs/recipes.md.",
 
   "color": {
     "recipe": {
@@ -22,6 +22,26 @@
           "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
         },
         "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "accent-text": {
+          "$value": "{primitives.color.patagonia.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
+        },
+        "on-accent": {
+          "$value": "{primitives.color.charcoal.100}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.ivory.base}" } }
+        },
+        "status-ok": {
+          "$value": "{primitives.color.green.soft}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.green.base}" } }
+        },
+        "status-bad": {
+          "$value": "{primitives.color.red.soft}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
+        },
+        "status-caution": {
+          "$value": "{primitives.color.lemon.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.amber.deep}" } }
+        },
         "font-primary": { "$value": "{font.family.body}" },
         "weight-primary": { "$value": "{type.body.md.fontWeight}" },
         "letter-spacing-primary": { "$value": "0" },
@@ -60,6 +80,26 @@
           "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
         },
         "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "accent-text": {
+          "$value": "{primitives.color.patagonia.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
+        },
+        "on-accent": {
+          "$value": "{primitives.color.charcoal.100}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.ivory.base}" } }
+        },
+        "status-ok": {
+          "$value": "{primitives.color.green.soft}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.green.base}" } }
+        },
+        "status-bad": {
+          "$value": "{primitives.color.red.soft}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
+        },
+        "status-caution": {
+          "$value": "{primitives.color.lemon.base}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.amber.deep}" } }
+        },
         "font-primary": { "$value": "{font.family.data}" },
         "weight-primary": { "$value": "{type.data.md.fontWeight}" },
         "letter-spacing-primary": { "$value": "{primitives.size.letterSpacing.display-tight}" },
@@ -86,6 +126,11 @@
         "em":      { "$value": "{primitives.color.patagonia.base}", "$type": "color" },
         "accent":  { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "accent-text": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "on-accent": { "$value": "{primitives.color.ivory.base}", "$type": "color" },
+        "status-ok": { "$value": "{primitives.color.green.base}", "$type": "color" },
+        "status-bad": { "$value": "{primitives.color.red.base}", "$type": "color" },
+        "status-caution": { "$value": "{primitives.color.amber.deep}", "$type": "color" },
         "font-primary": { "$value": "{font.family.editorial}" },
         "weight-primary": { "$value": "{type.editorial.md.fontWeight}" },
         "letter-spacing-primary": { "$value": "0" },
@@ -112,6 +157,11 @@
         "em":      { "$value": "{primitives.color.red.base}",     "$type": "color" },
         "accent":  { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "accent-text": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "on-accent": { "$value": "{primitives.color.lemon.base}", "$type": "color" },
+        "status-ok": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "status-bad": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "status-caution": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "font-primary": { "$value": "{font.family.display}" },
         "weight-primary": { "$value": "{type.display.md.fontWeight}" },
         "letter-spacing-primary": { "$value": "{primitives.size.letterSpacing.display}" },
@@ -138,6 +188,11 @@
         "em":      { "$value": "{primitives.color.ivory.base}",   "$type": "color" },
         "accent":  { "$value": "{primitives.color.ivory.base}",   "$type": "color" },
         "warn":    { "$value": "{primitives.color.lemon.base}",   "$type": "color" },
+        "accent-text": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "on-accent": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "status-ok": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "status-bad": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "status-caution": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "font-primary": { "$value": "{font.family.display}" },
         "weight-primary": { "$value": "{type.display.md.fontWeight}" },
         "letter-spacing-primary": { "$value": "{primitives.size.letterSpacing.display}" },
@@ -164,6 +219,11 @@
         "em":      { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "accent":  { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "warn":    { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "accent-text": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "on-accent": { "$value": "{primitives.color.ivory.base}", "$type": "color" },
+        "status-ok": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "status-bad": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
+        "status-caution": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "font-primary": { "$value": "{font.family.display}" },
         "weight-primary": { "$value": "{type.display.md.fontWeight}" },
         "letter-spacing-primary": { "$value": "{primitives.size.letterSpacing.display}" },

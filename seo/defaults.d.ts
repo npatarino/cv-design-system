@@ -47,6 +47,12 @@ export interface SEOSiteCatalogEntry {
   description: string;
 }
 
+/** Browser UI colours per `prefers-color-scheme`. */
+export interface ThemeColorScheme {
+  light: string;
+  dark: string;
+}
+
 export interface SEODefaults {
   siteId: SiteId;
   siteName: string;
@@ -58,6 +64,13 @@ export interface SEODefaults {
   defaultOgImageAlt: string;
   /** Hex string used by manifest theme_color and Safari pinned tab tint. */
   themeColor: string;
+  /**
+   * Optional per-color-scheme browser UI colours. When present,
+   * `renderSEOHeadHTML`/`<SEOHead>` emit a `prefers-color-scheme` pair of
+   * `<meta name="theme-color">` tags instead of the single `themeColor`.
+   * Absent unless the site's registry entry declares `themeColorScheme`.
+   */
+  themeColorScheme?: ThemeColorScheme;
   /** Hex string used by manifest background_color. */
   backgroundColor: string;
   /** OG locale, e.g. "es_AR". */

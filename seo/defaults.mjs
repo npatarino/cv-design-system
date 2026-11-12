@@ -28,6 +28,7 @@ import { SITE_REGISTRY_RUNTIME } from "./site-registry-runtime.generated.mjs";
  * @property {string} defaultOgImage
  * @property {string} defaultOgImageAlt
  * @property {string} themeColor
+ * @property {{ light: string; dark: string }} [themeColorScheme] - Optional per-scheme browser UI colours. Only set when the registry entry declares one.
  * @property {string} backgroundColor
  * @property {string} locale
  * @property {string} lang
@@ -55,13 +56,21 @@ export const SEO_SITE_CATALOG = Object.freeze(
  * Theme color presets per site.
  * Derived from the site registry.
  *
- * @type {Readonly<Record<SiteId, { themeColor: string; backgroundColor: string; maskIconColor: string }>>}
+ * `themeColorScheme` is optional: no registry entry declares it today, so
+ * it stays undefined and consumers fall back to the single `themeColor`.
+ *
+ * @type {Readonly<Record<SiteId, { themeColor: string; themeColorScheme?: { light: string; dark: string }; backgroundColor: string; maskIconColor: string }>>}
  */
 const SITE_THEMES = Object.freeze(
   Object.fromEntries(
     SITE_REGISTRY_RUNTIME.map((s) => [
       s.id,
-      { themeColor: s.themeColor, backgroundColor: s.backgroundColor, maskIconColor: s.maskIconColor },
+      {
+        themeColor: s.themeColor,
+        themeColorScheme: s.themeColorScheme,
+        backgroundColor: s.backgroundColor,
+        maskIconColor: s.maskIconColor,
+      },
     ]),
   ),
 );
@@ -96,6 +105,7 @@ export function defaultsForSite(siteId) {
     defaultOgImage: `/og/${siteId}.webp`,
     defaultOgImageAlt: `${entry.name} — ${entry.description}`,
     themeColor: theme.themeColor,
+    ...(theme.themeColorScheme ? { themeColorScheme: theme.themeColorScheme } : {}),
     backgroundColor: theme.backgroundColor,
     locale: "es_AR",
     lang: "es",

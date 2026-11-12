@@ -32,7 +32,7 @@
  * (talks, brand). Maintaining one implementation prevents drift.
  */
 import { renderSEOHeadHTML } from "../seo/render-head.mjs";
-import type { SiteId } from "../seo/defaults";
+import type { SiteId, ThemeColorScheme } from "../seo/defaults";
 
 interface Props {
   /**
@@ -79,6 +79,13 @@ interface Props {
     manifest?: string;
   };
   titleTemplate?: string;
+  /**
+   * Override for `<meta name="theme-color">`. A string emits one tag;
+   * `{ light, dark }` emits a `media="(prefers-color-scheme: …)"` pair.
+   * Omitted: the site's registry `themeColorScheme` if declared, else its
+   * single `themeColor` (the previous output).
+   */
+  themeColor?: string | ThemeColorScheme;
 }
 
 const props = Astro.props as Props;
