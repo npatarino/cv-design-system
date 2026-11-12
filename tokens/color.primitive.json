@@ -20,8 +20,16 @@
         "base": { "$value": "#F9D71C", "$type": "color", "$description": "Brand yellow — high-energy accent." }
       },
       "red": {
-        "base": { "$value": "#A64132", "$type": "color", "$description": "Brand red — warmth accent and emphasis." },
-        "soft": { "$value": "#D78579", "$type": "color", "$description": "Red lightened (same hue as base, L 66%) — status-bad text on dark surfaces (6.1:1 on charcoal.100, 5.1:1 on charcoal.90)." }
+        "base": { "$value": "#A64132", "$type": "color", "$description": "Brand red — warmth accent and emphasis." }
+      },
+      "plasma": {
+        "base": { "$value": "#FF2079", "$type": "color", "$description": "Plasma pink — critical accent. For disclaimers, alerts, controversial statements." }
+      }
+    },
+    "status": {
+      "$description": "Functional state colours for the status-ok / status-bad / status-caution roles. NOT part of the brand palette (the six families under `color`): do not list them as brand colours or use them for decoration.",
+      "red": {
+        "soft": { "$value": "#D78579", "$type": "color", "$description": "Brand red lightened (same hue, L 66%) — status-bad text on dark surfaces (6.1:1 on charcoal.100, 5.1:1 on charcoal.90)." }
       },
       "green": {
         "base": { "$value": "#2E6B47", "$type": "color", "$description": "Status green — the brand book's existing ok/success green. status-ok text on light surfaces (6.1:1 on ivory.base)." },
@@ -29,9 +37,6 @@
       },
       "amber": {
         "deep": { "$value": "#994F00", "$type": "color", "$description": "Status amber — the brand book's #B25C00 darkened to clear AA with margin. status-caution text on light surfaces (5.8:1 on ivory.base, 5.4:1 on ivory.raised)." }
-      },
-      "plasma": {
-        "base": { "$value": "#FF2079", "$type": "color", "$description": "Plasma pink — critical accent. For disclaimers, alerts, controversial statements." }
       }
     }
   }
