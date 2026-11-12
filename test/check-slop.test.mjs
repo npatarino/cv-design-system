@@ -60,8 +60,10 @@ describe("checkSlop", () => {
   });
 
   test("neutral shadows and backdrop-filter: none are fine", () => {
-    const r = checkSlop(site({ "a.css": ".a{box-shadow:0 1px 2px rgba(0,0,0,.2)}.b{backdrop-filter:none}" }));
+    const r = checkSlop(site({ "a.css": ".a{box-shadow:0 1px 2px rgba(0,0,0,.2)}.b{backdrop-filter:none}.c{box-shadow:0 2px 6px color-mix(in srgb, var(--chimi-primitives-color-charcoal-100) 20%, transparent)}" }));
     expect(rule(r, "color-shadows").count).toBe(0);
+    const tinted = checkSlop(site({ "a.css": ".c{box-shadow:0 2px 6px var(--chimi-primitives-color-patagonia-base)}" }));
+    expect(rule(tinted, "color-shadows").count).toBe(1);
     expect(rule(r, "glass").count).toBe(0);
   });
 

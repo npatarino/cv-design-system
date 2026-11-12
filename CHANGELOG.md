@@ -8,6 +8,7 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ### Fixed
 
+- `chimi-check-slop` reported shadows and borders in the charcoal or ivory primitives (`--chimi-primitives-color-charcoal-100`) as coloured: the neutral exception did not match the real variable names.
 - `font.primitive.json` described CHANEY as a condensed face; the face the system ships and renders is the extended one.
 
 ## [0.10.0] - 2026-11-12
