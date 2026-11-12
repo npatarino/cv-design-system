@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -136,6 +136,16 @@ describe("checkText: HTML", () => {
 describe("checkProse and the CLI", () => {
   const bad = () => site({ "content/posts/a.md": "Cinco tips para vos.", "content/b.mdx": "Hola.", "content/skip.txt": "tips", "content/node_modules/x.md": "tips" });
   const run = (...args) => spawnSync(process.execPath, [SCRIPT, ...args], { encoding: "utf8" });
+
+  test("runs when npm invokes it through the node_modules/.bin symlink", () => {
+    const dir = mkdtempSync(join(tmpdir(), "chimi-bin-"));
+    const link = join(dir, "chimi-check-prose");
+    symlinkSync(SCRIPT, link);
+    const r = spawnSync(process.execPath, [link, join(dir, "missing")], { encoding: "utf8" });
+    rmSync(dir, { recursive: true, force: true });
+    expect(r.status).toBe(2);
+    expect(r.stderr).toContain("check-prose");
+  });
 
   test("walks directories for .md, .mdx and .html", () => {
     const dir = bad();
