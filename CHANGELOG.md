@@ -6,6 +6,10 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+### Fixed
+
+- `font.primitive.json` described CHANEY as a condensed face; the face the system ships and renders is the extended one.
+
 ## [0.10.0] - 2026-11-12
 
 ### Changed
