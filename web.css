@@ -534,16 +534,15 @@ hr.hairline { border: 0; border-top: var(--chimi-border-1) solid var(--hairline)
  *   <a class="btn btn--primary" …>  accent fill (one per screen)
  *   <a class="btn btn--ghost" …>    quieter outline
  *   <a class="btn btn--sm" …>       compact (combines with the others)
- * Aliases kept for existing markup, same rendering:
+ * Aliases kept for existing markup, same rendering when combined with
+ * `.btn`:
  *   .btn.primary and .btn-primary = .btn--primary
  *   .btn-ghost = .btn--ghost, .btn-sm = .btn--sm
- * The `.btn-*` aliases also work without `.btn` (they used to need it for
- * the base box, except .btn-primary).
+ * The aliases only set their own colors or padding: without `.btn` they do
+ * NOT get the pill box, so a consumer's own `.btn-ghost` / `.btn-sm` class
+ * (toolbars, segmented controls) keeps its layout, as in 0.8.x.
  */
-.btn,
-.btn-primary,
-.btn-ghost,
-.btn-sm {
+.btn {
   display: inline-flex;
   align-items: center;
   gap: var(--chimi-space-2);
@@ -563,32 +562,17 @@ hr.hairline { border: 0; border-top: var(--chimi-border-1) solid var(--hairline)
     border-color var(--chimi-duration-base) var(--chimi-ease-standard),
     transform 80ms var(--chimi-ease-standard);
 }
-.btn:hover,
-.btn-primary:hover,
-.btn-ghost:hover,
-.btn-sm:hover {
+.btn:hover {
   border-color: var(--recipe-accent);
   color: var(--recipe-accent-text);
 }
-.btn:focus-visible,
-.btn-primary:focus-visible,
-.btn-ghost:focus-visible,
-.btn-sm:focus-visible {
+.btn:focus-visible {
   outline: var(--chimi-border-2) solid var(--recipe-accent-text);
   outline-offset: 2px;
 }
-.btn:active,
-.btn-primary:active,
-.btn-ghost:active,
-.btn-sm:active { transform: translateY(1px); }
+.btn:active { transform: translateY(1px); }
 .btn[disabled],
-.btn[aria-disabled="true"],
-.btn-primary[disabled],
-.btn-primary[aria-disabled="true"],
-.btn-ghost[disabled],
-.btn-ghost[aria-disabled="true"],
-.btn-sm[disabled],
-.btn-sm[aria-disabled="true"] {
+.btn[aria-disabled="true"] {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
@@ -797,17 +781,15 @@ textarea.input { resize: vertical; }
   .btn-ghost,
   .btn-primary,
   .btn-sm,
-  button,
   [role="button"],
   nav a,
   .nav a {
     min-height: 44px;
   }
-  /* Icon-only buttons (menu, theme toggle) are narrower than tall. */
-  button,
-  [role="button"] {
-    min-width: 44px;
-  }
+  /* Native <button> is deliberately NOT in this rule: a base stylesheet
+     must not resize a consumer's own controls (toolbars, segmented
+     controls, icon rows). SiteHeader and SiteFooter size their own icon
+     buttons to 44x44; give yours a 44px target in your own CSS. */
   /* Pure inline elements ignore min-height; flip nav anchors to inline-flex
      so they actually grow. Body links inside paragraphs are unaffected. */
   nav a,

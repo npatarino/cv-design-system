@@ -6,6 +6,29 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-12
+
+Restores three 0.8.x behaviours that 0.9.0 changed for sites that had not
+opted in. 0.9.0 was staged on npm but never approved; use 0.9.1.
+
+### Fixed
+
+- `.btn-ghost`, `.btn-sm` and `.btn-primary` no longer get the pill box
+  without `.btn`. In 0.9.0 a consumer's own `.btn-ghost` class (the font
+  tester's toolbar) was restyled and overflowed at 375px.
+- The 44px tap-target rule no longer applies to every native `<button>`
+  (and no longer sets `min-width`). It covers `.btn` and its aliases,
+  `[role="button"]` and nav links, below 1024px. `SiteHeader` and
+  `SiteFooter` still size their own icon buttons to 44×44.
+- `SiteHeader` with `mobileMenu={false}` keeps the nav hidden below 1024px
+  again (0.9.0 rendered it in flow under the brand). It is hidden with
+  `visibility`, so its links are also out of the tab order.
+- The state colours added in 0.9.0 (`red.soft`, `green.base`, `green.soft`,
+  `amber.deep`) move from `primitives.color` to a new `primitives.status`
+  group (`--chimi-primitives-status-*`). They are functional colours, not
+  brand families: under `color` the brand book listed them as part of the
+  palette (eight families instead of six).
+
 ## [0.9.0] - 2026-11-12
 
 ### Added
@@ -38,7 +61,7 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
   - Button modifiers `.btn--primary`, `.btn--ghost` and `.btn--sm` (the
     canonical names). `.btn.primary`, `.btn-primary`, `.btn-ghost` and
     `.btn-sm` stay as aliases with the same rendering, and the `.btn-*`
-    aliases now also work without `.btn`.
+    aliases now also work without `.btn` (reverted in 0.9.1).
   - `.skip-link`, a global `:focus-visible` ring, `color-scheme` per theme,
     a `prefers-reduced-motion` block and a `forced-colors` block.
 - `SiteHeader`: slot `actions` (icon links/buttons before the theme toggle,
@@ -69,7 +92,8 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 - `--muted` reaches 4.5:1 in every recipe and theme: light theme mix 55% →
   64%, and `energy-loud`, `cool-fresh` and `critical` pin their own value.
 - The 44px tap-target rule now runs below 1024px (was 768px) and covers
-  native `<button>` and `[role="button"]` (with `min-width: 44px`) besides
+  native `<button>` and `[role="button"]` (with `min-width: 44px`; native
+  buttons were taken out again in 0.9.1) besides
   `.btn` and nav links.
 - `SiteHeader` mobile menu: the closed menu is `visibility: hidden` (out of
   the tab order), Escape closes it and returns focus, the button label
@@ -107,7 +131,8 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
   ink instead of fading toward the surface.
 - Accent-colored text on `paper` in the dark theme is patagonia deep
   instead of patagonia base.
-- Native buttons and nav links are at least 44px tall below 1024px.
+- Nav links and `.btn` are at least 44px tall below 1024px (0.9.0 also
+  resized every native button; 0.9.1 does not).
 - Light-theme muted text is a little darker; a keyboard focus ring appears
   on every focusable element.
 
@@ -215,7 +240,8 @@ local patches:
 Consumer fixes, `docs/anti-patterns.md` and `check-slop`. Earlier versions
 were not tracked in a changelog.
 
-[Unreleased]: https://github.com/npatarino/cv-design-system/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/npatarino/cv-design-system/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/npatarino/cv-design-system/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/npatarino/cv-design-system/compare/v0.8.0...v0.9.0
 [0.8.1]: https://github.com/npatarino/cv-design-system/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/npatarino/cv-design-system/releases/tag/v0.8.0

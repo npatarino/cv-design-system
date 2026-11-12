@@ -26,9 +26,9 @@ The design system ships **two themes**: `light` and `dark`. Visitors land in lig
 | `canvas-signal` | `accent` | patagonia.base | patagonia.deep |
 | `canvas-quiet` / `canvas-signal` | `accent-text` | patagonia.base | patagonia.deep |
 | `canvas-quiet` / `canvas-signal` | `on-accent` | charcoal.100 | ivory.base |
-| `canvas-quiet` / `canvas-signal` | `status-ok` | green.soft | green.base |
-| `canvas-quiet` / `canvas-signal` | `status-bad` | red.soft | red.base |
-| `canvas-quiet` / `canvas-signal` | `status-caution` | lemon.base | amber.deep |
+| `canvas-quiet` / `canvas-signal` | `status-ok` | status.green.soft | status.green.base |
+| `canvas-quiet` / `canvas-signal` | `status-bad` | status.red.soft | red.base |
+| `canvas-quiet` / `canvas-signal` | `status-caution` | lemon.base | status.amber.deep |
 
 Rationale per role:
 

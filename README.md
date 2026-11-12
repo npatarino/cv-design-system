@@ -117,7 +117,7 @@ The full map is the `exports` field in [`package.json`](package.json).
 
 | Class | Use |
 |---|---|
-| `.btn` + `.btn--primary` / `.btn--ghost` / `.btn--sm` | Outline pill button; accent fill (one per screen); quieter outline; compact size. Aliases with the same rendering: `.btn.primary`, `.btn-primary`, `.btn-ghost`, `.btn-sm` (the `.btn-*` aliases also work without `.btn`). Labels wrap below 480px. |
+| `.btn` + `.btn--primary` / `.btn--ghost` / `.btn--sm` | Outline pill button; accent fill (one per screen); quieter outline; compact size. Aliases with the same rendering: `.btn.primary`, `.btn-primary`, `.btn-ghost`, `.btn-sm` (the `.btn-*` aliases need `.btn` for the pill box, as in 0.8.x). Labels wrap below 480px. |
 | `.prose` (+ `.prose--display`) | Long-form reading: paragraphs, h2–h4, lists, quotes, inline and block code, `hr`, images, `figure`/`figcaption`, `.img-grid`, tables with their own scroll, underlined links; text capped at `--chimi-measure-prose`. `--display` sets the headings in CHANEY. |
 | `.field` · `.label` · `.input` · `.field-hint` · `.field-error` | Form field: label, control (`input`, `select`, `textarea`) with a ≥3:1 outline, focus, `aria-invalid="true"` and disabled states, hint and per-field error linked with `aria-describedby`. |
 | `.list-rows` (+ `--between`, `.list-rows-link`, `.list-rows-title`, `.list-rows-meta`) | List of rows separated by hairlines, no boxes; titles wrap long words. |

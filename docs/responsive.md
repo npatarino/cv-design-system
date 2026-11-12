@@ -133,8 +133,7 @@ Code review rejects `@media (max-width: …)` for layout. The only justified exc
 /* tap targets ≥ 44px wherever the layout is touch-first (WCAG 2.5.5 / Apple HIG) */
 @media (max-width: 1023.98px) {
   .btn, .btn-ghost, .btn-primary, .btn-sm,
-  button, [role="button"], nav a, .nav a { min-height: 44px; }
-  button, [role="button"] { min-width: 44px; }   /* icon-only buttons */
+  [role="button"], nav a, .nav a { min-height: 44px; }
   nav a, .nav a { display: inline-flex; align-items: center; } /* so min-height applies */
 }
 
@@ -148,11 +147,11 @@ Code review rejects `@media (max-width: …)` for layout. The only justified exc
 ### The 44px rule
 
 - **Range: below 1024px** (`max-width: 1023.98px`), not only below 768px. The header keeps its hamburger (a touch layout) up to 1024px, and tablets in that range are touch devices.
-- **What it covers**: `.btn` and its aliases, every native `<button>`, `[role="button"]`, and links inside `<nav>` (or `.nav`). Buttons also get `min-width: 44px` so icon-only controls (menu, theme toggle) are square targets. Nav links become `inline-flex` because an inline `<a>` ignores `min-height`.
-- **What it does not cover**: links inside running text (`.prose`, paragraphs) keep their natural size; WCAG exempts inline links, and inflating them would break the reading rhythm. Form controls (`.input`) are 44px tall at every width.
+- **What it covers**: `.btn` and its aliases, `[role="button"]`, and links inside `<nav>` (or `.nav`). Nav links become `inline-flex` because an inline `<a>` ignores `min-height`.
+- **What it does not cover**: native `<button>` elements without `.btn` (a base stylesheet must not resize a consumer's toolbars or segmented controls; `SiteHeader` and `SiteFooter` size their own icon buttons to 44×44, and you give yours a 44px target in your own CSS); links inside running text (`.prose`, paragraphs) keep their natural size; WCAG exempts inline links, and inflating them would break the reading rhythm. Form controls (`.input`) are 44px tall at every width.
 - **From 1024px up** the rule stops: `.btn` is 38px (`.btn--sm` 30px), above the 24px minimum of WCAG 2.5.8 for pointer layouts.
 - **Components** keep their own touch boxes inside the same range: the header's icon buttons and socials are 44×44 with a negative margin that preserves the 32px layout box, `SiteFooter`'s socials are 44×44 in every width.
-- **Visible change for consumers**: native `<button>` elements now reach 44px below 1024px even without `.btn` (up to 0.8.x the rule stopped at 768px and did not include `button`).
+- **Visible change for consumers**: the rule now runs up to 1023px (up to 0.8.x it stopped at 768px).
 
 These two `max-width` queries are the only ones `web.css` uses; everything else is mobile-first `min-width`.
 
