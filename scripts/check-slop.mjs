@@ -24,7 +24,7 @@
  *   import { checkSlop } from "@chimichurricode/design-system/check-slop";
  *   const { rules, failed } = checkSlop("dist", { strict: true });
  */
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -227,4 +227,12 @@ function main(argv) {
   return result.failed ? 1 : 0;
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) process.exitCode = main(process.argv.slice(2));
+// npm links the bin from node_modules/.bin, so argv[1] is a symlink: resolve it before comparing.
+function isEntryPoint() {
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+if (isEntryPoint()) process.exitCode = main(process.argv.slice(2));

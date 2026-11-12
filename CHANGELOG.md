@@ -6,6 +6,12 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+## [0.9.3] - 2026-11-12
+
+### Fixed
+
+- `chimi-check-slop` and `chimi-check-prose` did nothing and exited 0 when run by their bin name (`npx`, npm scripts), because the entry-point check compared against the `node_modules/.bin` symlink. Running the script by path was not affected.
+
 ## [0.9.2] - 2026-11-12
 
 ### Added
