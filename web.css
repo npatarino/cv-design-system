@@ -665,9 +665,10 @@ hr.hairline { border: 0; border-top: var(--chimi-border-1) solid var(--hairline)
  * recipe and theme, test/contrast.test.mjs). Invalid = aria-invalid="true"
  * on the control: the border turns --status-bad and the .field-error text
  * (linked through aria-describedby) says what is wrong; keep the error
- * element `hidden` while there is no error. Form-level messages are plain
- * text too (a <p role="status"> or role="alert" with .field-hint /
- * .field-error): no tinted box and no side rule (docs/anti-patterns.md).
+ * element `hidden` while there is no error. A short form-level message is
+ * plain text too (a <p role="status"> or role="alert" with .field-hint /
+ * .field-error); a longer one goes in a .callout. Never a tinted box with
+ * a side rule (docs/anti-patterns.md).
  */
 .field {
   display: grid;
@@ -711,6 +712,47 @@ textarea.input { resize: vertical; }
 }
 .field-hint { color: var(--muted-strong); }
 .field-error { color: var(--status-bad); font-weight: 600; }
+
+/* ── callout: a note set apart from the text ─────────────────────────────
+ *   <aside class="callout">
+ *     <p class="callout-title">Importante</p>
+ *     <p>Las sugerencias las revisa siempre una persona.</p>
+ *   </aside>
+ *   <div class="callout callout--bad" role="alert">…</div>
+ *
+ * A neutral outline on the raised surface: no coloured side rule and no
+ * tinted fill (docs/anti-patterns.md). The state variants colour the whole
+ * outline and the title with the status roles, which are ≥4.5:1 on the
+ * surface in every recipe and theme. Colour is never the only signal: say
+ * the state in the title or the text. Use role="alert" for an error that
+ * appears after an action and role="status" for a result; a static note
+ * needs neither.
+ *
+ * One callout per idea. For an error on a single field use .field-error.
+ * On `critical` the ink is large-text only (ivory on plasma), so a callout
+ * there carries one short line at display size, not a paragraph.
+ */
+.callout {
+  border: var(--chimi-border-1) solid var(--hairline-strong);
+  border-radius: var(--chimi-radius-lg);
+  background: var(--surface-raised);
+  padding: var(--stack-sm) var(--stack-md);
+  color: var(--recipe-ink);
+  max-width: var(--chimi-measure-prose);
+}
+.callout > :first-child { margin-top: 0; }
+.callout > :last-child { margin-bottom: 0; }
+.callout-title {
+  margin: 0 0 var(--chimi-space-1);
+  font-weight: 700;
+  color: var(--recipe-ink);
+}
+.callout--ok { border-color: var(--status-ok); }
+.callout--bad { border-color: var(--status-bad); }
+.callout--caution { border-color: var(--status-caution); }
+.callout--ok .callout-title { color: var(--status-ok); }
+.callout--bad .callout-title { color: var(--status-bad); }
+.callout--caution .callout-title { color: var(--status-caution); }
 
 /* ── list rows ───────────────────────────────────────────────────────────
  * Lists of entries separated by hairlines, no boxes (the anti-patterns
@@ -852,6 +894,7 @@ textarea.input { resize: vertical; }
  * tags get a system-color outline and focus uses Highlight.
  */
 @media (forced-colors: active) {
+  .callout { border-color: CanvasText; }
   .btn,
   .btn-ghost,
   .btn-sm,

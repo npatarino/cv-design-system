@@ -14,7 +14,7 @@ Una superficie Chimi se reconoce por **una opinión fuerte y pocas excepciones**
 |---|---|---|
 | Grid de tarjetas idénticas con icono arriba, título, dos líneas y "→" | Es el bloque más repetido de las landings generadas | Lista de filas con hairline; eyebrow + título + párrafo; numeración display |
 | Emojis o glifos (`◉ ◇ ★ ▶ 📑`) como iconografía | Ruido, inconsistencia entre sistemas, lectura de pantalla | Texto, o SVG de línea 1.5 px del mismo set |
-| Bordes de color a la izquierda o arriba de cajas; cajas con tinte de fondo | Señal de "callout" genérico | Hairline neutra, sangría, o la cita en Scilla itálica |
+| Bordes de color a la izquierda o arriba de cajas; cajas con tinte de fondo | Señal de "callout" genérico | `.callout` de `web.css` (contorno neutro, o del color de estado en sus variantes), hairline neutra, sangría, o la cita en Scilla itálica |
 | Degradados de relleno, glows, sombras de color | Decoración sin información | Color plano de la receta |
 | Cristal esmerilado (`backdrop-filter`) | Default de plantilla | Superficie sólida (`--recipe-surface`) |
 | Filas de estadísticas ("50+ · 90 % · 5.0") | Prueba social vacía; suele ser inventada | El número dentro de una frase con contexto, solo si es real |

@@ -2,7 +2,7 @@
   "primitives": {
     "font": {
       "family": {
-        "chaney":    { "$value": "'CHANEY', 'Archivo Black', 'Impact', sans-serif",        "$type": "fontFamily", "$description": "CHANEY — condensed display face." },
+        "chaney":    { "$value": "'CHANEY', 'Archivo Black', 'Impact', sans-serif",        "$type": "fontFamily", "$description": "CHANEY — extended display face." },
         "atAero":    { "$value": "'At Aero', 'Archivo', 'Helvetica Neue', sans-serif",     "$type": "fontFamily", "$description": "At Aero — neutral sans for body copy." },
         "scilla":    { "$value": "'Scilla Narrow', 'Playfair Display', Georgia, serif",    "$type": "fontFamily", "$description": "Scilla Narrow — italic serif for emphasis and quotes." },
         "thunder":   { "$value": "'Thunder', 'Oswald', 'Helvetica Neue', sans-serif",      "$type": "fontFamily", "$description": "Thunder — tall condensed sans for data." },
