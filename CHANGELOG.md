@@ -6,6 +6,12 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-13
+
+### Added
+
+- **`.callout`** in `web.css`: a note set apart from the text, with `.callout--ok`, `.callout--bad`, `.callout--caution` and `.callout-title`. Neutral outline on the raised surface; the variants colour the outline and the title with the status roles. Three sites carried their own copy with a coloured side rule and a tinted fill, which is the anti-pattern this replaces.
+
 ### Fixed
 
 - `chimi-check-slop` reported shadows and borders in the charcoal or ivory primitives (`--chimi-primitives-color-charcoal-100`) as coloured: the neutral exception did not match the real variable names.
