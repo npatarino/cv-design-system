@@ -35,7 +35,7 @@ const THEMES = { dark: {}, light: { "data-theme": "light" } };
 const AA = 4.5;
 const LARGE_TEXT = 3;
 const UI = 3; // WCAG 1.4.11 non-text contrast
-const LARGE_TEXT_ONLY = new Set(["critical:ink"]);
+const LARGE_TEXT_ONLY = new Set(["critical:ink", "critical:ink/raised"]);
 
 // ─────────────────────────────────────────────────────────── color math
 
@@ -294,6 +294,7 @@ function pairsFor(props) {
   const surface = c("--recipe-surface");
   const accent = c("--recipe-accent");
   const onAccent = c("--recipe-on-accent");
+  const raised = over(c("--surface-raised"), surface);
   return [
     ["ink", c("--recipe-ink"), surface],
     ["accent-text", c("--recipe-accent-text"), surface],
@@ -305,6 +306,11 @@ function pairsFor(props) {
     ["status-ok", c("--status-ok"), surface],
     ["status-bad", c("--status-bad"), surface],
     ["status-caution", c("--status-caution"), surface],
+    // .callout: title and outline in a status role on the raised fill.
+    ["status-ok/raised", c("--status-ok"), raised],
+    ["status-bad/raised", c("--status-bad"), raised],
+    ["status-caution/raised", c("--status-caution"), raised],
+    ["ink/raised", c("--recipe-ink"), raised],
   ];
 }
 
