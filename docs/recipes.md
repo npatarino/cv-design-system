@@ -62,7 +62,7 @@ Every recipe also maps the five core font families to semantic roles. Components
 | ink | `#FAFAF8` | ivory |
 | em | `#F9D71C` | lemon |
 | accent | `#02B5B9` | patagonia |
-| warn | `#A64132` | red |
+| warn | `#A64132` | wada |
 
 **Mood**: lectura larga, editorial. La receta que *no se nota*.
 
@@ -73,7 +73,7 @@ Every recipe also maps the five core font families to semantic roles. Components
 
 > STATS, KPI WALLS, DASHBOARDS
 
-Misma paleta que `canvas-quiet` en los dos temas (lemon como `em` en oscuro, red en claro). Lo que cambia es el énfasis tipográfico: Thunder como fuente primaria y protagonista.
+Misma paleta que `canvas-quiet` en los dos temas (lemon como `em` en oscuro, wada en claro). Lo que cambia es el énfasis tipográfico: Thunder como fuente primaria y protagonista.
 
 ✓ Slides big-stat · KPI grid · stat cards · dashboards
 ✗ Body extenso (la lemon cansa) · charlas/talks de ideas (es para datos)
@@ -88,13 +88,13 @@ Misma paleta que `canvas-quiet` en los dos temas (lemon como `em` en oscuro, red
 | ink | `#1C1C1C` | charcoal |
 | em | `#02B5B9` | patagonia |
 | accent | `#1C1C1C` | charcoal |
-| warn | `#A64132` | red |
+| warn | `#A64132` | wada |
 
 **On webs** `web.css` remaps the three accent roles of `paper` to patagonia deep (`#017275`): `accent` and `accent-text` = `#017275`, `on-accent` = ivory. Slides keep the charcoal accent of the token.
 
 **In the dark theme**, a page whose recipe is `paper` turns charcoal: ivory ink, patagonia base for `em`, `accent` and `accent-text`, charcoal `on-accent`. The editorial type stays. A nested `paper` block (`.recipe-scope`) and slides stay ivory. See [theming.md](./theming.md).
 
-**Mood**: calidez sin saturación. Soporta doble énfasis: **patagonia** (vía `em`) para tono reflexivo/técnico y **red** (vía `warn` o `<i>` en web) para tono cálido/emocional. Accent colapsa en charcoal porque ivory no admite patagonia/lemon como CTA sin pelearse.
+**Mood**: calidez sin saturación. Soporta doble énfasis: **patagonia** (vía `em`) para tono reflexivo/técnico y **wada** (vía `warn` o `<i>` en web) para tono cálido/emocional. Accent colapsa en charcoal porque ivory no admite patagonia/lemon como CTA sin pelearse.
 
 ✓ Slides quote, prompts · testimonials · resource-cards · FAQ informativo · tickets, flyers print
 ✗ UI de producto (ivory agota a 60min) · stats grandes (sin contraste para Thunder)
@@ -107,9 +107,9 @@ Misma paleta que `canvas-quiet` en los dos temas (lemon como `em` en oscuro, red
 |---|---|---|
 | surface | `#F9D71C` | lemon |
 | ink | `#1C1C1C` | charcoal |
-| em | `#A64132` | red |
+| em | `#A64132` | wada |
 | accent | `#1C1C1C` | charcoal |
-| warn | `#A64132` | red |
+| warn | `#A64132` | wada |
 
 **Regla del 1**: solo *una* `energy-loud` por página, slide o feed-row.
 
@@ -205,7 +205,7 @@ Bold = below 3:1 (decoration only). Italic = large text only. What that means in
 
 - Text in the accent color is always `--recipe-accent-text`; text on an accent fill is always `--recipe-on-accent`. `--recipe-accent` is for fills and strokes.
 - `warn` on charcoal is a stroke/marker color, never body text in dark mode.
-- `paper` `em` (patagonia on ivory) is only for display-size italics (slides, ≥ 48 px). On webs use `--recipe-ink` or red for inline emphasis (`.prose em` keeps the ink).
+- `paper` `em` (patagonia on ivory) is only for display-size italics (slides, ≥ 48 px). On webs use `--recipe-ink` or wada for inline emphasis (`.prose em` keeps the ink).
 - `cool-fresh` text is `ink` (charcoal). Ivory `em`/`accent` and lemon `warn` are for display words and shapes, not for copy.
 - `critical` ink (ivory on plasma) is large-text only; keep disclaimers short and big. Secondary text on plasma (`--muted`, `--muted-strong`) is charcoal.
 - `.critical-fg-*` on light surfaces (plasma on ivory, 3.50:1) is large-text only.

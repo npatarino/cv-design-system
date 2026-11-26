@@ -19,8 +19,11 @@
       "lemon": {
         "base": { "$value": "#F9D71C", "$type": "color", "$description": "Brand yellow — high-energy accent." }
       },
+      "wada": {
+        "base": { "$value": "#A64132", "$type": "color", "$description": "Wada, the brand red — warmth accent and emphasis." }
+      },
       "red": {
-        "base": { "$value": "#A64132", "$type": "color", "$description": "Brand red — warmth accent and emphasis." }
+        "base": { "$value": "{primitives.color.wada.base}", "$type": "color", "$description": "Deprecated alias of wada.base (0.12.0). Use --chimi-primitives-color-wada-base; removed in 1.0." }
       },
       "plasma": {
         "base": { "$value": "#FF2079", "$type": "color", "$description": "Plasma pink — critical accent. For disclaimers, alerts, controversial statements." }
@@ -28,8 +31,11 @@
     },
     "status": {
       "$description": "Functional state colours for the status-ok / status-bad / status-caution roles. NOT part of the brand palette (the six families under `color`): do not list them as brand colours or use them for decoration.",
+      "wada": {
+        "soft": { "$value": "#D78579", "$type": "color", "$description": "Wada lightened (same hue, L 66%) — status-bad text on dark surfaces (6.1:1 on charcoal.100, 5.1:1 on charcoal.90)." }
+      },
       "red": {
-        "soft": { "$value": "#D78579", "$type": "color", "$description": "Brand red lightened (same hue, L 66%) — status-bad text on dark surfaces (6.1:1 on charcoal.100, 5.1:1 on charcoal.90)." }
+        "soft": { "$value": "{primitives.status.wada.soft}", "$type": "color", "$description": "Deprecated alias of status.wada.soft (0.12.0). Use --chimi-primitives-status-wada-soft; removed in 1.0." }
       },
       "green": {
         "base": { "$value": "#2E6B47", "$type": "color", "$description": "Status green — the brand book's existing ok/success green. status-ok text on light surfaces (6.1:1 on ivory.base)." },
