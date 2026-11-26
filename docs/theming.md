@@ -18,24 +18,24 @@ The design system ships **two themes**: `light` and `dark`. Visitors land in lig
 |---|---|---|---|
 | `canvas-quiet` | `surface` | charcoal.100 | ivory.base |
 | `canvas-quiet` | `ink` | ivory.base | charcoal.100 |
-| `canvas-quiet` | `em` | lemon.base | red.base |
+| `canvas-quiet` | `em` | lemon.base | wada.base |
 | `canvas-signal` | `surface` | charcoal.100 | ivory.base |
 | `canvas-signal` | `ink` | ivory.base | charcoal.100 |
-| `canvas-signal` | `em` | lemon.base | red.base |
+| `canvas-signal` | `em` | lemon.base | wada.base |
 | `canvas-quiet` | `accent` | patagonia.base | patagonia.deep |
 | `canvas-signal` | `accent` | patagonia.base | patagonia.deep |
 | `canvas-quiet` / `canvas-signal` | `accent-text` | patagonia.base | patagonia.deep |
 | `canvas-quiet` / `canvas-signal` | `on-accent` | charcoal.100 | ivory.base |
 | `canvas-quiet` / `canvas-signal` | `status-ok` | status.green.soft | status.green.base |
-| `canvas-quiet` / `canvas-signal` | `status-bad` | status.red.soft | red.base |
+| `canvas-quiet` / `canvas-signal` | `status-bad` | status.wada.soft | wada.base |
 | `canvas-quiet` / `canvas-signal` | `status-caution` | lemon.base | status.amber.deep |
 
 Rationale per role:
 
 - **`surface` and `ink`** flip together to keep AA contrast inverted (charcoal-on-ivory is the same eye-safe pair as ivory-on-charcoal).
-- **`em`** flips lemon → red because lemon-on-ivory falls below 1.5:1 (unreadable italic emphasis); red-on-ivory clears AA non-text.
+- **`em`** flips lemon → wada because lemon-on-ivory falls below 1.5:1 (unreadable italic emphasis); wada-on-ivory clears AA non-text.
 - **`accent`** flips patagonia.base → patagonia.deep because patagonia.base on ivory is 2.42:1 (fails even the 3:1 UI threshold); deep on ivory is 5.48:1.
-- **`warn` (red)** keeps its value. On ivory it is 5.87:1, but on charcoal it is only **2.78:1**: in dark mode `warn` is for markers, strokes and large display words, never for body-size text.
+- **`warn` (wada)** keeps its value. On ivory it is 5.87:1, but on charcoal it is only **2.78:1**: in dark mode `warn` is for markers, strokes and large display words, never for body-size text.
 
 `paper` follows the theme **when it is the recipe of the page** (`<body data-recipe="paper">` or `<html data-recipe="paper">`). This is a web-only rule in `web.css`, not a token override, because slides on paper must stay ivory:
 
@@ -46,7 +46,7 @@ Rationale per role:
 | `em` | patagonia.base | patagonia.base |
 | `accent`, `accent-text` | patagonia.base | patagonia.deep |
 | `on-accent` | charcoal.100 | ivory.base |
-| `status-ok` / `status-bad` / `status-caution` | green.soft / red.soft / lemon.base | green.base / red.base / amber.deep |
+| `status-ok` / `status-bad` / `status-caution` | green.soft / wada.soft / lemon.base | green.base / wada.base / amber.deep |
 
 What stays `paper` in the dark is the voice: the editorial type roles (Scilla) are untouched, and `em` is patagonia where the canvas recipes use lemon. Going from a canvas page to an article no longer flips the screen to ivory.
 
@@ -65,7 +65,7 @@ Ratios on canvas-quiet light:
 | Pair | Contrast | Meets AA normal (≥ 4.5:1) |
 | --- | ---: | :---: |
 | `--recipe-ink` (charcoal.100 `#1C1C1C`) on `--recipe-surface` (ivory.base `#FAFAF8`) | **16.31:1** | Yes |
-| `--recipe-em` (red.base `#A64132`) on `--recipe-surface` | **5.87:1** | Yes |
+| `--recipe-em` (wada.base `#A64132`) on `--recipe-surface` | **5.87:1** | Yes |
 | `--recipe-accent` (patagonia.deep `#017275`) on `--recipe-surface` | **5.48:1** | Yes |
 
 Accent-colored text uses `--recipe-accent-text` (patagonia.deep on light canvas, 5.48:1); text on an accent fill uses `--recipe-on-accent` (ivory on patagonia.deep, 5.48:1). `.prose a` uses `--recipe-accent-text` plus an underline. The full table for every recipe and theme is in [recipes.md](recipes.md#contrast-wcag-21).

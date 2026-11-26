@@ -20,7 +20,7 @@
         "meta": { "allowMultipleAccents": false, "allowMultipleStats": false, "allowDeckOverride": false }
       },
       "paper": {
-        "_description": "Editorial primary. Display downscaled. Sin data. Soporta em patagonia y warn red.",
+        "_description": "Editorial primary. Display downscaled. Sin data. Soporta em patagonia y warn wada.",
         "primary":     ["editorial", "body", "code"],
         "secondary":   ["display"],
         "disallowed":  ["data"],

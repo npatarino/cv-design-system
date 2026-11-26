@@ -6,6 +6,16 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-26
+
+### Changed
+
+- **The brand red is `wada`.** `primitives.color.wada.base` (`#A64132`) and `primitives.status.wada.soft` (`#D78579`) replace `color.red.base` and `status.red.soft`, so the token carries the name the brand book uses, like every other colour of the palette. Recipes, `web.css` and the docs point to the new names.
+
+### Deprecated
+
+- `--chimi-primitives-color-red-base` and `--chimi-primitives-status-red-soft` stay as aliases of the `wada` tokens and will be removed in 1.0. Move to `--chimi-primitives-color-wada-base` and `--chimi-primitives-status-wada-soft`.
+
 ## [0.11.0] - 2026-11-13
 
 ### Added

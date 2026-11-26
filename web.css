@@ -132,7 +132,7 @@
   --recipe-accent-text: var(--chimi-primitives-color-patagonia-base);
   --recipe-on-accent:   var(--chimi-primitives-color-charcoal-100);
   --status-ok:          var(--chimi-primitives-status-green-soft);
-  --status-bad:         var(--chimi-primitives-status-red-soft);
+  --status-bad:         var(--chimi-primitives-status-wada-soft);
   --status-caution:     var(--chimi-primitives-color-lemon-base);
 }
 

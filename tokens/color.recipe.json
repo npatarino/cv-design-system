@@ -15,13 +15,13 @@
         },
         "em": {
           "$value": "{primitives.color.lemon.base}", "$type": "color",
-          "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.wada.base}" } }
         },
         "accent": {
           "$value": "{primitives.color.patagonia.base}", "$type": "color",
           "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
         },
-        "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "warn":    { "$value": "{primitives.color.wada.base}",     "$type": "color" },
         "accent-text": {
           "$value": "{primitives.color.patagonia.base}", "$type": "color",
           "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
@@ -35,8 +35,8 @@
           "$extensions": { "chimi.theme": { "light": "{primitives.status.green.base}" } }
         },
         "status-bad": {
-          "$value": "{primitives.status.red.soft}", "$type": "color",
-          "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
+          "$value": "{primitives.status.wada.soft}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.wada.base}" } }
         },
         "status-caution": {
           "$value": "{primitives.color.lemon.base}", "$type": "color",
@@ -73,13 +73,13 @@
         },
         "em": {
           "$value": "{primitives.color.lemon.base}", "$type": "color",
-          "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.wada.base}" } }
         },
         "accent": {
           "$value": "{primitives.color.patagonia.base}", "$type": "color",
           "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
         },
-        "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "warn":    { "$value": "{primitives.color.wada.base}",     "$type": "color" },
         "accent-text": {
           "$value": "{primitives.color.patagonia.base}", "$type": "color",
           "$extensions": { "chimi.theme": { "light": "{primitives.color.patagonia.deep}" } }
@@ -93,8 +93,8 @@
           "$extensions": { "chimi.theme": { "light": "{primitives.status.green.base}" } }
         },
         "status-bad": {
-          "$value": "{primitives.status.red.soft}", "$type": "color",
-          "$extensions": { "chimi.theme": { "light": "{primitives.color.red.base}" } }
+          "$value": "{primitives.status.wada.soft}", "$type": "color",
+          "$extensions": { "chimi.theme": { "light": "{primitives.color.wada.base}" } }
         },
         "status-caution": {
           "$value": "{primitives.color.lemon.base}", "$type": "color",
@@ -125,11 +125,11 @@
         "ink":     { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "em":      { "$value": "{primitives.color.patagonia.base}", "$type": "color" },
         "accent":  { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
-        "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "warn":    { "$value": "{primitives.color.wada.base}",     "$type": "color" },
         "accent-text": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "on-accent": { "$value": "{primitives.color.ivory.base}", "$type": "color" },
         "status-ok": { "$value": "{primitives.status.green.base}", "$type": "color" },
-        "status-bad": { "$value": "{primitives.color.red.base}", "$type": "color" },
+        "status-bad": { "$value": "{primitives.color.wada.base}", "$type": "color" },
         "status-caution": { "$value": "{primitives.status.amber.deep}", "$type": "color" },
         "font-primary": { "$value": "{font.family.editorial}" },
         "weight-primary": { "$value": "{type.editorial.md.fontWeight}" },
@@ -154,9 +154,9 @@
         "_description": "Anuncios, posters, CTAs de evento. Lemon manda.",
         "surface": { "$value": "{primitives.color.lemon.base}",   "$type": "color" },
         "ink":     { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
-        "em":      { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "em":      { "$value": "{primitives.color.wada.base}",     "$type": "color" },
         "accent":  { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
-        "warn":    { "$value": "{primitives.color.red.base}",     "$type": "color" },
+        "warn":    { "$value": "{primitives.color.wada.base}",     "$type": "color" },
         "accent-text": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
         "on-accent": { "$value": "{primitives.color.lemon.base}", "$type": "color" },
         "status-ok": { "$value": "{primitives.color.charcoal.100}", "$type": "color" },
