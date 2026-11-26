@@ -6,6 +6,13 @@ and the project follows [Semantic Versioning](https://semver.org/) (`0.x`).
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-26
+
+### Changed
+
+- **Fonts load as WOFF2.** Every `@font-face` in `fonts.css` lists the `.woff2` first and the original `.otf`/`.ttf` as a fallback. `npatarino/cv-fonts` now carries a `.woff2` of each face, generated losslessly from the original (40-60 % smaller; At Aero drops from ~110 KB to ~43 KB per face). `fetch-fonts` already copied `.woff2`, so sites only need to rebuild.
+- **Font preloads by page type.** `renderSEOHeadHTML` / `SEOHead` take `preloadFontSet: "app" | "editorial" | "article"` and the sets are exported as `FONT_PRELOAD_SETS`. They list the faces that paint in the first viewport, measured on the sites: `app` (tools, listings) CHANEY Extended + Regular, At Aero Medium, Nudica Mono Medium; `editorial` (home, landings, brand book) the CHANEYs, Nudica Mono Medium and Scilla Narrow italic; `article` (long reads) CHANEY Regular, Nudica Mono Medium and Scilla Narrow roman + italic. The default is `app`, so sites that pass nothing (everything on `web-app-kit`) switch from AtAero-Regular/AtAero-Bold/CHANEY-Regular `.otf`, two of which never painted above the fold, to the `app` set in WOFF2. `preloadFontUrls` still wins when given.
+
 ## [0.12.0] - 2026-11-26
 
 ### Changed
