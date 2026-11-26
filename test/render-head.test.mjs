@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { renderSEOHeadHTML } from "../seo/render-head.mjs";
+import { renderSEOHeadHTML, FONT_PRELOAD_SETS } from "../seo/render-head.mjs";
 import { defaultsForSite } from "../seo/defaults.mjs";
 
 const base = { site: "blog", title: "Hola", description: "Descripción de prueba", pathname: "/" };
@@ -38,5 +38,37 @@ describe("renderSEOHeadHTML theme-color", () => {
 
   test("defaults expose no themeColorScheme unless the registry declares one", () => {
     expect("themeColorScheme" in defaultsForSite("blog")).toBe(false);
+  });
+});
+
+describe("renderSEOHeadHTML font preloads", () => {
+  const preloads = (html) =>
+    html.split("\n").filter((l) => l.startsWith('<link rel="preload" as="font"')).map((l) => l.match(/href="([^"]+)"/)[1]);
+
+  test("defaults to the app set, as woff2", () => {
+    const html = renderSEOHeadHTML(base);
+    expect(preloads(html)).toEqual([...FONT_PRELOAD_SETS.app]);
+    expect(html).toContain('<link rel="preload" as="font" type="font/woff2" href="/fonts/CHANEY-Extended.woff2" crossorigin="anonymous">');
+  });
+
+  test("preloadFontSet picks the page type", () => {
+    expect(preloads(renderSEOHeadHTML({ ...base, preloadFontSet: "article" }))).toEqual([...FONT_PRELOAD_SETS.article]);
+    expect(preloads(renderSEOHeadHTML({ ...base, preloadFontSet: "editorial" }))).toEqual([...FONT_PRELOAD_SETS.editorial]);
+  });
+
+  test("an unknown set falls back to app; explicit URLs win", () => {
+    expect(preloads(renderSEOHeadHTML({ ...base, preloadFontSet: "nope" }))).toEqual([...FONT_PRELOAD_SETS.app]);
+    const html = renderSEOHeadHTML({ ...base, preloadFontSet: "article", preloadFontUrls: ["/fonts/X.otf"] });
+    expect(preloads(html)).toEqual(["/fonts/X.otf"]);
+    expect(html).toContain('type="font/otf" href="/fonts/X.otf"');
+  });
+
+  test("every set only names faces that fonts.css declares", async () => {
+    const css = await Bun.file(new URL("../fonts.css", import.meta.url)).text();
+    for (const url of Object.values(FONT_PRELOAD_SETS).flat()) expect(css).toContain(`url('${url}')`);
+  });
+
+  test("preloadFonts: false emits none", () => {
+    expect(preloads(renderSEOHeadHTML({ ...base, preloadFonts: false }))).toEqual([]);
   });
 });

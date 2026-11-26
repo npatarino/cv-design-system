@@ -55,7 +55,8 @@ import { ensureArray } from "./json-ld.mjs";
  * @property {string}  [twitter.creator]
  * @property {Array<object> | object} [jsonLd]
  * @property {boolean} [preloadFonts]                            - Defaults to true.
- * @property {string[]} [preloadFontUrls]                        - When omitted, falls back to the DS canonical font URLs.
+ * @property {string[]} [preloadFontUrls]                        - Explicit list of font files to preload. Wins over `preloadFontSet`.
+ * @property {"app"|"editorial"|"article"} [preloadFontSet]       - Page type whose above-the-fold faces get preloaded (see FONT_PRELOAD_SETS). Defaults to "app".
  * @property {string}  [preloadImage]                            - Hero / LCP image (absolute or path); also rendered with `fetchpriority="high"` by the consumer.
  * @property {{ favicon?: string; favicon32?: string; appleTouchIcon?: string; maskIcon?: string; manifest?: string }} [icons]
  * @property {string}  [titleTemplate]                           - When provided, used as `template.replace("%s", title)`. Defaults to `"<title> · <siteName>"` (with the home page using just `<siteName>`).
@@ -92,11 +93,37 @@ function renderThemeColorTags(override, d) {
   return [`<meta name="theme-color" content="${attr(single)}">`];
 }
 
-const DEFAULT_FONT_URLS = [
-  "/fonts/AtAero-Regular.otf",
-  "/fonts/AtAero-Bold.otf",
-  "/fonts/CHANEY-Regular.otf",
-];
+/**
+ * Faces that paint in the first viewport, by page type (measured on the
+ * sites at 1280x800 and 390x844, both themes). SiteHeader always paints
+ * CHANEY Regular (wordmark) and Nudica Mono Medium (nav, eyebrows).
+ *   app        tools and listings: CHANEY Extended titles, At Aero Medium UI.
+ *   editorial  home, landings, brand book: CHANEY Extended + Scilla italic.
+ *   article    long reads: Scilla Narrow roman and italic.
+ * WOFF2 since 0.13.0 (fonts.css lists it first).
+ */
+export const FONT_PRELOAD_SETS = Object.freeze({
+  app: Object.freeze([
+    "/fonts/CHANEY-Extended.woff2",
+    "/fonts/CHANEY-Regular.woff2",
+    "/fonts/AtAero-Medium.woff2",
+    "/fonts/NudicaMono-Medium.woff2",
+  ]),
+  editorial: Object.freeze([
+    "/fonts/CHANEY-Extended.woff2",
+    "/fonts/CHANEY-Regular.woff2",
+    "/fonts/NudicaMono-Medium.woff2",
+    "/fonts/ScillaNarrow-RegularItalic.woff2",
+  ]),
+  article: Object.freeze([
+    "/fonts/CHANEY-Regular.woff2",
+    "/fonts/NudicaMono-Medium.woff2",
+    "/fonts/ScillaNarrow-Regular.woff2",
+    "/fonts/ScillaNarrow-RegularItalic.woff2",
+  ]),
+});
+
+const DEFAULT_FONT_URLS = FONT_PRELOAD_SETS.app;
 
 /** MIME type for a font URL, by extension. Falls back to font/woff2. */
 export function fontMimeType(href) {
@@ -260,11 +287,11 @@ export function renderSEOHeadHTML(props) {
   lines.push(...renderThemeColorTags(props.themeColor, d));
   lines.push(`<meta name="msapplication-TileColor" content="${attr(d.themeColor)}">`);
 
-  const fontUrls = props.preloadFontUrls ?? DEFAULT_FONT_URLS;
+  const fontUrls = props.preloadFontUrls ?? FONT_PRELOAD_SETS[props.preloadFontSet] ?? DEFAULT_FONT_URLS;
   if (props.preloadFonts !== false && fontUrls.length) {
     for (const href of fontUrls) {
       // A preload whose `type` does not match the file is discarded by the
-      // browser (and logged as an unused preload). The DS ships .otf today.
+      // browser (and logged as an unused preload), so type follows the extension.
       lines.push(
         `<link rel="preload" as="font" type="${fontMimeType(href)}" href="${attr(href)}" crossorigin="anonymous">`,
       );

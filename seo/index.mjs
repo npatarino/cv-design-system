@@ -33,5 +33,6 @@ export { renderManifest, renderManifestJson } from "./manifest.mjs";
 export {
   renderSEOHeadHTML,
   SEO_HEAD_DEFAULT_FONT_URLS,
+  FONT_PRELOAD_SETS,
   SEO_HEAD_DEFAULT_ICONS,
 } from "./render-head.mjs";

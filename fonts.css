@@ -3,7 +3,7 @@
  *
  * Why this exists:
  *   The brand uses five custom typefaces (CHANEY, At Aero, Scilla Narrow,
- *   Thunder, Nudica Mono). They are licensed, so the .otf/.ttf files are
+ *   Thunder, Nudica Mono). They are licensed, so the font files are
  *   NOT in this package: they live in the private repo npatarino/cv-fonts
  *   and each site copies them into its own /fonts/ path at build time.
  *
@@ -28,87 +28,106 @@
  *     sites can drop the size-adjust if they want CHANEY at native size.
  *   - font-display: swap → render fallback first, then swap when the
  *     custom font loads. Avoids invisible-text-during-load on slow nets.
+ *   - Each face lists its .woff2 first (40-60 % smaller) and the original
+ *     .otf/.ttf as a fallback; cv-fonts carries both since 0.13.0. The
+ *     browser downloads only the first source it supports.
  */
 
 @font-face {
   font-family: 'CHANEY';
-  src: url('/fonts/CHANEY-Regular.otf') format('opentype');
+  src: url('/fonts/CHANEY-Regular.woff2') format('woff2'),
+       url('/fonts/CHANEY-Regular.otf') format('opentype');
   font-weight: 400; font-style: normal; font-display: swap;
   size-adjust: 75%;
 }
 @font-face {
   font-family: 'CHANEY';
-  src: url('/fonts/CHANEY-Extended.otf') format('opentype');
+  src: url('/fonts/CHANEY-Extended.woff2') format('woff2'),
+       url('/fonts/CHANEY-Extended.otf') format('opentype');
   font-weight: 700 900; font-style: normal; font-display: swap;
   size-adjust: 75%;
 }
 @font-face {
   font-family: 'At Aero';
-  src: url('/fonts/AtAero-Regular.otf') format('opentype');
+  src: url('/fonts/AtAero-Regular.woff2') format('woff2'),
+       url('/fonts/AtAero-Regular.otf') format('opentype');
   font-weight: 400; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'At Aero';
-  src: url('/fonts/AtAero-Medium.otf') format('opentype');
+  src: url('/fonts/AtAero-Medium.woff2') format('woff2'),
+       url('/fonts/AtAero-Medium.otf') format('opentype');
   font-weight: 500; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'At Aero';
-  src: url('/fonts/AtAero-Semibold.otf') format('opentype');
+  src: url('/fonts/AtAero-Semibold.woff2') format('woff2'),
+       url('/fonts/AtAero-Semibold.otf') format('opentype');
   font-weight: 600; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'At Aero';
-  src: url('/fonts/AtAero-Bold.otf') format('opentype');
+  src: url('/fonts/AtAero-Bold.woff2') format('woff2'),
+       url('/fonts/AtAero-Bold.otf') format('opentype');
   font-weight: 700; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'At Aero';
-  src: url('/fonts/AtAero-RegularItalic.otf') format('opentype');
+  src: url('/fonts/AtAero-RegularItalic.woff2') format('woff2'),
+       url('/fonts/AtAero-RegularItalic.otf') format('opentype');
   font-weight: 400; font-style: italic; font-display: swap;
 }
 @font-face {
   font-family: 'Scilla Narrow';
-  src: url('/fonts/ScillaNarrow-Regular.otf') format('opentype');
+  src: url('/fonts/ScillaNarrow-Regular.woff2') format('woff2'),
+       url('/fonts/ScillaNarrow-Regular.otf') format('opentype');
   font-weight: 400 700; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'Scilla Narrow';
-  src: url('/fonts/ScillaNarrow-RegularItalic.otf') format('opentype');
+  src: url('/fonts/ScillaNarrow-RegularItalic.woff2') format('woff2'),
+       url('/fonts/ScillaNarrow-RegularItalic.otf') format('opentype');
   font-weight: 400 700; font-style: italic; font-display: swap;
 }
 @font-face {
   font-family: 'Thunder';
-  src: url('/fonts/Thunder-VF.ttf') format('truetype-variations');
+  src: url('/fonts/Thunder-VF.woff2') format('woff2'),
+       url('/fonts/Thunder-VF.ttf') format('truetype-variations');
   font-weight: 100 900; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'Nudica Mono';
-  src: url('/fonts/NudicaMono-Regular.otf') format('opentype');
+  src: url('/fonts/NudicaMono-Regular.woff2') format('woff2'),
+       url('/fonts/NudicaMono-Regular.otf') format('opentype');
   font-weight: 400; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'Nudica Mono';
-  src: url('/fonts/NudicaMono-RegularItalic.otf') format('opentype');
+  src: url('/fonts/NudicaMono-RegularItalic.woff2') format('woff2'),
+       url('/fonts/NudicaMono-RegularItalic.otf') format('opentype');
   font-weight: 400; font-style: italic; font-display: swap;
 }
 @font-face {
   font-family: 'Nudica Mono';
-  src: url('/fonts/NudicaMono-Medium.otf') format('opentype');
+  src: url('/fonts/NudicaMono-Medium.woff2') format('woff2'),
+       url('/fonts/NudicaMono-Medium.otf') format('opentype');
   font-weight: 500; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'Nudica Mono';
-  src: url('/fonts/NudicaMono-MediumItalic.otf') format('opentype');
+  src: url('/fonts/NudicaMono-MediumItalic.woff2') format('woff2'),
+       url('/fonts/NudicaMono-MediumItalic.otf') format('opentype');
   font-weight: 500; font-style: italic; font-display: swap;
 }
 @font-face {
   font-family: 'Nudica Mono';
-  src: url('/fonts/NudicaMono-Bold.otf') format('opentype');
+  src: url('/fonts/NudicaMono-Bold.woff2') format('woff2'),
+       url('/fonts/NudicaMono-Bold.otf') format('opentype');
   font-weight: 700; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'Nudica Mono';
-  src: url('/fonts/NudicaMono-BoldItalic.otf') format('opentype');
+  src: url('/fonts/NudicaMono-BoldItalic.woff2') format('woff2'),
+       url('/fonts/NudicaMono-BoldItalic.otf') format('opentype');
   font-weight: 700; font-style: italic; font-display: swap;
 }

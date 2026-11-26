@@ -70,6 +70,8 @@ interface Props {
   jsonLd?: Array<Record<string, unknown>> | Record<string, unknown>;
   preloadFonts?: boolean;
   preloadFontUrls?: string[];
+  /** Page type whose above-the-fold faces are preloaded (default "app"). */
+  preloadFontSet?: "app" | "editorial" | "article";
   preloadImage?: string;
   icons?: {
     favicon?: string;
